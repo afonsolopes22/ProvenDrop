@@ -1,0 +1,11 @@
+# Configuração local do Supabase CLI (opcional). O deploy das funções usa
+# `supabase functions deploy <nome> --no-verify-jwt`: o Stripe e o pg_cron
+# não enviam JWT do Supabase; a autenticação é feita pela assinatura do
+# webhook e pelo cabeçalho x-cron-secret, respetivamente.
+project_id = "provendrop"
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.email-diario]
+verify_jwt = false

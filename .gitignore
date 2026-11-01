@@ -1,0 +1,10 @@
+# segredos e ficheiros locais do Supabase CLI
+supabase/.env
+supabase/.env.*
+!supabase/.env.example
+supabase/.temp/
+supabase/.branches/
+
+# ferramentas locais
+.claude/
+.claude-flow/
