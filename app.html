@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>A tua área · ProvenDrop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Mesmos tokens do index.html (Hybrid Premium). */
+:root{
+  --light:#F7F8F6; --white:#FFFFFF; --ink:#171A18; --ink-2:#5C645E; --line:#E6E9E5; --line-2:#CFD4CE;
+  --dark:#101310; --dark-card:#191E1A; --dark-line:#2A312C; --on-dark:#F2F4F1; --on-dark-2:#A3ACA5;
+  --green:#78C995; --green-soft:#DFF3E5; --green-ink:#1D6E42;
+  --watch:#E2BC74; --watch-ink:#7A5610; --watch-soft:#F7EDD8;
+  --red-soft:#F8E1DE; --red-ink:#8A2E24;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--light);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+a{color:inherit}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+h1,h2{font-family:var(--display);letter-spacing:-.02em}
+h1{font-size:clamp(32px,4vw,46px);line-height:1.05}
+h2{font-size:clamp(24px,2.6vw,32px);line-height:1.1}
+h3{font-size:17px;font-weight:600;line-height:1.3}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
+.wrap{width:100%;max-width:1100px;margin-inline:auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+/* topo */
+.top{position:sticky;top:0;z-index:10;background:var(--light);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.01em;text-decoration:none}
+.brand svg{display:block}
+.tabs{display:flex;gap:2px}
+.tabs button{padding:8px 12px;border:0;background:none;font:inherit;font-size:15px;color:var(--ink-2);border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:600;box-shadow:inset 0 0 0 1px var(--line-2)}
+.who{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink-2);min-width:0}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch}
+
+/* botões e formulários */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn-go{background:var(--green);color:#101310}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn-sm{min-height:36px;padding:6px 12px;font-size:14px}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;pointer-events:none}
+@media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+input[type=email],select{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line-2);border-radius:6px;background:var(--white);font:inherit;font-size:16px;color:var(--ink)}
+input[type=email]:focus,select:focus{border-color:var(--ink);outline:none}
+.check{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:8px;background:var(--white);font-size:15px;font-weight:500;cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--green-ink)}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.msg{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15px;background:var(--green-soft);color:var(--green-ink)}
+.msg.erro{background:var(--red-soft);color:var(--red-ink)}
+.msg.aviso{background:var(--watch-soft);color:var(--watch-ink)}
+
+/* vistas */
+main{padding-block:32px 72px}
+.view{display:grid;gap:24px}
+.card{background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:clamp(18px,2.4vw,28px)}
+.narrow{max-width:520px;margin:clamp(24px,6vw,72px) auto 0}
+.narrow .lede{margin-top:12px}
+.lede{color:var(--ink-2);font-size:17px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+.head p{color:var(--ink-2)}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-2);border:1px dashed var(--line-2);border-radius:14px}
+
+/* cartões do feed */
+.feed{display:grid;gap:14px}
+.col{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3fr);gap:18px clamp(20px,3vw,40px);align-items:start}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;white-space:nowrap}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.go{color:var(--green-ink)}
+.status.watch{color:var(--watch-ink)}
+.status.watch::before{background:transparent;border:1.5px solid currentColor}
+.col h3{font-family:var(--display);font-size:clamp(24px,2.4vw,30px);font-weight:400;line-height:1.1;letter-spacing:-.015em;margin-top:8px}
+.col .shop{margin-top:6px;font-size:15px;color:var(--ink-2)}
+.col .shop a{text-underline-offset:3px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.facts div{min-width:0}
+.facts dt{font-size:13px;line-height:1.3;color:var(--ink-2)}
+.facts dd{margin:3px 0 0;font-size:19px;font-weight:500;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.cap{margin:14px 0 8px;font-size:13px;color:var(--ink-2)}
+.strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.strip li{display:grid;place-items:center;height:30px;border-radius:3px;border:1px solid var(--line-2);color:var(--ink-2);font-size:12.5px;font-weight:600}
+.strip .ok{background:var(--green);border-color:var(--green);color:#101310}
+.side{display:grid;gap:12px;justify-items:start}
+.score{font-family:var(--display);font-size:clamp(44px,4.4vw,60px);line-height:.9;letter-spacing:-.03em}
+.score small{font-family:var(--body);font-size:14px;letter-spacing:0;color:var(--ink-2);margin-left:3px}
+.nota{font-size:14.5px;color:var(--ink-2)}
+.pref-first{border-color:var(--green-ink)}
+
+/* arquivo */
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end;margin-bottom:18px}
+.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th{padding:10px 14px 10px 0;text-align:left;font-size:13px;font-weight:500;color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+.dt td{padding:14px 14px 14px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.dt .n{font-variant-numeric:tabular-nums}
+.dt .sub{display:block;font-size:13.5px;color:var(--ink-2)}
+.dt a{text-underline-offset:3px}
+
+/* guia de primeiro acesso */
+.guia{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(16,19,16,.55)}
+.guia .card{max-width:620px;width:100%}
+.guia ol{margin-top:18px;display:grid;gap:12px;counter-reset:g}
+.guia li{counter-increment:g;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start}
+.guia li::before{content:counter(g);width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);display:grid;place-items:center}
+.guia b{display:block;font-weight:600}
+.guia span{color:var(--ink-2);font-size:15px}
+
+footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px solid var(--line)}
+
+@media (max-width:860px){
+  .col{grid-template-columns:minmax(0,1fr)}
+  .side{grid-template-columns:auto 1fr;align-items:center}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-left,0px)) max(8px,env(safe-area-inset-bottom,0px));background:var(--white);border-top:1px solid var(--line-2)}
+  .tabs button{font-size:14px;padding:10px 8px}
+  main{padding-bottom:110px}
+  .who span{display:none}
+}
+@media (max-width:640px){
+  .dt thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .dt,.dt tbody,.dt tr,.dt td{display:block;width:100%}
+  .dt tr{padding-block:12px;border-bottom:1px solid var(--line-2)}
+  .dt td{padding:3px 0;border:0;display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px}
+  .dt td::before{content:attr(data-l);font-size:13.5px;color:var(--ink-2)}
+}
+</style>
+<script>
+/* ── CONFIGURAÇÃO DA ÁREA PESSOAL ─────────────────────────────────
+   Só valores públicos. A chave "anon" do Supabase é pública por desenho:
+   o acesso aos dados é controlado pelas políticas RLS no servidor.
+   NUNCA colocar aqui a service role key nem chaves do Stripe. */
+window.PROVENDROP_SUPABASE_URL = "";        /* https://<project-ref>.supabase.co */
+window.PROVENDROP_SUPABASE_ANON_KEY = "";   /* Settings → API → anon public */
+window.PROVENDROP_PORTAL_LINK = "";         /* Stripe → Customer portal → link de login (https://billing.stripe.com/p/login/…). Vazio = botão escondido. */
+window.PROVENDROP_DAILY_TIME = "";          /* ex.: "9:00"; igual ao index.html */
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" translate="no" href="./">
+      <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#101310"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#78C995" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ProvenDrop
+    </a>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Secções" hidden>
+      <button role="tab" data-tab="hoje" aria-selected="true">Hoje</button>
+      <button role="tab" data-tab="arquivo" aria-selected="false">Arquivo</button>
+      <button role="tab" data-tab="prefs" aria-selected="false">Preferências</button>
+      <button role="tab" data-tab="conta" aria-selected="false">Subscrição</button>
+    </nav>
+    <div class="who" id="who" hidden><span id="whoEmail"></span><button class="btn btn-line btn-sm" id="btnSair" type="button">Sair</button></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 0. sem configuração -->
+  <section class="view" id="vConfig" hidden>
+    <div class="card narrow">
+      <h1>A área pessoal ainda não está ativa</h1>
+      <p class="lede">Esta página fica operacional quando a ligação ao servidor for configurada. Até lá, não há nada para ver aqui.</p>
+      <p style="margin-top:18px"><a class="btn btn-line" href="./">Voltar ao site</a></p>
+    </div>
+  </section>
+
+  <!-- 1. entrar -->
+  <section class="view" id="vLogin" hidden>
+    <form class="card narrow" id="formLogin" novalidate>
+      <h1>Entrar na tua área</h1>
+      <p class="lede">Escreve o email com que pagaste. Enviamos-te um link de entrada: sem palavra-passe.</p>
+      <div style="margin-top:22px">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="o-teu@email.pt">
+      </div>
+      <button class="btn btn-go" id="btnLogin" type="submit" style="margin-top:14px;width:100%">Enviar link de entrada</button>
+      <div class="msg" id="msgLogin" hidden></div>
+      <p class="nota" style="margin-top:18px">Ainda não és subscritor? <a href="./#join">Subscreve no site</a>. Cliente da Click? O teu acesso é pelo grupo de WhatsApp da Click.</p>
+    </form>
+  </section>
+
+  <!-- 2. com sessão mas sem subscrição ativa -->
+  <section class="view" id="vSemAcesso" hidden>
+    <div class="card narrow">
+      <h1 id="semTitulo">Sem subscrição ativa</h1>
+      <p class="lede" id="semTexto"></p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+        <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Gerir subscrição</a>
+        <a class="btn btn-line" href="./#join">Subscrever</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. área -->
+  <section class="view" id="vApp" hidden>
+    <div id="tHoje" role="tabpanel">
+      <div class="head">
+        <div><h1 id="hojeTitulo">As coleções de hoje</h1><p id="hojeSub"></p></div>
+        <p class="nota" id="hojeHora"></p>
+      </div>
+      <div class="msg aviso" id="hojePrefs" hidden>Ainda não escolheste o teu nicho nem os teus países. <a href="#" data-go="prefs">Escolher agora</a>: o que te interessa passa a aparecer primeiro.</div>
+      <div class="feed" id="feed" style="margin-top:20px"></div>
+    </div>
+
+    <div id="tArquivo" role="tabpanel" hidden>
+      <div class="head"><div><h1>Arquivo de aprovadas</h1><p>Todas as coleções aprovadas e se a loja ainda as está a anunciar.</p></div></div>
+      <div class="filters" style="margin-top:20px">
+        <div><label for="fNicho">Nicho</label><select id="fNicho"><option value="">Todos</option></select></div>
+        <div><label for="fPais">País em destaque</label><select id="fPais"><option value="">Todos</option></select></div>
+        <label class="check" style="margin-bottom:0"><input type="checkbox" id="fAtivas"> Só ainda a anunciar</label>
+      </div>
+      <div class="card" id="arqBox" style="padding-top:6px"></div>
+    </div>
+
+    <div id="tPrefs" role="tabpanel" hidden>
+      <div class="head"><div><h1>Preferências</h1><p>O teu nicho e os teus países. As coleções que te interessam aparecem primeiro; as outras continuam visíveis.</p></div></div>
+      <form class="card" id="formPrefs" style="margin-top:20px">
+        <h3>Nichos</h3>
+        <div class="checks" id="prefNichos" style="margin-top:10px"></div>
+        <h3 style="margin-top:22px">Países onde vendes</h3>
+        <div class="checks" id="prefPaises" style="margin-top:10px"></div>
+        <button class="btn btn-go" type="submit" style="margin-top:22px">Guardar preferências</button>
+        <div class="msg" id="msgPrefs" hidden></div>
+      </form>
+    </div>
+
+    <div id="tConta" role="tabpanel" hidden>
+      <div class="head"><div><h1>Subscrição</h1><p>Sem fidelização: cancelas quando quiseres.</p></div></div>
+      <div class="card" style="margin-top:20px;display:grid;gap:14px">
+        <div><div class="cap" style="margin:0 0 4px">Email</div><div id="contaEmail" style="font-weight:500"></div></div>
+        <div><div class="cap" style="margin:0 0 4px">Estado</div><div id="contaEstado" style="font-weight:500"></div></div>
+        <div><div class="cap" style="margin:0 0 4px">Membro desde</div><div id="contaDesde" style="font-weight:500"></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+          <a class="btn btn-go" id="contaPortal" href="#" target="_blank" rel="noopener" hidden>Gerir subscrição</a>
+          <button class="btn btn-line" type="button" id="btnGuia">Ver o guia de 1 minuto</button>
+        </div>
+        <p class="nota" id="contaNota"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">As fotografias dos kits pertencem a lojas concorrentes e servem só de referência: nunca as publiques nos teus anúncios. Sem descontos falsos, contadores ou alegações de saúde.</div></footer>
+
+<!-- guia de primeiro acesso -->
+<div class="guia" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
+  <div class="card">
+    <h2 id="guiaTitulo">Bem-vindo. Um minuto para começar.</h2>
+    <ol>
+      <li><b>Abre uma coleção</b><span>Em “Hoje” tens as coleções do dia com a prova de cada uma: anúncios, dias, alcance e países. Abre o link da coleção para ver a loja concorrente.</span></li>
+      <li><b>Descarrega o kit</b><span>Nas aprovadas há um kit: fotos de referência, 20 prompts de criativos, 4 vídeos UGC e o material de Google Ads. Lê primeiro o LEIA-ME.</span></li>
+      <li><b>Cola os prompts no ChatGPT</b><span>Com as fotos de referência anexadas, geras as 20 imagens prontas para anunciar. Nunca publiques as fotos originais.</span></li>
+      <li><b>Lança o Google Ads</b><span>Keywords, negativas, títulos de Shopping e texto da landing page estão no ficheiro 3 - Google Ads. Começa pelo país em destaque.</span></li>
+    </ol>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+      <button class="btn btn-go" type="button" id="guiaOk">Escolher o meu nicho e países</button>
+      <button class="btn btn-line" type="button" id="guiaSaltar">Ver as coleções de hoje</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const url = v => /^https?:\/\//i.test(String(v||"")) ? String(v) : "";
+  const MARKETS = ["IT","ES","FR","DE","GB","US"];
+  const PAIS = {IT:"Itália",ES:"Espanha",FR:"França",DE:"Alemanha",GB:"Reino Unido",US:"Estados Unidos"};
+  const NICHOS = [["Joalharia","Joalharia feminina"],["House Decor","Decoração de casa"],["Roupa Feminina","Roupa de mulher"],["Roupa Masculina","Roupa de homem"]];
+  const nicho = v => (NICHOS.find(n => n[0].toLowerCase() === String(v||"").trim().toLowerCase()) || [v, v])[1] || "";
+  const HORA = String(window.PROVENDROP_DAILY_TIME||"").trim();
+  const PORTAL = url(window.PROVENDROP_PORTAL_LINK);
+  const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("pt-PT");
+  const score = n => n == null || n === "" ? "—" : (Math.round(Number(n)*10)/10).toFixed(1);
+  const dia = v => { if(!v) return ""; const d = new Date(String(v).length === 10 ? v+"T12:00:00" : v); return isNaN(d) ? "" : d.toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"}); };
+  const diaCurto = v => { if(!v) return ""; const d = new Date(String(v).length === 10 ? v+"T12:00:00" : v); return isNaN(d) ? "" : d.toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit",year:"numeric"}); };
+  const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
+
+  const views = ["vConfig","vLogin","vSemAcesso","vApp"];
+  function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
+  function msg(el, texto, tipo){ el.textContent = texto; el.className = "msg" + (tipo ? " "+tipo : ""); el.hidden = !texto; }
+
+  const SB_URL = String(window.PROVENDROP_SUPABASE_URL||"").trim(), SB_KEY = String(window.PROVENDROP_SUPABASE_ANON_KEY||"").trim();
+  if(!/^https:\/\//.test(SB_URL) || !SB_KEY || !window.supabase){ show("vConfig"); return; }
+  const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+  let user = null, sub = null, feedRows = [], verdes = null;
+
+  /* ── sessão ─────────────────────────────────────────────────────── */
+  $("#formLogin").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("#email").value.trim().toLowerCase(), m = $("#msgLogin"), b = $("#btnLogin");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg(m, "Escreve um email válido.", "erro");
+    b.disabled = true; msg(m, "A enviar…");
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false } });
+    b.disabled = false;
+    if(error){
+      const semConta = /signup|not allowed|not found/i.test(error.message);
+      return msg(m, semConta ? "Este email não tem subscrição. Confirma o email com que pagaste ou subscreve no site." : "Não foi possível enviar o link: " + error.message, "erro");
+    }
+    msg(m, "Enviámos-te um link para " + email + ". Abre-o neste dispositivo. Vê também a pasta de spam.");
+  });
+  $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.hash = ""; location.reload(); });
+
+  sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
+  sb.auth.getSession().then(({ data }) => entrar(data.session));
+
+  async function entrar(session){
+    user = session?.user || null;
+    if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
+    $("#whoEmail").textContent = user.email || ""; $("#who").hidden = false;
+    const { data, error } = await sb.from("subscritores").select("email,origem,estado,nichos,paises,guia_visto,criado_em").eq("user_id", user.id).maybeSingle();
+    sub = error ? null : data;
+    if(!sub || sub.origem !== "direto" || sub.estado !== "ativo") return semAcesso();
+    show("vApp");
+    renderConta(); renderPrefsForm();
+    if(!sub.guia_visto) abrirGuia(); else if(!(sub.nichos||[]).length) $("#hojePrefs").hidden = false;
+    carregarHoje();
+  }
+
+  function semAcesso(){
+    const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal");
+    if(!sub){ t.textContent = "Sem subscrição ativa"; p.textContent = "Este email tem conta mas não está ligado a nenhuma subscrição ProvenDrop ativa. Se acabaste de pagar, aguarda um minuto e recarrega a página."; }
+    else if(sub.estado === "em_atraso"){ t.textContent = "Pagamento em atraso"; p.textContent = "O último pagamento falhou. Atualiza o cartão em “Gerir subscrição” e o acesso volta de imediato."; }
+    else if(sub.estado === "cancelado"){ t.textContent = "Subscrição cancelada"; p.textContent = "A tua subscrição foi cancelada. Podes voltar a subscrever quando quiseres."; }
+    else { t.textContent = "Sem acesso à área"; p.textContent = "Clientes da Click recebem as coleções no grupo de WhatsApp da Click, não nesta área."; }
+    g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
+    show("vSemAcesso");
+  }
+
+  /* ── separadores ────────────────────────────────────────────────── */
+  const paineis = { hoje:"#tHoje", arquivo:"#tArquivo", prefs:"#tPrefs", conta:"#tConta" };
+  function go(tab){
+    Object.entries(paineis).forEach(([k, s]) => { $(s).hidden = k !== tab; });
+    document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+    if(tab === "arquivo" && !verdes) carregarArquivo();
+    scrollTo({ top: 0 });
+  }
+  $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) go(b.dataset.tab); });
+  document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
+
+  /* ── hoje ───────────────────────────────────────────────────────── */
+  async function carregarHoje(){
+    const feed = $("#feed");
+    feed.innerHTML = '<div class="empty">A carregar…</div>';
+    const ult = await sb.from("feed_dia").select("dia").order("dia", { ascending: false }).limit(1).maybeSingle();
+    if(ult.error){ feed.innerHTML = '<div class="empty">Não foi possível carregar as coleções: ' + esc(ult.error.message) + '</div>'; return; }
+    if(!ult.data){ feed.innerHTML = '<div class="empty">Ainda não há coleções publicadas. ' + (HORA ? "Chegam todos os dias às " + esc(HORA) + "." : "") + '</div>'; return; }
+    const d = ult.data.dia;
+    const { data, error } = await sb.from("feed_dia").select("*").eq("dia", d).order("ordem");
+    if(error){ feed.innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
+    feedRows = data || [];
+    const hoje = new Date().toISOString().slice(0,10);
+    $("#hojeTitulo").textContent = d === hoje ? "As coleções de hoje" : "Coleções de " + dia(d);
+    $("#hojeSub").textContent = d === hoje ? dia(d) : "Ainda não há lista de hoje; esta é a mais recente.";
+    $("#hojeHora").textContent = HORA ? "Novas coleções todos os dias às " + HORA : "";
+    renderFeed();
+  }
+
+  function renderFeed(){
+    const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
+    const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
+    $("#feed").innerHTML = rows.length ? rows.map(cartao).join("") : '<div class="empty">Sem coleções neste dia.</div>';
+  }
+
+  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Mercados">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
+
+  function cartao(r){
+    const ok = aprovada(r), link = url(r.link_colecao), zip = url(r.zip_url), mk = String(r.mercado_destaque||"").toUpperCase();
+    const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
+    const kit = ok ? (r.zip_path ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Descarregar kit</button>`
+                    : zip ? `<a class="btn btn-go" href="${esc(zip)}" target="_blank" rel="noopener">Descarregar kit</a>`
+                    : `<span class="nota">Kit a preparar</span>`) : `<span class="nota">Sem kit: ainda não aprovada</span>`;
+    return `<article class="card col${pref ? " pref-first" : ""}">
+      <div>
+        <span class="status ${ok ? "go" : "watch"}">${ok ? "Aprovada" : "A observar"}</span>
+        <h3>${esc(r.colecao || "Coleção")}</h3>
+        <p class="shop"><b>${esc(nicho(r.nicho))}</b>${mk ? " · em destaque: " + esc(PAIS[mk] || mk) : ""}<br>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>
+        ${r.nota ? `<p class="nota" style="margin-top:10px">${esc(r.nota)}</p>` : ""}
+      </div>
+      <div>
+        <dl class="facts">
+          <div><dt>Anúncios ativos</dt><dd>${fmt(r.anuncios_ativos)}</dd></div>
+          <div><dt>Dias a anunciar</dt><dd>${fmt(r.dias_ativo)}</dd></div>
+          <div><dt>Alcance UE</dt><dd>${fmt(r.alcance_eu)}</dd></div>
+        </dl>
+        <p class="cap">${r.trends_validados != null ? `Procura validada em ${esc(r.trends_validados)} de 6 países` : "Procura: sem dados"}</p>
+        ${strip(mk, r.mercados_verdes)}
+      </div>
+      <div class="side">
+        <div class="score">${score(r.score)}<small>/ 10</small></div>
+        ${kit}
+      </div>
+    </article>`;
+  }
+
+  /* kits: URL assinada (1 h) do bucket privado, só funciona para membros ativos (RLS) */
+  document.addEventListener("click", async e => {
+    const b = e.target.closest("[data-zip]"); if(!b) return;
+    b.disabled = true; const t = b.textContent; b.textContent = "A preparar…";
+    const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, 3600);
+    b.disabled = false; b.textContent = t;
+    if(error || !data?.signedUrl) return alert("Não foi possível preparar o kit: " + (error?.message || "tenta outra vez"));
+    const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  /* ── arquivo ────────────────────────────────────────────────────── */
+  async function carregarArquivo(){
+    const box = $("#arqBox"); box.innerHTML = '<div class="empty">A carregar…</div>';
+    const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
+    if(error){ box.innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
+    verdes = data || [];
+    const nichos = [...new Set(verdes.map(r => r.nicho).filter(Boolean))], paises = [...new Set(verdes.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))];
+    $("#fNicho").innerHTML = '<option value="">Todos</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
+    $("#fPais").innerHTML = '<option value="">Todos</option>' + paises.map(p => `<option value="${esc(p)}">${esc(PAIS[p] || p)}</option>`).join("");
+    renderArquivo();
+  }
+  ["#fNicho","#fPais","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  function renderArquivo(){
+    const n = $("#fNicho").value, p = $("#fPais").value, so = $("#fAtivas").checked;
+    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && (!so || r.ainda_a_anunciar === true));
+    if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">Sem coleções com estes filtros.</div>'; return; }
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Aprovada</th><th>Coleção</th><th>Nicho</th><th>País</th><th>Score</th><th>Anúncios</th><th>Ainda a anunciar</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+      const link = url(r.link_colecao), zip = url(r.zip_url), mk = String(r.mercado_destaque||"").toUpperCase();
+      const kit = r.zip_path ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : zip ? `<a class="btn btn-line btn-sm" href="${esc(zip)}" target="_blank" rel="noopener">Kit</a>` : "—";
+      return `<tr>
+        <td data-l="Aprovada"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
+        <td data-l="Coleção"><span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : esc(r.colecao)}<span class="sub">${esc(r.loja||"")}</span></span></td>
+        <td data-l="Nicho"><span>${esc(nicho(r.nicho))}</span></td>
+        <td data-l="País"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
+        <td class="n" data-l="Score"><span>${score(r.score)}</span></td>
+        <td class="n" data-l="Anúncios"><span>${fmt(r.anuncios_ativos)} na aprovação${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} em ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td data-l="Ainda a anunciar"><span>${r.ainda_a_anunciar === true ? "Sim" : r.ainda_a_anunciar === false ? "Não" : "—"}</span></td>
+        <td data-l="Kit"><span>${kit}</span></td>
+      </tr>`; }).join("")}</tbody></table>`;
+  }
+
+  /* ── preferências ───────────────────────────────────────────────── */
+  function renderPrefsForm(){
+    const n = new Set(sub?.nichos||[]), p = new Set(sub?.paises||[]);
+    $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
+    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${PAIS[c]}</label>`).join("");
+  }
+  $("#formPrefs").addEventListener("submit", async e => {
+    e.preventDefault();
+    const nichos = [...document.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
+    const paises = [...document.querySelectorAll('input[name="pais"]:checked')].map(i => i.value);
+    const { error } = await sb.from("subscritores").update({ nichos, paises }).eq("user_id", user.id);
+    if(error) return msg($("#msgPrefs"), "Não foi possível guardar: " + error.message, "erro");
+    sub.nichos = nichos; sub.paises = paises; $("#hojePrefs").hidden = nichos.length > 0;
+    msg($("#msgPrefs"), "Preferências guardadas."); renderFeed();
+  });
+
+  /* ── subscrição ─────────────────────────────────────────────────── */
+  function renderConta(){
+    $("#contaEmail").textContent = sub.email; $("#contaEstado").textContent = { ativo:"Ativa", em_atraso:"Pagamento em atraso", cancelado:"Cancelada" }[sub.estado] || sub.estado;
+    $("#contaDesde").textContent = dia(sub.criado_em) || "—";
+    const g = $("#contaPortal"); g.hidden = !PORTAL; if(PORTAL) g.href = PORTAL;
+    $("#contaNota").textContent = PORTAL ? "Em “Gerir subscrição” mudas o cartão, vês as faturas e cancelas. Pede-te o email e envia-te um link de acesso ao portal." : "Para alterar o cartão ou cancelar, responde ao email de boas-vindas.";
+  }
+
+  /* ── guia ───────────────────────────────────────────────────────── */
+  function abrirGuia(){ $("#guia").hidden = false; $("#guiaOk").focus(); }
+  async function fecharGuia(tab){
+    $("#guia").hidden = true;
+    if(sub && !sub.guia_visto){ sub.guia_visto = true; await sb.from("subscritores").update({ guia_visto: true }).eq("user_id", user.id); }
+    if(!(sub?.nichos||[]).length && tab !== "prefs") $("#hojePrefs").hidden = false;
+    go(tab);
+  }
+  $("#guiaOk").addEventListener("click", () => fecharGuia("prefs"));
+  $("#guiaSaltar").addEventListener("click", () => fecharGuia("hoje"));
+  $("#btnGuia").addEventListener("click", abrirGuia);
+  addEventListener("keydown", e => { if(e.key === "Escape" && !$("#guia").hidden) fecharGuia("hoje"); });
+})();
+</script>
+</body>
+</html>
