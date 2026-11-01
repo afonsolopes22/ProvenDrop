@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="description" content="Ecommerce collections already backed by real advertising activity and validated market demand. Daily opportunities and complete launch kits, delivered on WhatsApp.">
+<meta name="description" content="Discover. Validate. Create. Launch. More than product research: market validation, AI-powered creative production and Google Ads campaign preparation for ecommerce, delivered as Launch Kits.">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#F7F8F6">
 <title>ProvenDrop</title>
@@ -245,14 +245,6 @@ h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
 .matrix td{height:clamp(36px,3.6vw,52px);background:var(--white);border:1px solid var(--line-2);border-radius:3px}
 .matrix td.on{background:var(--green);border-color:var(--green)}
 .matrix figcaption{margin-top:12px;font-size:14.5px;color:var(--ink-2)}
-.price{background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:clamp(24px,3vw,40px);display:grid;gap:20px}
-.amount{font-family:var(--display);font-size:clamp(72px,8vw,112px);line-height:.9;letter-spacing:-.035em}
-.amount small{font-family:var(--body);font-size:18px;letter-spacing:0;color:var(--ink-2);margin-left:6px}
-.fee{font-size:17px;font-weight:500}
-.price ul{display:grid;gap:9px;padding-top:18px;border-top:1px solid var(--line);font-size:16px}
-.price li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
-.price li svg{margin-top:5px;color:var(--green-ink)}
-.price .btn{width:100%}
 .pay-note{font-size:14.5px;color:var(--ink-2)}
 .pay-note a{text-underline-offset:3px}
 
@@ -276,6 +268,86 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
 .foot ul{display:grid;gap:6px}
 .foot a{text-underline-offset:3px}
 
+/* overview: three components */
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;background:var(--line-2);border:1px solid var(--line-2);border-radius:12px;overflow:hidden}
+.pillars>li{background:var(--white);padding:clamp(22px,2.4vw,34px);display:grid;gap:12px;align-content:start;min-width:0}
+.pillars .k{font-family:var(--display);font-size:15px;letter-spacing:.08em;color:var(--green-ink)}
+.pillars h3{font-family:var(--display);font-size:clamp(26px,2.4vw,34px);font-weight:400;line-height:1.1;letter-spacing:-.015em}
+.pillars p{color:var(--ink-2);font-size:16px}
+.pillars ul{margin-top:6px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:8px;font-size:15.5px}
+.pillars ul li{display:grid;grid-template-columns:10px minmax(0,1fr);gap:12px}
+.pillars ul li::before{content:"";width:8px;height:8px;margin-top:8px;border-radius:50%;background:var(--green)}
+.flow{margin-top:clamp(44px,5vw,72px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px clamp(20px,2.4vw,36px);counter-reset:f}
+.flow li{counter-increment:f;padding-top:18px;border-top:2px solid var(--ink);min-width:0}
+.flow li:last-child{border-top-color:var(--green-ink)}
+.flow li::before{content:counter(f,decimal-leading-zero);display:block;font-size:13px;letter-spacing:.08em;color:var(--ink-2);margin-bottom:10px}
+.flow b{display:block;font-family:var(--display);font-size:clamp(30px,3.2vw,44px);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.flow span{display:block;margin-top:10px;font-size:16px;color:var(--ink-2)}
+
+/* launch kit (dark) */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;background:var(--dark-line);border:1px solid var(--dark-line);border-radius:12px;overflow:hidden}
+.tile{background:var(--dark-card);padding:clamp(20px,2.2vw,30px);min-height:clamp(210px,17vw,260px);display:flex;flex-direction:column;gap:8px;min-width:0}
+.tile.creative{background:#17271D}
+.tile .tag{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--on-dark-2)}
+.tile .big{font-family:var(--display);font-size:clamp(60px,5.8vw,88px);line-height:.9;letter-spacing:-.03em;color:var(--green);margin-top:auto}
+.tile .ico{margin-top:auto;color:var(--green)}
+.tile .ico svg{width:40px;height:40px}
+.tile b{font-weight:600;font-size:18px;line-height:1.3}
+.tile .d{font-size:15px;color:var(--on-dark-2)}
+.kit-foot{margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,72px);align-items:start}
+.dark .window{background:var(--dark-card);border-color:var(--dark-line)}
+.dark .window-bar{border-bottom-color:var(--dark-line)}
+.dark .window-bar span:last-child{color:var(--on-dark-2)}
+.dark .tree li{border-bottom-color:var(--dark-line)}
+.dark .tree svg,.dark .tree span{color:var(--on-dark-2)}
+.dark .warn{background:#2A2416;color:var(--on-dark)}
+.dark .warn b{color:var(--watch)}
+.dark .kit-side .small{color:var(--on-dark-2)}
+.ctr{margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px clamp(24px,4vw,56px);align-items:center;padding:clamp(22px,2.6vw,36px);border:1px solid var(--dark-line);border-radius:12px;background:var(--dark-card)}
+.ctr[hidden]{display:none}
+.ctr-num{font-family:var(--display);font-size:clamp(64px,7vw,104px);line-height:.9;letter-spacing:-.035em;color:var(--green)}
+.ctr-num small{display:block;font-family:var(--body);font-size:15px;letter-spacing:0;color:var(--on-dark-2);margin-top:8px}
+.ctr p{font-size:16px}
+.ctr .ctr-dis{margin-top:10px;font-size:14px;color:var(--on-dark-2)}
+
+/* delivery (light section, dark phone) */
+#delivery .cmds,#delivery .cmd{border-color:var(--line-2)}
+#delivery .cmd code{color:var(--green-ink)}
+#delivery .cmd span.d,#delivery .wa-points span{color:var(--ink-2)}
+#delivery .copy{color:var(--ink);border-color:var(--line-2)}
+#delivery .copy.done{border-color:var(--green-ink);color:var(--green-ink)}
+.chan{padding-top:22px;border-top:2px solid var(--ink)}
+.chan.direct{border-top-color:var(--green-ink)}
+.chan+.chan{margin-top:clamp(32px,4vw,48px)}
+.chan .tag{display:block;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--green-ink);margin-bottom:10px}
+.chan h3{font-family:var(--display);font-size:clamp(26px,2.4vw,34px);font-weight:400;line-height:1.1;letter-spacing:-.015em}
+.chan p{margin-top:10px;color:var(--ink-2)}
+.chan .wa-points{margin:18px 0 0}
+.chan h4{margin:22px 0 10px;font-size:15px;font-weight:600}
+
+/* join: two memberships */
+.join-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2vw,28px);align-items:stretch}
+.plan{position:relative;background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:clamp(24px,3vw,40px);display:flex;flex-direction:column;gap:18px;min-width:0;overflow:hidden}
+.plan::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--ink)}
+.plan.direct::before{background:var(--green)}
+.plan-tag{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.plan h3{font-family:var(--display);font-size:clamp(30px,3vw,42px);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.plan-for{font-size:17px;color:var(--ink-2)}
+.plan-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding-top:18px;border-top:1px solid var(--line)}
+.plan-price .amt{font-family:var(--display);font-size:clamp(44px,4.4vw,60px);line-height:.9;letter-spacing:-.03em}
+.plan-price small{font-size:16px;color:var(--ink-2)}
+.plan-price .fee{flex-basis:100%;font-size:15px;font-weight:500}
+.plan ul{display:grid;gap:9px;padding-top:18px;border-top:1px solid var(--line);font-size:16px}
+.plan li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
+.plan li svg{margin-top:5px;color:var(--green-ink)}
+.plan .btn{width:100%;margin-top:auto}
+.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;pointer-events:none}
+.compare{margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px clamp(24px,3vw,44px);padding-top:24px;border-top:1px solid var(--line-2)}
+.compare div{min-width:0}
+.compare dt{font-weight:600;font-size:16px}
+.compare dd{margin:8px 0 0;font-size:15.5px;color:var(--ink-2)}
+.join-note{margin-top:24px;font-size:15px;color:var(--ink-2);max-width:72ch}
+
 /* the single orchestrated moment: the hero assembles once */
 @media (prefers-reduced-motion:no-preference){
   html{scroll-behavior:smooth}
@@ -294,9 +366,11 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
   .cats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .niches{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recheck,.faq-grid{grid-template-columns:minmax(0,1fr)}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .compare,.flow{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:860px){
-  .hero-grid,.head,.kit-grid,.wa-grid,.pair{grid-template-columns:minmax(0,1fr)}
+  .hero-grid,.head,.kit-grid,.kit-foot,.wa-grid,.pair,.pillars,.join-grid{grid-template-columns:minmax(0,1fr)}
   .head{align-items:start}
   .phone{margin-inline:auto}
   .menu{display:block}
@@ -320,6 +394,10 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
   .cmd{grid-template-columns:minmax(0,1fr) auto}
   .cmd span.d{grid-column:1/-1;grid-row:2}
   .wa-points{grid-template-columns:minmax(0,1fr)}
+  .tiles,.compare,.flow{grid-template-columns:minmax(0,1fr)}
+  .tile{min-height:0}
+  .tile .big,.tile .ico{margin-top:8px}
+  .ctr{grid-template-columns:minmax(0,1fr)}
   .mk li{grid-template-columns:minmax(0,1fr) auto}
   .mk .state{grid-column:1/-1}
   /* archive table becomes a stacked list on phones */
@@ -332,10 +410,21 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
 }
 </style>
 <script>
-/* ── PAYMENT CONFIGURATION ─────────────────────────────────────────
-   Paste the Stripe Payment Link here (€15/month + €25 joining fee).
-   While it is empty, the subscribe buttons open WhatsApp. */
-window.PROVENDROP_STRIPE_LINK = "";
+/* ── MEMBERSHIP CONFIGURATION ─────────────────────────────────────
+   Two independent Stripe destinations, one per membership option.
+   Leave a link empty until the product exists in Stripe: its button
+   stays disabled and says enrolment is not open yet. Never paste a
+   guessed or test URL here. */
+window.PROVENDROP_CLICK_STRIPE_LINK = "";   /* Stripe product of the Click Dynamics partnership */
+window.PROVENDROP_DIRECT_STRIPE_LINK = "";  /* Stripe Payment Link of the ProvenDrop Direct product (redirects to bem-vindo.html) */
+
+/* Optional public contact for Direct members (an e-mail address). Empty = not shown. */
+window.PROVENDROP_CONTACT_EMAIL = "";
+
+/* Observed Google Ads CTR. The indicator is shown ONLY when all four
+   fields are filled from documented campaign data (value in percent,
+   number of campaigns, period, Google Ads format). Empty = hidden. */
+window.PROVENDROP_CTR = { value: "", campaigns: "", period: "", format: "" };
 </script>
 </head>
 <body>
@@ -351,12 +440,13 @@ window.PROVENDROP_STRIPE_LINK = "";
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg>
     </button>
     <nav class="nav" id="nav" aria-label="Main">
-      <a href="#how-it-works">How it works</a>
+      <a href="#overview">What it is</a>
       <a href="#intelligence">Intelligence</a>
+      <a href="#kit">Launch Kit</a>
       <a href="#markets">Markets</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#join">Join</a>
       <a href="#faq">FAQ</a>
-      <a class="btn btn-go btn-sm" href="#pricing">Get Access</a>
+      <a class="btn btn-go btn-sm" href="#join">Join ProvenDrop</a>
     </nav>
   </div>
 </header>
@@ -365,11 +455,11 @@ window.PROVENDROP_STRIPE_LINK = "";
   <div class="hero wrap">
     <div class="hero-grid">
       <div>
-        <h1 class="in" style="--i:0">Stop guessing. Start launching proven collections.</h1>
-        <p class="lede in" style="--i:1">Discover ecommerce collections already backed by real advertising activity and validated market demand. Get daily opportunities and complete launch kits directly through WhatsApp.</p>
+        <h1 class="in" style="--i:0">Discover. Validate. Create. Launch.</h1>
+        <p class="lede in" style="--i:1">More than product research. Everything you need to turn ecommerce opportunities into advertising campaigns.</p>
         <div class="cta in" style="--i:2">
-          <a class="btn btn-go" href="#pricing">Get Daily Access</a>
-          <a class="btn btn-line" href="#how-it-works">Discover How It Works</a>
+          <a class="btn btn-go" href="#join">Choose how to join</a>
+          <a class="btn btn-line" href="#overview">See how it works</a>
         </div>
       </div>
       <aside class="panel in" id="heroPanel" style="--i:2" aria-label="Latest daily entry. Collection names, stores and links are reserved for members.">
@@ -388,10 +478,57 @@ window.PROVENDROP_STRIPE_LINK = "";
             <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
           </dl>
         <ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul>
-        <p class="panel-sub" style="margin:0">Names, stores, links and kits are sent to members on WhatsApp.</p>
+        <p class="panel-sub" style="margin:0">Names, stores, links and Launch Kits are sent to members through their membership channel.</p>
       </aside>
     </div>
   </div>
+
+  <section id="overview" style="padding-top:0">
+    <div class="wrap">
+      <div class="head">
+        <h2>Three components, one system</h2>
+        <p class="lede">ProvenDrop is not only product research. It combines market validation, AI-powered creative production and advertising campaign preparation, so every opportunity arrives ready to work on.</p>
+      </div>
+      <ol class="pillars">
+        <li>
+          <span class="k">01</span>
+          <h3>Product Research &amp; Market Validation</h3>
+          <p>Collections discovered from stores already advertising, then validated on advertising evidence and search demand across six markets.</p>
+          <ul>
+            <li>Discover collections and opportunities</li>
+            <li>Analyse advertising evidence and market demand</li>
+            <li>Validate opportunities across different markets</li>
+          </ul>
+        </li>
+        <li>
+          <span class="k">02</span>
+          <h3>AI-Powered Creative Production</h3>
+          <p>Ready-to-use prompts and visual references to produce your own advertising images and UGC videos with the AI tools you already use.</p>
+          <ul>
+            <li>Prompts for advertising images</li>
+            <li>Prompts for UGC videos</li>
+            <li>Visual references for every approved collection</li>
+          </ul>
+        </li>
+        <li>
+          <span class="k">03</span>
+          <h3>Advertising Campaign Preparation</h3>
+          <p>The material a Google Ads campaign needs on day one, prepared for the market where the collection is performing.</p>
+          <ul>
+            <li>Shopping titles, keywords and negative keywords</li>
+            <li>Landing-page copy</li>
+            <li>From discovery to a campaign ready to prepare</li>
+          </ul>
+        </li>
+      </ol>
+      <ol class="flow" aria-label="The ProvenDrop path, in four steps">
+        <li><b>Discover</b><span>Collections already backed by real advertising activity.</span></li>
+        <li><b>Validate</b><span>13 metrics, six markets, measured again 24 hours later.</span></li>
+        <li><b>Create</b><span>Image and UGC video prompts, with visual references.</span></li>
+        <li><b>Launch</b><span>Google Ads keywords, titles and landing copy, ready to use.</span></li>
+      </ol>
+    </div>
+  </section>
 
   <section class="dark" id="intelligence">
     <div class="wrap">
@@ -411,7 +548,7 @@ window.PROVENDROP_STRIPE_LINK = "";
             <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
           </dl><div class="row-mk"><p class="cap">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
-          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Comes with the collection link and a complete launch kit.</p></div>
+          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Comes with the collection link and its Launch Kit.</p></div>
         </article>
         <article class="row" aria-label="Example of an observing entry. Details are reserved for members.">
           <div class="row-name"><span class="status watch">Observing</span><h3><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
@@ -423,7 +560,7 @@ window.PROVENDROP_STRIPE_LINK = "";
           <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Promising but not approved yet, so it has no kit.</p></div>
         </article>
       </div>
-      <p class="members-note">Members can also ask for recent approved collections at any time, by niche or by country, on WhatsApp.</p>
+      <p class="members-note">Approved collections and their Launch Kits reach members through their membership channel: the WhatsApp channel managed by Click, or directly from ProvenDrop.</p>
 
       <div class="archive" id="archive" hidden>
         <div class="archive-head">
@@ -527,15 +664,35 @@ window.PROVENDROP_STRIPE_LINK = "";
     </div>
   </section>
 
-  <section id="kit" style="padding-top:0">
+  <section class="dark" id="kit">
     <div class="wrap">
       <div class="head">
-        <h2>Ready-to-launch kits</h2>
-        <p class="lede">Each confirmed collection comes with one ZIP: the instructions and references to build your ads, and the research behind the decision.</p>
+        <h2>Every approved collection ships as a Launch Kit</h2>
+        <p class="lede">Research tells you what to launch. The Launch Kit gives you what you need to launch it: creative prompts, visual references and the Google Ads material, prepared for the collection’s strongest market.</p>
       </div>
-      <div class="kit-grid">
+      <ul class="tiles" aria-label="What a Launch Kit contains">
+        <li class="tile creative"><span class="tag">Creative production</span><span class="big">20</span><b>Advertising image prompts</b><span class="d">Ready to paste into your image model, one per creative angle.</span></li>
+        <li class="tile creative"><span class="tag">Creative production</span><span class="big">4</span><b>UGC video prompts</b><span class="d">Script and visual direction for four short-form videos.</span></li>
+        <li class="tile creative"><span class="tag">Creative production</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></span><b>Visual references</b><span class="d">Competitor photographs to guide your creatives and your supplier search. References only.</span></li>
+        <li class="tile"><span class="tag">Research</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><b>Opportunity analysis</b><span class="d">The complete research behind the decision: evidence, demand, markets and risks.</span></li>
+        <li class="tile"><span class="tag">Campaign preparation</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><b>Google Ads keywords</b><span class="d">Search terms in the language of the market where the collection performs.</span></li>
+        <li class="tile"><span class="tag">Campaign preparation</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></span><b>Negative keywords</b><span class="d">What to exclude so the budget is not spent on the wrong searches.</span></li>
+        <li class="tile"><span class="tag">Campaign preparation</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span><b>Shopping titles</b><span class="d">Product titles written for Google Shopping listings.</span></li>
+        <li class="tile"><span class="tag">Campaign preparation</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M8 14h8"/></svg></span><b>Landing-page copy</b><span class="d">Headline and copy for the page your ads send people to.</span></li>
+      </ul>
+
+      <!-- Observed-CTR indicator. Hidden until window.PROVENDROP_CTR is fully documented (see configuration in <head>). -->
+      <div class="ctr" id="ctrBox" hidden>
+        <div class="ctr-num"><span id="ctrValue"></span><small>observed CTR on Google Ads</small></div>
+        <div>
+          <p id="ctrWhat"></p>
+          <p class="ctr-dis">Observed campaign results. Performance is not guaranteed and depends on multiple campaign factors.</p>
+        </div>
+      </div>
+
+      <div class="kit-foot">
         <div class="window">
-          <div class="window-bar"><span>Approved collection.zip</span><span>Sample structure</span></div>
+          <div class="window-bar"><span>Approved collection.zip</span><span>Real kit structure</span></div>
           <ul class="tree">
             <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b>LEIA-ME.txt</b><span>One page: the collection, where to sell it, pricing and the first three steps.</span></li>
             <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b>1 - Imagens</b><span>Reference photographs and the instructions for generating 20 advertising images.</span></li>
@@ -546,17 +703,17 @@ window.PROVENDROP_STRIPE_LINK = "";
         </div>
         <div class="kit-side">
           <div class="warn"><b>Competitor photographs are references only</b>Use them to generate your own creatives and to find the products with your supplier. Never publish them in your ads.</div>
-          <p class="small">Kit documents are currently written in Portuguese. File names above match the real kit.</p>
+          <p class="small">Kit documents are currently written in Portuguese. File names above match the real kit. Prompts are written for the AI image and video tools you already use; ProvenDrop does not run your campaigns.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="dark" id="whatsapp">
+  <section id="delivery">
     <div class="wrap">
       <div class="head">
-        <h2>Delivered where you already work</h2>
-        <p class="lede">The research reaches your phone on WhatsApp. There is no other platform to learn and no dashboard to log in to.</p>
+        <h2>Delivered through your membership channel</h2>
+        <p class="lede">The same research and Launch Kits reach every member. How they arrive depends on how you joined.</p>
       </div>
       <div class="wa-grid">
         <div class="phone" role="img" aria-label="Example WhatsApp conversation showing the daily list and a ZIP file">
@@ -576,11 +733,15 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
           </div>
         </div>
         <div class="wa-side">
-          <div class="wa-points">
-            <div><b>9 AM, every day</b><span>The day’s list arrives with each collection’s evidence and kit.</span></div>
-            <div><b>Commands at any time</b><span>Filter by niche or country, or ask for approved collections again.</span></div>
-          </div>
-          <h3>Available commands</h3>
+          <div class="chan">
+            <span class="tag">ProvenDrop via Click</span>
+            <h3>WhatsApp channel managed by Click Dynamics</h3>
+            <p>Members who join through Click Dynamics receive the research in the Click WhatsApp channel, with the Click bot and community.</p>
+            <div class="wa-points">
+              <div><b>9 AM, every day</b><span>The day’s list arrives with each collection’s evidence and Launch Kit.</span></div>
+              <div><b>Commands at any time</b><span>Filter by niche or country, or ask for approved collections again.</span></div>
+            </div>
+            <h4>Bot commands in the Click channel</h4>
           <div class="cmds" role="list" id="cmds">
             <div class="cmd" role="listitem"><code translate="no">/pr hoje</code><span class="d">The day’s collections, with a ZIP for each approved one.</span><button class="copy" type="button" data-cmd="/pr hoje" aria-label="Copy command /pr hoje"><span class="label" aria-live="polite">Copy</span></button></div>
             <div class="cmd" role="listitem"><code translate="no">/pr verdes</code><span class="d">The last 10 approved collections.</span><button class="copy" type="button" data-cmd="/pr verdes" aria-label="Copy command /pr verdes"><span class="label" aria-live="polite">Copy</span></button></div>
@@ -588,6 +749,12 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
             <div class="cmd" role="listitem"><code translate="no">/pr homem, mulher, joalharia, decor</code><span class="d">Only the niche you want.</span><button class="copy" type="button" data-cmd="/pr homem" aria-label="Copy command /pr homem"><span class="label" aria-live="polite">Copy</span></button></div>
             <div class="cmd" role="listitem"><code translate="no">/pr ES, IT, FR, DE, GB, US</code><span class="d">Approved collections for that country.</span><button class="copy" type="button" data-cmd="/pr ES" aria-label="Copy command /pr ES"><span class="label" aria-live="polite">Copy</span></button></div>
             <div class="cmd" role="listitem"><code translate="no">/pr ajuda</code><span class="d">The list of commands.</span><button class="copy" type="button" data-cmd="/pr ajuda" aria-label="Copy command /pr ajuda"><span class="label" aria-live="polite">Copy</span></button></div>
+          </div>
+          </div>
+          <div class="chan direct">
+            <span class="tag">ProvenDrop Direct</span>
+            <h3>Direct communication with ProvenDrop</h3>
+            <p>Members who join independently are onboarded and managed by ProvenDrop. Research and Launch Kits are delivered to you directly. A private member platform is in development: Direct members receive access when it becomes available.</p>
           </div>
         </div>
       </div>
@@ -618,28 +785,54 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
     </div>
   </section>
 
-  <section id="pricing">
+  <section id="join">
     <div class="wrap">
-      <div class="pair">
-        <div>
-          <h2>One plan, everything included</h2>
-          <p class="lede">No tiers and no long-term commitment. Cancel whenever you want.</p>
-        </div>
-        <div class="price">
-          <div class="amount">€15<small>/ month</small></div>
-          <div class="fee">+ €25 one-time joining fee</div>
-          <ul>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Daily validated collections</li>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>WhatsApp delivery and commands</li>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>A complete launch kit for each approved collection</li>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Access to the approved archive</li>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Four niches and six markets</li>
-          </ul>
-          <a class="btn btn-go" id="btnSubscrever" data-subscribe href="https://wa.me/351920117648?text=I%27d%20like%20to%20join%20ProvenDrop" target="_blank" rel="noopener">Get Access</a>
-          <p class="pay-note" id="payNote">Sign-up is handled on WhatsApp for now. The button opens a chat with us.</p>
-          <p class="pay-note"><a href="https://wa.me/351920117648?text=I%20have%20a%20question%20about%20ProvenDrop" target="_blank" rel="noopener">Questions? Message us on WhatsApp</a></p>
-        </div>
+      <div class="head">
+        <h2>Choose how to join ProvenDrop</h2>
+        <p class="lede">Both membership options provide access to ProvenDrop research and creative resources. The difference is how you join, pay and receive your membership experience.</p>
       </div>
+      <div class="join-grid">
+        <article class="plan click" aria-labelledby="planClick">
+          <p class="plan-tag">Option A</p>
+          <h3 id="planClick">ProvenDrop via Click</h3>
+          <p class="plan-for">For customers joining through Click Dynamics.</p>
+          <!-- Price: the only membership price published so far (€15/month + €25 joining fee). Edit here if the Click product differs. -->
+          <div class="plan-price"><span class="amt">€15</span><small>/ month</small><span class="fee">+ €25 one-time joining fee</span></div>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Membership through the Stripe product of the Click Dynamics partnership</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Collections delivered on the WhatsApp channel managed by Click</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Click bot commands and the Click community</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Support according to the model agreed with Click Dynamics</li>
+          </ul>
+          <a class="btn btn-go" id="btnClick" aria-disabled="true">Join via Click</a>
+          <p class="pay-note" id="noteClick">Enrolment via Click is not open on this page yet.</p>
+          <p class="pay-note"><a href="https://wa.me/351920117648?text=I%20have%20a%20question%20about%20ProvenDrop%20via%20Click" target="_blank" rel="noopener">Questions about the Click channel? Message Click Dynamics</a></p>
+        </article>
+        <article class="plan direct" aria-labelledby="planDirect">
+          <p class="plan-tag">Option B</p>
+          <h3 id="planDirect">ProvenDrop Direct</h3>
+          <p class="plan-for">For customers who want to join ProvenDrop independently.</p>
+          <!-- Price: the only membership price published so far (€15/month + €25 joining fee). Edit here if the Direct product differs. -->
+          <div class="plan-price"><span class="amt">€15</span><small>/ month</small><span class="fee">+ €25 one-time joining fee</span></div>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Join directly on this website</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Payment through the ProvenDrop Direct Stripe product</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Independent onboarding, handled by ProvenDrop</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Access to the private member platform when it becomes available</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Direct communication with ProvenDrop</li>
+          </ul>
+          <a class="btn btn-go" id="btnDirect" aria-disabled="true">Join ProvenDrop Direct</a>
+          <p class="pay-note" id="noteDirect">Direct enrolment is not open on this page yet.</p>
+          <p class="pay-note" id="noteDirectContact" hidden></p>
+        </article>
+      </div>
+      <dl class="compare" aria-label="What is the same and what differs between the two memberships">
+        <div><dt>Research and Launch Kits</dt><dd>The same ProvenDrop research for both memberships. No collection is exclusive to one channel.</dd></div>
+        <div><dt>Who manages your membership</dt><dd>Via Click: the Click channel and community. Direct: ProvenDrop itself.</dd></div>
+        <div><dt>How you pay</dt><dd>Each membership has its own Stripe product. You pay once, on the option you choose.</dd></div>
+        <div><dt>Where it arrives</dt><dd>Via Click: the WhatsApp channel managed by Click. Direct: directly from ProvenDrop, plus the private platform when available.</dd></div>
+      </dl>
+      <p class="join-note">Memberships are limited by niche and country for both options. No minimum term: cancel whenever you want.</p>
     </div>
   </section>
 
@@ -648,14 +841,15 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
       <div class="faq-grid">
         <h2>Questions</h2>
         <div class="faq">
-          <details><summary>What exactly is ProvenDrop?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>An ecommerce market intelligence service. We research collections from stores already advertising in international markets, validate them and send you the results on WhatsApp. It is not a store, a product catalogue or a dashboard.</p></details>
+          <details><summary>What exactly is ProvenDrop?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>An ecommerce market intelligence service with three components: product research and market validation, AI-powered creative production, and advertising campaign preparation. We discover collections from stores already advertising in international markets, validate them, and deliver each approved one as a Launch Kit. It is not a store, a product catalogue or an advertising agency.</p></details>
+          <details><summary>What is the difference between ProvenDrop via Click and ProvenDrop Direct?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Both give access to the same ProvenDrop research and creative resources. Via Click, you join through the Click Dynamics partnership product and receive everything in the WhatsApp channel managed by Click, with its bot and community. Direct, you join on this website, are onboarded and managed by ProvenDrop, and communicate with us directly. Each option has its own Stripe product.</p></details>
           <details><summary>How are collections validated?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Each candidate is scored on 13 metrics across advertising evidence, search demand, store and collection quality, and risk. Brands are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
           <details><summary>How many collections do I receive?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Normally 1 to 4 a day. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
-          <details><summary>Which countries are covered?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Italy, Spain, France, Germany, the United Kingdom and the United States.</p></details>
-          <details><summary>Which niches are available?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
-          <details><summary>What is included in the ZIP?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A one-page guide, reference photographs, instructions for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete analysis. The photographs are references only and must not be published in ads.</p></details>
-          <details><summary>How does WhatsApp delivery work?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>The list arrives at 9 AM with each collection’s evidence and kit. At any time you can send a command to filter by niche or country.</p></details>
-          <details><summary>Can I cancel my subscription?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Yes, whenever you want, with no minimum term. The welcome page you see after paying explains how to manage your subscription.</p></details>
+          <details><summary>Which countries and niches are covered?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Italy, Spain, France, Germany, the United Kingdom and the United States. Four niches: women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
+          <details><summary>What is included in the Launch Kit?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A one-page guide, reference photographs, prompts for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete opportunity analysis. The photographs are references only and must not be published in ads.</p></details>
+          <details><summary>Do you run my campaigns or produce my creatives?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. The Launch Kit gives you the prompts, references and Google Ads material; you generate the images and videos with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
+          <details><summary>Is there a member platform?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A private platform is in development. Direct members receive access when it becomes available; until then, research and Launch Kits are delivered to them directly by ProvenDrop. Members via Click continue to use the Click WhatsApp channel.</p></details>
+          <details><summary>Can I cancel my subscription?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Yes, whenever you want, with no minimum term. For Direct members, the welcome page you see after paying explains how to manage your subscription. Members via Click follow the model agreed with Click Dynamics.</p></details>
           <details><summary>Why are memberships limited?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
         </div>
       </div>
@@ -664,8 +858,9 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
 
   <section class="dark final" id="join">
     <div class="wrap">
-      <h2>Less guessing. More informed launches.</h2>
-      <a class="btn btn-go" data-subscribe href="https://wa.me/351920117648?text=I%27d%20like%20to%20join%20ProvenDrop" target="_blank" rel="noopener">Join ProvenDrop</a>
+      <h2>Discover. Validate. Create. Launch.</h2>
+      <p class="lede" style="margin-top:20px">From a validated opportunity to a campaign ready to prepare, in one membership.</p>
+      <a class="btn btn-go" href="#join">Choose how to join</a>
     </div>
   </section>
 </main>
@@ -675,18 +870,20 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
     <div class="foot">
       <div>
         <a class="brand" translate="no" href="#main">ProvenDrop</a>
-        <p style="margin-top:8px">Ecommerce market intelligence, delivered on WhatsApp.</p>
+        <p style="margin-top:8px">Product research, AI-powered creative production and campaign preparation for ecommerce.</p>
       </div>
       <ul>
-        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#overview">What it is</a></li>
         <li><a href="#intelligence">Intelligence</a></li>
+        <li><a href="#kit">Launch Kit</a></li>
         <li><a href="#markets">Markets</a></li>
-        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#join">Join</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
       <div>
-        <p><a href="https://wa.me/351920117648">+351 920 117 648</a></p>
-        <p style="margin-top:8px">Competitor photographs in the kit are for reference only. Never publish other stores’ photographs in your ads.</p>
+        <p id="footContact" hidden></p>
+        <p style="margin-top:8px">Competitor photographs in the Launch Kit are for reference only. Never publish other stores’ photographs in your ads.</p>
+        <p style="margin-top:8px">ProvenDrop via Click is delivered in partnership with Click Dynamics. ProvenDrop Direct is managed by ProvenDrop.</p>
       </div>
     </div>
   </div>
@@ -696,11 +893,31 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
 document.documentElement.classList.add("js");
 setTimeout(function(){ document.documentElement.classList.add("settled"); }, 1500);
 (function(){
-  var l=window.PROVENDROP_STRIPE_LINK;
-  if(!l) return;
-  document.querySelectorAll("[data-subscribe]").forEach(function(b){ b.href=l; b.removeAttribute("target"); b.removeAttribute("rel"); });
-  var n=document.getElementById("payNote");
-  if(n) n.textContent="Secure card payment by Stripe. Setup steps appear right after you pay.";
+  /* Membership buttons: enabled only when their own Stripe link is configured. */
+  function wire(btnId, noteId, link, note){
+    var b=document.getElementById(btnId), n=document.getElementById(noteId);
+    if(!b || !/^https:\/\//.test(String(link||""))) return;
+    b.href=link; b.removeAttribute("aria-disabled");
+    if(n) n.textContent=note;
+  }
+  wire("btnClick","noteClick",window.PROVENDROP_CLICK_STRIPE_LINK,"Secure card payment by Stripe. Onboarding continues in the Click channel after you pay.");
+  wire("btnDirect","noteDirect",window.PROVENDROP_DIRECT_STRIPE_LINK,"Secure card payment by Stripe. Your onboarding steps appear right after you pay.");
+
+  /* Optional public contact for Direct members. */
+  var mail=String(window.PROVENDROP_CONTACT_EMAIL||"").trim();
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
+    var f=document.getElementById("footContact"), c=document.getElementById("noteDirectContact");
+    if(f){ f.innerHTML='<a href="mailto:'+mail+'">'+mail+'</a>'; f.hidden=false; }
+    if(c){ c.innerHTML='Questions about Direct membership? <a href="mailto:'+mail+'">Write to ProvenDrop</a>'; c.hidden=false; }
+  }
+
+  /* Observed CTR: shown only when every field is documented. */
+  var k=window.PROVENDROP_CTR||{}, v=String(k.value||"").trim();
+  if(v && k.campaigns && k.period && k.format){
+    document.getElementById("ctrValue").textContent="~"+v.replace("%","")+"%";
+    document.getElementById("ctrWhat").textContent="Observed across "+k.campaigns+" "+k.format+" campaigns, "+k.period+", run with ProvenDrop Launch Kit material.";
+    document.getElementById("ctrBox").hidden=false;
+  }
 })();
 
 (function(){
@@ -806,7 +1023,7 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
     return `<article class="row" aria-label="${st==="go"?"Approved":"Observing"} collection. Name, store and link are reserved for members.">
       <div class="row-name">${badge(st)}<h3>${redact(st==="go"?"78%":"64%")}</h3><p class="shop"><b>${niche(r.nicho)}</b>${where(r)}</p></div>
       <div>${facts(r)}<div class="row-mk"><p class="cap">${validated(r)}</p>${strip(mk)}</div></div>
-      <div class="row-score"><div class="score-big">${score(num(r.score))}<small>/ 10</small></div><p class="row-note">${st==="go"?"Comes with the collection link and a complete launch kit.":"Promising but not approved yet, so it has no kit."}</p></div>
+      <div class="row-score"><div class="score-big">${score(num(r.score))}<small>/ 10</small></div><p class="row-note">${st==="go"?"Comes with the collection link and its Launch Kit.":"Promising but not approved yet, so it has no kit."}</p></div>
     </article>`;
   }
 
@@ -825,7 +1042,7 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
         <div><div class="score-big">${score(num(first.score))}<small>/ 10 ProvenDrop score</small></div></div>
         ${facts(first)}
         <div><p class="panel-sub" style="margin:0 0 8px">${validated(first)}</p>${strip(mk)}</div>
-        <p class="panel-sub" style="margin:0">Names, stores, links and kits are sent to members on WhatsApp.</p>`;
+        <p class="panel-sub" style="margin:0">Names, stores, links and Launch Kits are sent to members through their membership channel.</p>`;
     $("#cardsHoje").innerHTML = rows.map(row).join("");
     const u = ago(upd); $("#listUpd").textContent = u ? u + (day ? ", list for "+day : "") : (day ? "List for "+day : "");
     const wa = $("#waMsg"); if (wa) {

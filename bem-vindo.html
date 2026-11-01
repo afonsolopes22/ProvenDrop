@@ -8,114 +8,115 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
 <style>
+/* Same Hybrid Premium tokens as index.html: off-white page, graphite accents, green marks. */
 :root{
-  --bg:#F4F6F2; --surface:#FFFFFF; --ink:#121A14; --muted:#5C675E; --line:#DDE2DA; --line-strong:#C7CEC4;
-  --go:#178246; --go-ink:#0F5F32; --go-soft:#E3F3E9;
-  --wait:#B4731A; --wait-soft:#FBEFDA;
-  --wa:#0B5C4B; --wa-bubble:#DCF3E4;
-  --header:rgba(244,246,242,.72);
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  /* motion tokens — never approximate */
-  --ease-out:cubic-bezier(0.23,1,0.32,1);
-  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
-  --t-press:160ms; --t-ui:200ms; --t-enter:320ms; --t-reveal:600ms;
+  --light:#F7F8F6; --white:#FFFFFF; --ink:#171A18; --ink-2:#5C645E; --line:#E6E9E5; --line-2:#CFD4CE;
+  --dark:#101310; --dark-card:#191E1A; --dark-line:#2A312C; --on-dark:#F2F4F1; --on-dark-2:#A3ACA5;
+  --green:#78C995; --green-soft:#DFF3E5; --green-ink:#1D6E42;
+  --watch:#E2BC74; --watch-ink:#7A5610; --watch-soft:#F7EDD8;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
-  --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
-  --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}
-
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:760px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 64px}
+body{margin:0;background:var(--light);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 a{color:inherit}
-h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02em}
-h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.05}
-h1 em{font-style:normal;color:var(--go)}
-.lead{color:var(--muted);font-size:18px;margin:14px 0 0;max-width:56ch}
-.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-block;margin-bottom:28px}
-ol.steps{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:14px;counter-reset:s}
-ol.steps>li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 20px 64px;position:relative}
-ol.steps>li::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-family:var(--mono);font-weight:500;display:grid;place-items:center}
-ol.steps h2{font-size:21px;font-weight:700;line-height:1.2}
-ol.steps p,ol.steps li li{color:var(--muted)}
-ol.steps p{margin:8px 0 0}
-ol.steps ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
-code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
-.btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--go);background:var(--go);color:var(--bg);transition:transform 160ms cubic-bezier(.23,1,.32,1)}
-.btn:active{transform:scale(.97)}
-.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
-.num{font-family:var(--mono);user-select:all}
-.rules{margin-top:28px;background:var(--wait-soft);border-radius:16px;padding:20px}
-.rules h2{font-size:19px;color:var(--ink)}
-.rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
-.note{margin-top:16px;color:var(--muted);font-size:14px}
-footer{margin-top:36px;color:var(--muted);font-size:14px}
+p{margin:0}
+.wrap{max-width:820px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 72px}
+h1,h2{font-family:var(--display);margin:0;font-weight:400;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(40px,6vw,64px);line-height:1.02}
+h1 em{font-style:normal;color:var(--green-ink)}
+.lede{color:var(--ink-2);font-size:clamp(18px,1.5vw,21px);line-height:1.5;margin-top:18px;max-width:58ch}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.01em;text-decoration:none;margin-bottom:32px}
+.brand svg{display:block}
+.tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:6px 12px;border-radius:999px;background:var(--green-soft);color:var(--green-ink);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+
+ol.steps{list-style:none;padding:0;margin:40px 0 0;display:grid;gap:14px;counter-reset:s}
+ol.steps>li{counter-increment:s;background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:22px 22px 22px 70px;position:relative}
+ol.steps>li::before{content:counter(s);position:absolute;left:22px;top:22px;width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);font-size:17px;display:grid;place-items:center}
+ol.steps h2{font-size:clamp(22px,2.2vw,27px);line-height:1.2}
+ol.steps p,ol.steps li li{color:var(--ink-2)}
+ol.steps p{margin-top:8px}
+ol.steps ul{margin:10px 0 0;padding-left:18px;display:grid;gap:5px}
+ol.steps b{color:var(--ink);font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;background:var(--light);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn-go{background:var(--green);color:#101310}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn[hidden]{display:none}
+@media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
+.pending{margin-top:14px;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:8px;background:var(--light);border:1px solid var(--line);font-size:15px;color:var(--ink-2)}
+.pending::before{content:"";flex-shrink:0;width:10px;height:10px;margin-top:6px;border-radius:50%;border:1.5px solid var(--watch)}
+.rules{margin-top:32px;background:var(--watch-soft);border-radius:14px;padding:22px}
+.rules h2{font-size:21px}
+.rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:#4A4030}
+.note{margin-top:16px;color:var(--ink-2);font-size:14.5px}
+footer{margin-top:40px;padding-top:24px;border-top:1px solid var(--line-2);color:var(--ink-2);font-size:15px}
+footer p+p{margin-top:8px}
+:focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
 </style>
 <script>
-/* Stripe customer portal link (manage or cancel the subscription). Empty = the button opens WhatsApp. */
+/* ── DIRECT ONBOARDING CONFIGURATION ──────────────────────────────
+   This page is the after-payment page of the ProvenDrop Direct
+   Stripe product only. Members via Click never land here. */
+
+/* Stripe customer portal link (manage or cancel the subscription).
+   Empty = the button is hidden and the page points to the receipt. */
 window.PROVENDROP_PORTAL_LINK = "";
+
+/* Public contact e-mail for Direct members. Empty = no contact button. */
+window.PROVENDROP_CONTACT_EMAIL = "";
 </script>
 </head>
 <body>
 <main class="wrap">
-  <a class="brand" href="./">ProvenDrop</a>
-  <h1>Payment received. <em>Welcome.</em></h1>
-  <p class="lead">You are two minutes away from receiving collections. Follow these steps in order.</p>
+  <a class="brand" translate="no" href="./">
+    <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#101310"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#78C995" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    ProvenDrop
+  </a>
+  <span class="tag">ProvenDrop Direct</span>
+  <h1>Payment received. <em>Welcome to ProvenDrop.</em></h1>
+  <p class="lede">You joined ProvenDrop directly. Your membership is managed by ProvenDrop, and your onboarding happens with us, not through a third-party channel. Here is what happens next.</p>
 
   <ol class="steps">
     <li>
-      <h2>Save the assistant’s number</h2>
-      <p>It is the Click Dynamics assistant on WhatsApp: <span class="num">+351 920 117 648</span>. Save it as “ProvenDrop” so the messages do not end up with unknown senders.</p>
+      <h2>Check the inbox you paid with</h2>
+      <p>Stripe has sent your receipt to the e-mail address you used at checkout. That address identifies your membership: every message from ProvenDrop about your membership goes there.</p>
     </li>
     <li>
-      <h2>Send us your niche and your countries</h2>
-      <p>Tap the button and complete the message. Use the same email you paid with, so we can confirm your subscription.</p>
-      <a class="btn" id="btnEntrar" href="#" target="_blank" rel="noopener">Send a WhatsApp message</a>
-      <p>We reply the same day and add you to the group. Places are limited by niche and country; if yours is already full, we offer you another one or refund your payment.</p>
+      <h2>Confirm your niche and your markets</h2>
+      <p>ProvenDrop will contact you at that address to confirm your niche (women’s jewellery, home decoration, women’s or men’s fashion) and the countries you sell in, and to complete your onboarding. You can also write first:</p>
+      <a class="btn btn-go" id="btnContact" href="#" hidden>Write to ProvenDrop</a>
+      <p class="note">Memberships are limited by niche and country. If your combination is already full, we offer you another one or refund your payment.</p>
     </li>
     <li>
-      <h2>Receive the list every morning</h2>
-      <p>At 9 AM the day’s list reaches the group: the link to each collection, how many ads the competitor has active and for how many days, how many people they reached, and the ZIP. At any time you can ask for:</p>
-      <ul>
-        <li><code>/pr hoje</code> today’s collections</li>
-        <li><code>/pr verdes</code> the latest approved collections</li>
-        <li><code>/pr homem</code> · <code>mulher</code> · <code>joalharia</code> · <code>decor</code> one niche only</li>
-        <li><code>/pr ES</code> · <code>IT</code> · <code>FR</code> · <code>DE</code> · <code>GB</code> · <code>US</code> one country only</li>
-        <li><code>/pr ajuda</code> the list of commands</li>
-      </ul>
-      <p class="note">The assistant and the kit documents are currently written in Portuguese. The commands above are typed exactly as shown.</p>
+      <h2>Receive your research and Launch Kits</h2>
+      <p>Approved collections and their Launch Kits are delivered to you directly by ProvenDrop: the collection link, its evidence and score, and the kit with image prompts, UGC video prompts, visual references and the Google Ads material.</p>
+      <div class="pending">A private member platform is in development. As a Direct member you receive access when it becomes available. Nothing else is needed from you until then.</div>
     </li>
     <li>
       <h2>Launch a collection in 1–2 days</h2>
       <ul>
         <li><b>Choose</b> an approved collection in your niche. The country next to its name is where it is performing: start there.</li>
-        <li><b>Find the products</b> with your supplier using the reference photographs in the ZIP (folder <i>1 - Imagens</i>).</li>
-        <li><b>Create the images</b>: paste the text from <i>Colar no ChatGPT.txt</i> into ChatGPT together with the photographs, and generate the advertising images.</li>
-        <li><b>Create the videos</b> with the folder <i>2 - Videos</i>: it has a photograph and a ready prompt for each video.</li>
-        <li><b>Google Ads</b>: the file <i>3 - Google Ads.txt</i> brings the keywords, negative keywords, titles and landing-page copy for that country.</li>
+        <li><b>Find the products</b> with your supplier using the reference photographs in the kit (folder <i>1 - Imagens</i>).</li>
+        <li><b>Create the images</b>: paste the text from <i>Colar no ChatGPT.txt</i> into your image model together with the photographs, and generate the 20 advertising images.</li>
+        <li><b>Create the videos</b> with the folder <i>2 - Videos</i>: a photograph and a ready prompt for each of the 4 UGC videos.</li>
+        <li><b>Google Ads</b>: the file <i>3 - Google Ads.txt</i> brings the keywords, negative keywords, Shopping titles and landing-page copy for that country.</li>
         <li>Read <i>LEIA-ME.txt</i> first: it explains everything on one page.</li>
       </ul>
+      <p class="note">Kit documents are currently written in Portuguese.</p>
     </li>
   </ol>
 
   <div class="rules">
     <h2>Rules that protect you</h2>
     <ul>
-      <li>The photographs in the ZIP belong to competitors and are <b>for reference only</b>. Never publish them in your ads.</li>
+      <li>The photographs in the kit belong to competitors and are <b>for reference only</b>. Never publish them in your ads.</li>
       <li>Do not copy competitors’ ad copy: use it as inspiration.</li>
       <li>No fake discounts, countdowns, invented “stock running out” or health claims. Meta and Google block accounts for this.</li>
       <li>Shipping in 11–15 days? Seasonal collections (Christmas, Mother’s Day…) launch at least 4 weeks ahead.</li>
@@ -123,15 +124,25 @@ window.PROVENDROP_PORTAL_LINK = "";
   </div>
 
   <footer>
-    <p>You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
-    <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=I%27d%20like%20to%20manage%20my%20ProvenDrop%20subscription" target="_blank" rel="noopener">Manage subscription</a>
+    <p>No minimum term: cancel whenever you want.</p>
+    <p id="manageText">To change your niche or cancel your subscription, contact ProvenDrop using the details on your payment receipt.</p>
+    <a class="btn btn-line" id="btnManage" href="#" hidden>Manage subscription</a>
   </footer>
 </main>
 <script>
 (function(){
-  var t="Hi! I have just subscribed to ProvenDrop.\nPayment email: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ";
-  document.getElementById("btnEntrar").href="https://wa.me/351920117648?text="+encodeURIComponent(t);
-  var p=window.PROVENDROP_PORTAL_LINK; if(p){var g=document.getElementById("btnGerir");g.href=p;}
+  var mail=String(window.PROVENDROP_CONTACT_EMAIL||"").trim();
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
+    var c=document.getElementById("btnContact");
+    c.href="mailto:"+mail+"?subject="+encodeURIComponent("ProvenDrop Direct: my niche and markets")+"&body="+encodeURIComponent("Hi! I have just joined ProvenDrop Direct.\nPayment e-mail: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ");
+    c.hidden=false;
+    document.getElementById("manageText").textContent="To change your niche or cancel your subscription, write to "+mail+".";
+  }
+  var p=String(window.PROVENDROP_PORTAL_LINK||"").trim();
+  if(/^https:\/\//.test(p)){
+    var g=document.getElementById("btnManage"); g.href=p; g.hidden=false;
+    document.getElementById("manageText").textContent="Manage or cancel your subscription at any time in the Stripe customer portal.";
+  }
 })();
 </script>
 </body>
