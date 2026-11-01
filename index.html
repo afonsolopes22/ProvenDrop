@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Coleções de dropshipping que já estão a vender na Europa, UK e EUA. Confirmadas 24 h depois, com o kit pronto a lançar.">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ProvenDrop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ============================================================
+   ProvenDrop — "ficha de prova"
+   Layout: uma coluna estreita de secções; cada coleção é um cartão
+   de prova (carimbo + números). O bot aparece como um telemóvel real.
+   Motion (emil-design-eng): só transform/opacity, curvas fortes,
+   UI < 300ms, entradas uma vez por visita, filtros instantâneos.
+   ============================================================ */
+:root{
+  --bg:#F4F6F2; --surface:#FFFFFF; --ink:#121A14; --muted:#5C675E; --line:#DDE2DA; --line-strong:#C7CEC4;
+  --go:#178246; --go-ink:#0F5F32; --go-soft:#E3F3E9;
+  --wait:#B4731A; --wait-soft:#FBEFDA;
+  --wa:#0B5C4B; --wa-bubble:#DCF3E4;
+  --header:rgba(244,246,242,.72);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  /* motion tokens — nunca aproximar */
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+  --t-press:160ms; --t-ui:200ms; --t-enter:320ms; --t-reveal:600ms;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
+  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --wait:#E6A94B; --wait-soft:#3A2C14;
+  --wa:#7FD3B8; --wa-bubble:#173B30;
+  --header:rgba(14,21,18,.72); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
+  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --wait:#E6A94B; --wait-soft:#3A2C14;
+  --wa:#7FD3B8; --wa-bubble:#173B30;
+  --header:rgba(14,21,18,.72); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--go);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;font-optical-sizing:auto}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+
+/* ── header: material translúcido, orla só quando há conteúdo por baixo ── */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--header);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--header);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid transparent;transition:border-color 150ms ease}
+header.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em;text-decoration:none}
+.brand svg{flex-shrink:0}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav a{text-decoration:none;color:var(--muted);font-size:14px;padding:6px 10px;border-radius:8px;transition:color 150ms ease,background-color 150ms ease}
+@media (hover:hover) and (pointer:fine){nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--line) 50%,transparent)}}
+nav a:active{transform:scale(.97)}
+
+/* ── hero ── */
+.hero{padding-block:56px 40px;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:end}
+.hero h1{font-size:clamp(38px,6.2vw,68px);font-weight:800;line-height:1.0;letter-spacing:-.025em}
+.hero h1 em{font-style:normal;color:var(--go)}
+.hero .lead{max-width:52ch;color:var(--muted);font-size:18px;line-height:1.5;margin-top:18px}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.today{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 4%,transparent)}
+.today .big{font-family:var(--display);font-size:52px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.today .row{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.today .row b{color:var(--ink);font-weight:600}
+
+section{padding-block:44px;border-top:1px solid var(--line);scroll-margin-top:72px}
+.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.sec-head h2{font-size:clamp(26px,3.6vw,36px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.sec-head p{margin-top:6px;color:var(--muted);max-width:60ch}
+
+/* ── cartões de prova ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;align-content:start;min-width:0;transition:border-color 150ms ease,transform var(--t-ui) var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.card:hover{border-color:var(--line-strong)}}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stamp{flex-shrink:0;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1.5px solid currentColor}
+.stamp.go{color:var(--go-ink);background:var(--go-soft)} .stamp.wait{color:var(--wait);background:var(--wait-soft)}
+.card h3{font-size:22px;font-weight:700;line-height:1.15;letter-spacing:-.015em}
+.card .shop{font-size:14px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.proof{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;margin:0;padding:12px 0;border-block:1px dashed var(--line)}
+.proof div{min-width:0} .proof dt{font-size:12px;color:var(--muted)} .proof dd{margin:0;font-family:var(--mono);font-size:17px;font-weight:500}
+.score{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--go);transform-origin:left center;transform:scaleX(var(--s,0));transition:transform 700ms var(--ease-out)}
+.bar i.wait{background:var(--wait)}
+.score b{color:var(--ink)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ── botões: feedback no toque, 160ms, scale .97 ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-press) var(--ease-out),background-color 150ms ease,border-color 150ms ease,color 150ms ease}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.go{background:var(--go);color:var(--bg);border-color:var(--go)}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{border-color:var(--muted)}
+  .btn.primary:hover{background:color-mix(in srgb,var(--ink) 86%,var(--go))}
+  .btn.go:hover{background:var(--go-ink);border-color:var(--go-ink)}
+}
+/* conteúdo do botão que muda de estado: crossfade com blur (máscara da transição) */
+.btn .label{display:inline-block;transition:filter var(--t-ui) ease,opacity var(--t-ui) ease}
+.btn.swap .label{filter:blur(2px);opacity:.6}
+.empty{background:var(--surface);border:1px dashed var(--line-strong);border-radius:16px;padding:24px;color:var(--muted)}
+
+/* ── método: sequência real, por isso numerada ── */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.step{border-top:2px solid var(--ink);padding-top:12px;min-width:0}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.step h3{font-size:18px;font-weight:700;margin-top:6px;letter-spacing:-.01em} .step p{margin-top:6px;color:var(--muted);font-size:15px}
+
+/* ── whatsapp ── */
+.wa-grid{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:32px;align-items:start}
+.phone{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:14px;display:grid;gap:10px;min-width:0}
+.phone .bar-top{display:flex;align-items:center;gap:10px;padding:4px 6px 10px;border-bottom:1px solid var(--line)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--wa);display:grid;place-items:center;color:var(--surface);font-weight:700;font-family:var(--display);font-size:14px;flex-shrink:0}
+.phone .who{font-weight:600;font-size:14px} .phone .sub{font-size:12px;color:var(--muted)}
+.msg{max-width:88%;padding:8px 11px;border-radius:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.msg.me{justify-self:end;background:var(--wa-bubble);transform-origin:bottom right}
+.msg.bot{justify-self:start;background:var(--bg);border:1px solid var(--line);transform-origin:bottom left}
+.msg .time{display:block;text-align:right;font-size:11px;color:var(--muted);margin-top:2px}
+.file{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:12px}
+.file b{display:grid;place-items:center;width:34px;height:40px;border-radius:6px;background:var(--wa);color:var(--surface);font-size:10px;flex-shrink:0}
+.cmds{display:grid;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.cmd{display:grid;grid-template-columns:minmax(150px,auto) 1fr auto;gap:14px;align-items:center;padding:10px 12px 10px 16px;border-top:1px solid var(--line);min-width:0}
+.cmd:first-child{border-top:0}
+.cmd code{font-family:var(--mono);font-size:14px;color:var(--go-ink);font-weight:500}
+.cmd span{font-size:14px;color:var(--muted)}
+.copy{font:inherit;font-family:var(--mono);font-size:12px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer;transition:transform var(--t-press) var(--ease-out),border-color 150ms ease,color 150ms ease;-webkit-tap-highlight-color:transparent}
+.copy:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.copy:hover{border-color:var(--muted);color:var(--ink)}}
+.copy .label{display:inline-block;transition:filter var(--t-ui) ease,opacity var(--t-ui) ease}
+.copy.swap .label{filter:blur(2px);opacity:.6}
+.copy.done{color:var(--go-ink);border-color:var(--go)}
+
+/* ── arquivo: filtros sem animação (uso frequente) ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters select{font:inherit;font-size:14px;padding:8px 32px 8px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);transition:border-color 150ms ease}
+@media (hover:hover) and (pointer:fine){.filters select:hover{border-color:var(--muted)}}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:680px}
+th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+th{border-top:0;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.num{font-family:var(--mono)}
+@media (hover:hover) and (pointer:fine){tbody tr:hover td{background:color-mix(in srgb,var(--line) 35%,transparent)}}
+.live{font-family:var(--mono);font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.live i{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.live.yes{color:var(--go-ink)} .live.no{color:var(--muted)} .live.no i{background:transparent;border:1.5px solid currentColor}
+
+/* ── acesso ── */
+.access{display:grid;grid-template-columns:1fr minmax(0,380px);gap:32px;align-items:start}
+.access p{color:var(--muted);max-width:56ch}
+.access p + p{margin-top:10px}
+.price{background:var(--ink);color:var(--bg);border-radius:20px;padding:24px;display:grid;gap:14px}
+.price .amount{font-family:var(--display);font-size:56px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.price .amount small{font-size:18px;font-weight:600;letter-spacing:0}
+.price ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+.price .fine{font-size:13px;opacity:.8}
+.price .btn{justify-self:start}
+.contact{font-family:var(--mono);font-size:13px;opacity:.85;user-select:all}
+footer{padding-block:28px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+
+@media (max-width:760px){
+  .hero,.wa-grid,.access{grid-template-columns:1fr}
+  .hero{padding-block:36px 28px}
+  nav{display:none}
+  .cmd{grid-template-columns:1fr auto;gap:4px 10px} .cmd span{grid-column:1/-1}
+}
+
+/* ── motion ───────────────────────────────────────────────
+   Entradas: uma vez por visita (marketing) → fade + 8px, 320ms ease-out,
+   stagger 60ms. Keyframes aqui são corretos: não são disparadas repetidamente.
+   Telemóvel: revela com clip-path (receita "scroll reveal"), uma vez. */
+@keyframes enter{to{opacity:1;transform:none}}
+.js .enter{opacity:0;transform:translateY(8px);animation:enter var(--t-enter) var(--ease-out) forwards;animation-delay:calc(var(--i,0)*60ms)}
+.js .card.enter{transform:translateY(8px) scale(.98)}
+.js .reveal{clip-path:inset(0 0 100% 0 round 24px);transition:clip-path var(--t-reveal) var(--ease-in-out)}
+.js .reveal[data-visible]{clip-path:inset(0 0 0 0 round 24px)}
+.js .reveal .msg{opacity:0;transform:translateY(6px) scale(.97);transition:opacity var(--t-enter) var(--ease-out),transform var(--t-enter) var(--ease-out)}
+.js .reveal[data-visible] .msg{opacity:1;transform:none;transition-delay:calc(200ms + var(--i,0)*350ms)}
+.js .later{opacity:0;transform:translateY(8px);transition:opacity var(--t-enter) var(--ease-out),transform var(--t-enter) var(--ease-out);transition-delay:calc(var(--i,0)*60ms)}
+.js .later[data-visible]{opacity:1;transform:none}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.card:hover{transform:translateY(-2px)}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+/* reduzido: ficam os fades, cai o movimento */
+@media (prefers-reduced-motion:reduce){
+  .js .enter,.js .card.enter,.js .later{transform:none;transition-property:opacity;animation-duration:200ms}
+  .js .reveal{clip-path:none;opacity:0;transition:opacity 200ms ease} .js .reveal[data-visible]{opacity:1}
+  .js .reveal .msg{transform:none;transition-property:opacity}
+  .bar i{transition:none} .btn:active,.copy:active,nav a:active{transform:none}
+}
+.price .duvidas{font-size:13px;opacity:.85;justify-self:start}
+</style>
+<script>
+/* ── CONFIGURAÇÃO DE PAGAMENTO ─────────────────────────────────────
+   Cola aqui o Payment Link da Stripe (15 €/mês + 25 € de adesão).
+   Enquanto estiver vazio, o botão "Subscrever" abre o WhatsApp da Click. */
+window.PROVENDROP_STRIPE_LINK = "";
+</script>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="#hoje" aria-label="ProvenDrop">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="var(--go)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ProvenDrop
+    </a>
+    <nav aria-label="Secções">
+      <a href="#hoje">Hoje</a><a href="#metodo">Método</a><a href="#whatsapp">WhatsApp</a><a href="#arquivo">Arquivo</a><a href="#acesso">Acesso</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow enter" style="--i:0">Coleções para dropshipping · EU, UK e EUA</div>
+      <h1 class="enter" style="--i:1">Coleções que já estão <em>a vender</em>. Com prova, todos os dias.</h1>
+      <p class="lead enter" style="--i:2">Lemos os anúncios da concorrência e a procura no Google em 6 países. Só recebes coleções que já estão a bater, confirmadas 24 horas depois, com o kit pronto para lançar.</p>
+      <div class="cta enter" style="--i:3">
+        <a class="btn primary" href="#hoje"><span class="label">Ver a lista de hoje</span></a>
+        <a class="btn" href="#acesso"><span class="label">Acesso por 15 €/mês</span></a>
+      </div>
+    </div>
+    <aside class="today enter" style="--i:2" aria-label="Resumo de hoje">
+      <div class="eyebrow">Lista de <span id="dia">—</span></div>
+      <div class="big num" id="countHoje">—</div>
+      <div class="muted" id="countSub" style="font-size:14px">coleções na lista de hoje</div>
+      <div class="row"><span>Aprovadas (verdes)</span><b class="num" id="countGo">—</b></div>
+      <div class="row"><span>No arquivo</span><b class="num" id="countArq">—</b></div>
+      <div class="row"><span>Atualizado</span><b class="num" id="upd">—</b></div>
+    </aside>
+  </div>
+
+  <section id="hoje">
+    <div class="sec-head">
+      <div><h2>Coleções de hoje</h2><p>Cada cartão mostra a prova: há quanto tempo a concorrente anuncia, quantas pessoas alcançou e em quantos países a procura no Google está validada.</p></div>
+    </div>
+    <div class="cards" id="cardsHoje"><div class="empty">A carregar as coleções de hoje…</div></div>
+  </section>
+
+  <section id="metodo">
+    <div class="sec-head"><div><h2>Como uma coleção fica verde</h2><p>Quatro filtros, por esta ordem, para cada candidata. Se falhar um, não chega até ti.</p></div></div>
+    <div class="steps">
+      <div class="step later" style="--i:0"><div class="n">1 · Anúncios</div><h3>A concorrência já está a pagar</h3><p>Lemos a Biblioteca de Anúncios da Meta em 7 países: anúncios ativos, há quantos dias, e o alcance real na Europa.</p></div>
+      <div class="step later" style="--i:1"><div class="n">2 · Procura</div><h3>As pessoas estão a procurar</h3><p>Google Trends em Itália, Espanha, França, Alemanha, Reino Unido e EUA, comparado com a categoria do produto.</p></div>
+      <div class="step later" style="--i:2"><div class="n">3 · Loja</div><h3>É genérica, não é marca</h3><p>Só lojas com produtos que encontras em fornecedor. Marcas com design próprio ficam de fora.</p></div>
+      <div class="step later" style="--i:3"><div class="n">4 · 24 horas</div><h3>Confirmada no dia seguinte</h3><p>Voltamos a medir no dia seguinte. Se os anúncios caírem, a coleção não é aprovada.</p></div>
+    </div>
+  </section>
+
+  <section id="whatsapp">
+    <div class="sec-head">
+      <div><h2>Também chega pelo WhatsApp</h2><p>O assistente da Click Dynamics envia a lista todas as manhãs às 9h e responde a comandos a qualquer hora, em conversa ou em grupo.</p></div>
+    </div>
+    <div class="wa-grid">
+      <div class="phone reveal" id="phone" aria-label="Exemplo de conversa no WhatsApp">
+        <div class="bar-top"><div class="avatar">C</div><div><div class="who">Assistente Clickdynamics</div><div class="sub">bot · WhatsApp</div></div></div>
+        <div class="msg me" style="--i:0">/pr hoje<span class="time">09:00</span></div>
+        <div class="msg bot" id="waMsg" style="--i:1">A carregar…<span class="time">09:00</span></div>
+        <div class="msg bot" style="--i:2"><div class="file"><b>ZIP</b><div id="waFile">Coleção aprovada.zip<br><span class="muted">Imagens · Vídeos · Google Ads</span></div></div><span class="time">09:00</span></div>
+      </div>
+      <div>
+        <div class="cmds" role="list" id="cmds">
+          <div class="cmd" role="listitem"><code>/pr hoje</code><span>As coleções do dia, com o zip de cada aprovada.</span><button class="copy" type="button" data-cmd="/pr hoje"><span class="label">Copiar</span></button></div>
+          <div class="cmd" role="listitem"><code>/pr verdes</code><span>As últimas 10 coleções aprovadas.</span><button class="copy" type="button" data-cmd="/pr verdes"><span class="label">Copiar</span></button></div>
+          <div class="cmd" role="listitem"><code>/pr ativas</code><span>Aprovadas que a concorrente ainda está a anunciar.</span><button class="copy" type="button" data-cmd="/pr ativas"><span class="label">Copiar</span></button></div>
+          <div class="cmd" role="listitem"><code>/pr homem · mulher · joalharia · decor</code><span>Só o nicho que te interessa.</span><button class="copy" type="button" data-cmd="/pr homem"><span class="label">Copiar</span></button></div>
+          <div class="cmd" role="listitem"><code>/pr ES · IT · FR · DE · GB · US</code><span>Coleções aprovadas para esse país.</span><button class="copy" type="button" data-cmd="/pr ES"><span class="label">Copiar</span></button></div>
+          <div class="cmd" role="listitem"><code>/pr ajuda</code><span>A lista de comandos.</span><button class="copy" type="button" data-cmd="/pr ajuda"><span class="label">Copiar</span></button></div>
+        </div>
+        <p class="muted" style="font-size:14px;margin-top:14px">O zip traz um guia de uma página, as fotos de referência, o texto para gerar 20 imagens de anúncio no ChatGPT, 4 vídeos prontos a gerar e as palavras-chave de Google Ads para o país onde a coleção está a bater.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="arquivo">
+    <div class="sec-head"><div><h2>Arquivo de verdes</h2><p>Todas as coleções aprovadas desde o início, e se a concorrente ainda as anuncia hoje.</p></div></div>
+    <div class="filters">
+      <select id="fNicho" aria-label="Filtrar por nicho"><option value="">Todos os nichos</option><option>Joalharia</option><option>House Decor</option><option>Roupa Feminina</option><option>Roupa Masculina</option></select>
+      <select id="fPais" aria-label="Filtrar por país"><option value="">Todos os países</option><option>ES</option><option>IT</option><option>FR</option><option>DE</option><option>GB</option><option>US</option></select>
+      <select id="fVivas" aria-label="Filtrar por estado"><option value="">Todas</option><option value="sim">Ainda a anunciar</option></select>
+    </div>
+    <div id="arqBox"></div>
+  </section>
+
+  <section id="acesso">
+    <div class="access">
+      <div>
+        <div class="sec-head" style="margin-bottom:10px"><div><h2>Acesso</h2></div></div>
+        <p>Lugares limitados por nicho e país, para que a mesma coleção não chegue a demasiadas lojas ao mesmo tempo.</p>
+        <p>Subscreves aqui, com cartão, num pagamento seguro da Stripe. Logo a seguir mostramos-te os passos para entrar no grupo do WhatsApp, e ficas com acesso no mesmo dia.</p>
+        <p>Cancelas quando quiseres, sem fidelização.</p>
+      </div>
+      <div class="price later">
+        <div class="eyebrow" style="color:inherit;opacity:.75">ProvenDrop</div>
+        <div class="amount num">15 € <small>/ mês</small></div>
+        <ul>
+          <li>Coleções aprovadas todos os dias</li>
+          <li>Zip pronto a usar em cada coleção</li>
+          <li>Comandos no WhatsApp e envio às 9h</li>
+          <li>Arquivo completo de verdes</li>
+        </ul>
+        <div class="fine">+ 25 € de adesão, uma vez.</div>
+        <a class="btn go" id="btnSubscrever" href="https://wa.me/351920117648?text=Quero%20entrar%20no%20ProvenDrop" target="_blank" rel="noopener"><span class="label">Subscrever</span></a>
+        <a class="duvidas" href="https://wa.me/351920117648?text=Tenho%20uma%20d%C3%BAvida%20sobre%20o%20ProvenDrop" target="_blank" rel="noopener">Dúvidas? Fala com a Click no WhatsApp</a>
+        <div class="contact">+351 920 117 648</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">ProvenDrop · As fotos e as lojas mostradas são da concorrência e servem só de referência. Nunca publicar as fotos de outras lojas nos anúncios.</div></footer>
+
+<script>
+document.documentElement.classList.add("js");
+(function(){
+  var b=document.getElementById("btnSubscrever"), l=window.PROVENDROP_STRIPE_LINK;
+  if(b && l){ b.href=l; b.removeAttribute("target"); b.removeAttribute("rel"); }
+})();
+
+(function(){
+  const $ = s => document.querySelector(s);
+  const fmt = n => (n==null||isNaN(n)) ? "—" : Math.round(n).toLocaleString("pt-PT");
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const isGo = it => /aprovad/i.test(it.estado||"") || /🟢/.test(it.veredito||"");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const pr = new Intl.PluralRules("pt-PT");
+  const plural = (n, one, other) => pr.select(n)==="one" ? one : other;
+  let DATA = {hoje:[], verdes:[]};
+
+  /* "há 2 h" até uma semana; depois a data absoluta (ui-cheatsheet) */
+  function when(iso){
+    if(!iso) return "—";
+    const d = new Date(iso); if(isNaN(d)) return iso.replace("T"," ");
+    const diff = (Date.now()-d)/1000;
+    if(diff < 0 || diff > 7*86400) return d.toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});
+    if(diff < 3600) return "há "+Math.max(1,Math.round(diff/60))+" min";
+    if(diff < 86400) return "há "+Math.round(diff/3600)+" h";
+    const days=Math.round(diff/86400); return "há "+days+" "+plural(days,"dia","dias");
+  }
+
+  /* cabeçalho: orla só quando há conteúdo por baixo */
+  const top = $("#top");
+  const onScroll = () => top.classList.toggle("scrolled", scrollY > 8);
+  addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+  function card(it,i){
+    const go = isGo(it);
+    const pais = it.mercado_destaque || (it.paises_ads||[])[0] || "—";
+    const zip = it.zip_url ? `<a class="btn primary" href="${esc(it.zip_url)}" target="_blank" rel="noopener"><span class="label">Descarregar zip</span></a>`
+                           : `<span class="btn" aria-disabled="true"><span class="label">${go ? "Zip a caminho" : "Sem zip (a observar)"}</span></span>`;
+    const s = Math.min(1,(it.score||0)/10);
+    return `<article class="card enter" style="--i:${i}">
+      <div class="card-top"><span class="chip">${esc(it.nicho)}</span><span class="stamp ${go?"go":"wait"}">${go?"Aprovada":"A observar"}</span></div>
+      <div><h3>${esc(it.colecao)}</h3><div class="shop">${esc(it.loja)} · a bater em <b>${esc(pais)}</b></div></div>
+      <dl class="proof">
+        <div><dt>Anúncios ativos</dt><dd class="num">${fmt(it.anuncios_ativos)}</dd></div>
+        <div><dt>Dias a anunciar</dt><dd class="num">${fmt(it.dias_ativo)}</dd></div>
+        <div><dt>Alcance na UE</dt><dd class="num">${fmt(it.alcance_eu)}</dd></div>
+        <div><dt>Países com procura</dt><dd class="num">${it.trends_validados ?? "—"}/6</dd></div>
+      </dl>
+      <div class="score">Score <span class="bar"><i class="${go?"":"wait"}" data-s="${s}"></i></span> <b class="num">${(+it.score||0).toFixed(1)}</b></div>
+      <div class="actions"><a class="btn" href="${esc(it.link)}" target="_blank" rel="noopener"><span class="label">Ver coleção</span></a>${zip}</div>
+    </article>`;
+  }
+
+  function waText(){
+    const its = DATA.hoje;
+    if(!its.length) return "Hoje não há coleções aprovadas.";
+    return `PR ${DATA.dia} — coleções a bater\n\n` + its.map((it,i)=>`${i+1}. ${it.colecao} — ${it.nicho}\n${isGo(it)?"🟢 Aprovada":"🟡 A observar"} · score ${(+it.score).toFixed(1)}\n${fmt(it.anuncios_ativos)} anúncios · ${fmt(it.dias_ativo)} dias`).join("\n\n");
+  }
+
+  /* arquivo: re-render instantâneo (filtros são uso frequente → sem animação) */
+  function renderArq(){
+    const n=$("#fNicho").value, p=$("#fPais").value, v=$("#fVivas").value;
+    const rows = DATA.verdes.filter(r => (!n||r.nicho===n) && (!p||r.mercado_destaque===p||String(r.mercados_verdes||"").includes(p)) && (!v||r.ainda_a_anunciar===v));
+    const box = $("#arqBox");
+    if(!DATA.verdes.length){ box.innerHTML = `<div class="empty">O arquivo começa com a primeira coleção confirmada. Cada coleção aprovada fica aqui guardada, com a indicação diária de se a concorrente ainda a anuncia.</div>`; return; }
+    if(!rows.length){ box.innerHTML = `<div class="empty">Nenhuma coleção com estes filtros.</div>`; return; }
+    box.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Aprovada</th><th>Coleção</th><th>Nicho</th><th>País</th><th>Score</th><th>Ainda a anunciar</th><th></th></tr></thead><tbody>${
+      rows.slice().reverse().map(r=>`<tr><td class="num">${esc(r.data_aprovacao)}</td><td><b>${esc(r.colecao)}</b><br><span class="muted">${esc(r.loja)}</span></td><td>${esc(r.nicho)}</td><td>${esc(r.mercado_destaque)}</td><td class="num">${(+r.score).toFixed(1)}</td><td><span class="live ${r.ainda_a_anunciar==="sim"?"yes":"no"}"><i></i>${r.ainda_a_anunciar==="sim"?"sim":"não"}</span></td><td><a href="${esc(r.link_colecao||r.link)}" target="_blank" rel="noopener">Ver</a>${(r.link_zip||r.zip_url)?` · <a href="${esc(r.link_zip||r.zip_url)}" target="_blank" rel="noopener">Zip</a>`:""}</td></tr>`).join("")
+    }</tbody></table></div>`;
+  }
+
+  /* revelar uma vez ao entrar no ecrã; nunca voltar a animar */
+  function show(el){
+    el.setAttribute("data-visible","");
+    el.querySelectorAll(".bar i[data-s]").forEach(b=>b.style.setProperty("--s",b.dataset.s));
+  }
+  const io = ("IntersectionObserver" in window) ? new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ show(e.target); io.unobserve(e.target);} }),{rootMargin:"0px 0px -60px 0px"}) : null;
+  function watch(){ document.querySelectorAll(".reveal:not([data-visible]),.later:not([data-visible]),.card:not([data-visible])").forEach(el=> io ? io.observe(el) : show(el)); }
+  /* completo em repouso: o que o observador não alcançou aparece à mesma */
+  setTimeout(()=>document.querySelectorAll(".reveal:not([data-visible]),.later:not([data-visible]),.card:not([data-visible])").forEach(show), 1800);
+
+  function render(){
+    const n = DATA.hoje.length, g = DATA.hoje.filter(isGo).length;
+    $("#dia").textContent = DATA.dia || "—";
+    $("#countHoje").textContent = n;
+    $("#countSub").textContent = plural(n,"coleção na lista de hoje","coleções na lista de hoje");
+    $("#countGo").textContent = g;
+    $("#countArq").textContent = DATA.verdes.length;
+    $("#upd").textContent = when(DATA.atualizado);
+    $("#cardsHoje").innerHTML = n ? DATA.hoje.map(card).join("") : `<div class="empty">Hoje não há coleções aprovadas. A lista nova sai ao fim da tarde.</div>`;
+    const m = $("#waMsg"); m.textContent = waText(); const t=document.createElement("span"); t.className="time"; t.textContent="09:00"; m.appendChild(t);
+    const first = DATA.hoje.find(isGo); if(first){ $("#waFile").innerHTML = `${esc(first.colecao)}.zip<br><span class="muted">Imagens · Vídeos · Google Ads</span>`; }
+    renderArq();
+    watch();
+  }
+
+  /* copiar comando: estado muda uma vez por clique → crossfade com blur, 200ms */
+  async function copy(btn){
+    const text = btn.dataset.cmd, label = btn.querySelector(".label");
+    let ok = false;
+    try{ await navigator.clipboard.writeText(text); ok = true; }
+    catch{ const r=document.createRange(); r.selectNodeContents(btn.closest(".cmd").querySelector("code")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+    btn.classList.add("swap");
+    setTimeout(()=>{ label.textContent = ok ? "Copiado" : "Seleciona e copia"; btn.classList.add("done"); btn.classList.remove("swap"); }, reduce?0:120);
+    clearTimeout(btn._t);
+    btn._t = setTimeout(()=>{ btn.classList.add("swap"); setTimeout(()=>{ label.textContent="Copiar"; btn.classList.remove("done","swap"); }, reduce?0:120); }, 1800);
+  }
+  $("#cmds").addEventListener("click", e => { const b = e.target.closest(".copy"); if(b) copy(b); });
+
+  ["#fNicho","#fPais","#fVivas"].forEach(s=>$(s).addEventListener("change",renderArq));
+  fetch("data.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{DATA=Object.assign({hoje:[],verdes:[]},d);render();})
+    .catch(()=>{$("#cardsHoje").innerHTML=`<div class="empty">Não foi possível carregar a lista de hoje. Tenta recarregar a página.</div>`;renderArq();watch();});
+})();
+</script>
+</body>
+</html>
