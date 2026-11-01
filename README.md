@@ -1,6 +1,8 @@
 # ProvenDrop
 
-Site estático (GitHub Pages): `index.html` (página principal, lê `data.json`), `bem-vindo.html` (página depois do pagamento) e `data.json` (lista do dia, gerada pela rotina de research).
+Site estático (GitHub Pages): `index.html` (página principal) e `bem-vindo.html` (página depois do pagamento).
+
+**Este repo e o site são públicos: não colocar aqui `data.json`, coleções, lojas nem links de ZIP.** As coleções só são entregues a quem subscreve, pelo WhatsApp.
 
 ## Pagamentos (Stripe Payment Link)
 1. Stripe → **Catálogo de produtos** → novo produto "ProvenDrop": preço **recorrente 15 €/mês**.

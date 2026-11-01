@@ -1,446 +1,688 @@
 <!doctype html>
-<html lang="pt-PT">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="description" content="Coleções de dropshipping que já estão a vender na Europa, UK e EUA. Confirmadas 24 h depois, com o kit pronto a lançar.">
+<meta name="description" content="Ecommerce collections already backed by real advertising activity and validated market demand. Daily opportunities and complete launch kits, delivered on WhatsApp.">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F8F6">
 <title>ProvenDrop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
 <style>
 /* ============================================================
-   ProvenDrop — "ficha de prova"
-   Layout: uma coluna estreita de secções; cada coleção é um cartão
-   de prova (carimbo + números). O bot aparece como um telemóvel real.
-   Motion (emil-design-eng): só transform/opacity, curvas fortes,
-   UI < 300ms, entradas uma vez por visita, filtros instantâneos.
+   ProvenDrop: "the evidence file"
+   Light sections explain, dark sections show the intelligence.
+   The one memorable element is the evidence row: a collection,
+   its proof and its six-market strip, values reserved for members.
    ============================================================ */
 :root{
-  --bg:#F4F6F2; --surface:#FFFFFF; --ink:#121A14; --muted:#5C675E; --line:#DDE2DA; --line-strong:#C7CEC4;
-  --go:#178246; --go-ink:#0F5F32; --go-soft:#E3F3E9;
-  --wait:#B4731A; --wait-soft:#FBEFDA;
-  --wa:#0B5C4B; --wa-bubble:#DCF3E4;
-  --header:rgba(244,246,242,.72);
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  /* motion tokens — nunca aproximar */
-  --ease-out:cubic-bezier(0.23,1,0.32,1);
-  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
-  --t-press:160ms; --t-ui:200ms; --t-enter:320ms; --t-reveal:600ms;
+  --light:#F7F8F6; --white:#FFFFFF; --ink:#171A18; --ink-2:#5C645E; --line:#E6E9E5; --line-2:#CFD4CE;
+  --dark:#101310; --dark-card:#191E1A; --dark-line:#2A312C; --on-dark:#F2F4F1; --on-dark-2:#A3ACA5;
+  --green:#78C995; --green-soft:#DFF3E5; --green-ink:#1D6E42;
+  --watch:#E2BC74; --watch-ink:#7A5610; --watch-soft:#F7EDD8;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --gutter:clamp(16px,4vw,48px);
+  --section:clamp(72px,9vw,136px);
+  --ease:cubic-bezier(.23,1,.32,1);
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
-  --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
-  --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}
-
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--light);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--go);outline-offset:3px;border-radius:6px}
-h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;font-optical-sizing:auto}
 p{margin:0}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.num{font-variant-numeric:tabular-nums}
-.muted{color:var(--muted)}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+h1,h2{font-family:var(--display);letter-spacing:-.02em}
+h2{font-size:clamp(36px,4.6vw,62px);line-height:1.05}
+h3{font-family:var(--body);font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.005em}
+svg{display:block}
+.wrap{width:100%;max-width:1296px;margin-inline:auto;padding-inline:max(var(--gutter),env(safe-area-inset-left,0px)) max(var(--gutter),env(safe-area-inset-right,0px))}
+.skip{position:absolute;left:16px;top:-60px;z-index:20;background:var(--ink);color:var(--white);padding:10px 14px;border-radius:6px}
+.skip:focus{top:12px}
+:focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
+.dark :focus-visible,.panel :focus-visible{outline-color:var(--green)}
 
-/* ── header: material translúcido, orla só quando há conteúdo por baixo ── */
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--header);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%)}
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--header);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid transparent;transition:border-color 150ms ease}
-header.top.scrolled{border-bottom-color:var(--line)}
-.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em;text-decoration:none}
-.brand svg{flex-shrink:0}
-nav{display:flex;gap:4px;flex-wrap:wrap}
-nav a{text-decoration:none;color:var(--muted);font-size:14px;padding:6px 10px;border-radius:8px;transition:color 150ms ease,background-color 150ms ease}
-@media (hover:hover) and (pointer:fine){nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--line) 50%,transparent)}}
-nav a:active{transform:scale(.97)}
+section{padding-block:var(--section);scroll-margin-top:64px}
+.dark{background:var(--dark);color:var(--on-dark)}
+.lede{font-size:clamp(18px,1.5vw,21px);line-height:1.5;color:var(--ink-2);max-width:58ch}
+.dark .lede{color:var(--on-dark-2)}
+.head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px clamp(32px,5vw,72px);align-items:end;margin-bottom:clamp(40px,5vw,72px)}
 
-/* ── hero ── */
-.hero{padding-block:56px 40px;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:end}
-.hero h1{font-size:clamp(38px,6.2vw,68px);font-weight:800;line-height:1.0;letter-spacing:-.025em}
-.hero h1 em{font-style:normal;color:var(--go)}
-.hero .lead{max-width:52ch;color:var(--muted);font-size:18px;line-height:1.5;margin-top:18px}
-.hero .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
-.today{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:12px;box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 4%,transparent)}
-.today .big{font-family:var(--display);font-size:52px;font-weight:800;line-height:1;letter-spacing:-.03em}
-.today .row{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
-.today .row b{color:var(--ink);font-weight:600}
-
-section{padding-block:44px;border-top:1px solid var(--line);scroll-margin-top:72px}
-.sec-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.sec-head h2{font-size:clamp(26px,3.6vw,36px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
-.sec-head p{margin-top:6px;color:var(--muted);max-width:60ch}
-
-/* ── cartões de prova ── */
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;align-content:start;min-width:0;transition:border-color 150ms ease,transform var(--t-ui) var(--ease-out)}
-@media (hover:hover) and (pointer:fine){.card:hover{border-color:var(--line-strong)}}
-.card-top{display:flex;justify-content:space-between;gap:10px;align-items:start}
-.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.stamp{flex-shrink:0;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1.5px solid currentColor}
-.stamp.go{color:var(--go-ink);background:var(--go-soft)} .stamp.wait{color:var(--wait);background:var(--wait-soft)}
-.card h3{font-size:22px;font-weight:700;line-height:1.15;letter-spacing:-.015em}
-.card .shop{font-size:14px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
-.proof{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px;margin:0;padding:12px 0;border-block:1px dashed var(--line)}
-.proof div{min-width:0} .proof dt{font-size:12px;color:var(--muted)} .proof dd{margin:0;font-family:var(--mono);font-size:17px;font-weight:500}
-.score{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--muted)}
-.bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.bar i{display:block;height:100%;width:100%;background:var(--go);transform-origin:left center;transform:scaleX(var(--s,0));transition:transform 700ms var(--ease-out)}
-.bar i.wait{background:var(--wait)}
-.score b{color:var(--ink)}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-
-/* ── botões: feedback no toque, 160ms, scale .97 ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:transform var(--t-press) var(--ease-out),background-color 150ms ease,border-color 150ms ease,color 150ms ease}
-.btn:active{transform:scale(.97)}
-.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn.go{background:var(--go);color:var(--bg);border-color:var(--go)}
-.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+/* buttons */
+.btn,.copy,.menu,summary,.nav a{touch-action:manipulation}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:16px;font-weight:600;line-height:1.2;text-decoration:none;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease,transform 160ms var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn-go{background:var(--green);color:#101310}
+.btn-line{background:transparent;color:inherit;border-color:var(--line-2)}
+.dark .btn-line,.panel .btn-line{border-color:#4A534D}
+.btn-sm{min-height:40px;padding:8px 14px;font-size:14px}
 @media (hover:hover) and (pointer:fine){
-  .btn:hover{border-color:var(--muted)}
-  .btn.primary:hover{background:color-mix(in srgb,var(--ink) 86%,var(--go))}
-  .btn.go:hover{background:var(--go-ink);border-color:var(--go-ink)}
-}
-/* conteúdo do botão que muda de estado: crossfade com blur (máscara da transição) */
-.btn .label{display:inline-block;transition:filter var(--t-ui) ease,opacity var(--t-ui) ease}
-.btn.swap .label{filter:blur(2px);opacity:.6}
-.empty{background:var(--surface);border:1px dashed var(--line-strong);border-radius:16px;padding:24px;color:var(--muted)}
-
-/* ── método: sequência real, por isso numerada ── */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.step{border-top:2px solid var(--ink);padding-top:12px;min-width:0}
-.step .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.step h3{font-size:18px;font-weight:700;margin-top:6px;letter-spacing:-.01em} .step p{margin-top:6px;color:var(--muted);font-size:15px}
-
-/* ── whatsapp ── */
-.wa-grid{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:32px;align-items:start}
-.phone{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:14px;display:grid;gap:10px;min-width:0}
-.phone .bar-top{display:flex;align-items:center;gap:10px;padding:4px 6px 10px;border-bottom:1px solid var(--line)}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--wa);display:grid;place-items:center;color:var(--surface);font-weight:700;font-family:var(--display);font-size:14px;flex-shrink:0}
-.phone .who{font-weight:600;font-size:14px} .phone .sub{font-size:12px;color:var(--muted)}
-.msg{max-width:88%;padding:8px 11px;border-radius:12px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
-.msg.me{justify-self:end;background:var(--wa-bubble);transform-origin:bottom right}
-.msg.bot{justify-self:start;background:var(--bg);border:1px solid var(--line);transform-origin:bottom left}
-.msg .time{display:block;text-align:right;font-size:11px;color:var(--muted);margin-top:2px}
-.file{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:12px}
-.file b{display:grid;place-items:center;width:34px;height:40px;border-radius:6px;background:var(--wa);color:var(--surface);font-size:10px;flex-shrink:0}
-.cmds{display:grid;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
-.cmd{display:grid;grid-template-columns:minmax(150px,auto) 1fr auto;gap:14px;align-items:center;padding:10px 12px 10px 16px;border-top:1px solid var(--line);min-width:0}
-.cmd:first-child{border-top:0}
-.cmd code{font-family:var(--mono);font-size:14px;color:var(--go-ink);font-weight:500}
-.cmd span{font-size:14px;color:var(--muted)}
-.copy{font:inherit;font-family:var(--mono);font-size:12px;padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer;transition:transform var(--t-press) var(--ease-out),border-color 150ms ease,color 150ms ease;-webkit-tap-highlight-color:transparent}
-.copy:active{transform:scale(.97)}
-@media (hover:hover) and (pointer:fine){.copy:hover{border-color:var(--muted);color:var(--ink)}}
-.copy .label{display:inline-block;transition:filter var(--t-ui) ease,opacity var(--t-ui) ease}
-.copy.swap .label{filter:blur(2px);opacity:.6}
-.copy.done{color:var(--go-ink);border-color:var(--go)}
-
-/* ── arquivo: filtros sem animação (uso frequente) ── */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.filters select{font:inherit;font-size:14px;padding:8px 32px 8px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);transition:border-color 150ms ease}
-@media (hover:hover) and (pointer:fine){.filters select:hover{border-color:var(--muted)}}
-.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
-table{width:100%;border-collapse:collapse;font-size:14px;min-width:680px}
-th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
-th{border-top:0;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
-td.num{font-family:var(--mono)}
-@media (hover:hover) and (pointer:fine){tbody tr:hover td{background:color-mix(in srgb,var(--line) 35%,transparent)}}
-.live{font-family:var(--mono);font-size:12px;display:inline-flex;align-items:center;gap:6px}
-.live i{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
-.live.yes{color:var(--go-ink)} .live.no{color:var(--muted)} .live.no i{background:transparent;border:1.5px solid currentColor}
-
-/* ── acesso ── */
-.access{display:grid;grid-template-columns:1fr minmax(0,380px);gap:32px;align-items:start}
-.access p{color:var(--muted);max-width:56ch}
-.access p + p{margin-top:10px}
-.price{background:var(--ink);color:var(--bg);border-radius:20px;padding:24px;display:grid;gap:14px}
-.price .amount{font-family:var(--display);font-size:56px;font-weight:800;line-height:1;letter-spacing:-.03em}
-.price .amount small{font-size:18px;font-weight:600;letter-spacing:0}
-.price ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
-.price .fine{font-size:13px;opacity:.8}
-.price .btn{justify-self:start}
-.contact{font-family:var(--mono);font-size:13px;opacity:.85;user-select:all}
-footer{padding-block:28px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-
-@media (max-width:760px){
-  .hero,.wa-grid,.access{grid-template-columns:1fr}
-  .hero{padding-block:36px 28px}
-  nav{display:none}
-  .cmd{grid-template-columns:1fr auto;gap:4px 10px} .cmd span{grid-column:1/-1}
+  .btn-go:hover{background:#8FD6A8}
+  .btn-line:hover{border-color:var(--ink)}
+  .dark .btn-line:hover,.panel .btn-line:hover{border-color:var(--on-dark)}
 }
 
-/* ── motion ───────────────────────────────────────────────
-   Entradas: uma vez por visita (marketing) → fade + 8px, 320ms ease-out,
-   stagger 60ms. Keyframes aqui são corretos: não são disparadas repetidamente.
-   Telemóvel: revela com clip-path (receita "scroll reveal"), uma vez. */
-@keyframes enter{to{opacity:1;transform:none}}
-.js .enter{opacity:0;transform:translateY(8px);animation:enter var(--t-enter) var(--ease-out) forwards;animation-delay:calc(var(--i,0)*60ms)}
-.js .card.enter{transform:translateY(8px) scale(.98)}
-.js .reveal{clip-path:inset(0 0 100% 0 round 24px);transition:clip-path var(--t-reveal) var(--ease-in-out)}
-.js .reveal[data-visible]{clip-path:inset(0 0 0 0 round 24px)}
-.js .reveal .msg{opacity:0;transform:translateY(6px) scale(.97);transition:opacity var(--t-enter) var(--ease-out),transform var(--t-enter) var(--ease-out)}
-.js .reveal[data-visible] .msg{opacity:1;transform:none;transition-delay:calc(200ms + var(--i,0)*350ms)}
-.js .later{opacity:0;transform:translateY(8px);transition:opacity var(--t-enter) var(--ease-out),transform var(--t-enter) var(--ease-out);transition-delay:calc(var(--i,0)*60ms)}
-.js .later[data-visible]{opacity:1;transform:none}
-@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.card:hover{transform:translateY(-2px)}}
-@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-/* reduzido: ficam os fades, cai o movimento */
+/* navigation */
+.top{position:sticky;top:0;z-index:10;background:var(--light);border-bottom:1px solid transparent;transition:border-color 150ms ease}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:64px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.01em;text-decoration:none}
+.nav{display:flex;align-items:center;gap:clamp(4px,1.6vw,20px)}
+.nav a:not(.btn){padding:8px;font-size:15px;color:var(--ink-2);text-decoration:none;transition:color 150ms ease}
+.nav .btn{margin-left:8px}
+.menu{display:none;width:44px;height:44px;margin-right:-10px;padding:0;background:none;border:0;color:inherit;cursor:pointer}
+.menu svg{margin:auto}
+@media (hover:hover) and (pointer:fine){.nav a:not(.btn):hover{color:var(--ink)}}
+
+/* hero */
+.hero{padding-block:clamp(40px,6vw,88px) var(--section)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(40px,5vw,80px);align-items:center}
+h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
+.hero .lede{margin-top:clamp(20px,2.4vw,32px)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,3vw,40px)}
+
+.panel{background:var(--dark);color:var(--on-dark);border-radius:14px;padding:clamp(20px,2.2vw,30px);display:grid;gap:20px;min-width:0}
+.panel-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:14px;color:var(--on-dark-2)}
+.panel-name{font-family:var(--display);font-size:clamp(28px,2.6vw,38px);line-height:1.08;letter-spacing:-.015em}
+.panel-sub{margin-top:6px;font-size:15px;color:var(--on-dark-2)}
+.scoreline{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:center}
+.score-big{font-family:var(--display);font-size:clamp(56px,5.4vw,76px);line-height:.9;letter-spacing:-.03em}
+.score-big small{font-family:var(--body);font-size:15px;letter-spacing:0;color:var(--on-dark-2);margin-left:3px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0;padding-block:16px;border-block:1px solid var(--dark-line)}
+.facts div{min-width:0}
+.facts dt{font-size:13px;line-height:1.3;color:var(--on-dark-2)}
+.facts dd{margin:4px 0 0;font-size:21px;font-weight:500;letter-spacing:-.01em}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;white-space:nowrap}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.go{color:var(--green)}
+.status.watch{color:var(--watch)}
+.status.watch::before{background:transparent;border:1.5px solid currentColor}
+
+/* values reserved for members */
+.redact{display:inline-block;height:.68em;max-width:100%;vertical-align:baseline;border-radius:2px;background:#3B443E}
+.row-note{font-size:15px;color:var(--on-dark-2);max-width:32ch}
+.members-note{margin-top:24px;color:var(--on-dark-2);max-width:62ch}
+
+/* six-market strip */
+.strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:0;padding:0;list-style:none}
+.strip li{position:relative;display:grid;place-items:center;height:32px;border-radius:3px;border:1px solid var(--dark-line);color:#8D968F;font-size:12.5px;font-weight:600}
+.strip .ad{border-color:#5F6B63;color:var(--on-dark)}
+.strip .ok{background:var(--green);border-color:var(--green);color:#101310}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--on-dark-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:14px;height:14px;border-radius:2px;border:1px solid var(--dark-line)}
+.legend .l-ok{background:var(--green);border-color:var(--green)}
+.legend .l-ad{border-color:#5F6B63}
+
+/* daily intelligence: the evidence file */
+.file-list{border-top:1px solid var(--dark-line)}
+.row{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,4fr) minmax(0,3fr);gap:20px clamp(24px,3vw,48px);padding-block:clamp(24px,2.6vw,36px);border-bottom:1px solid var(--dark-line);align-items:start}
+.row-name h3{font-family:var(--display);font-size:clamp(26px,2.4vw,34px);font-weight:400;line-height:1.1;letter-spacing:-.015em;margin-top:10px}
+.row-name .shop{margin-top:6px;font-size:15px;color:var(--on-dark-2)}
+.row .facts{padding:0;border:0}
+.row-mk{margin-top:18px}
+.row-mk .cap{font-size:13px;color:var(--on-dark-2);margin-bottom:8px}
+.row-score{display:grid;gap:14px}
+
+/* validation */
+.weights{display:flex;height:clamp(56px,6vw,84px);gap:3px;margin-bottom:clamp(28px,3vw,44px)}
+.weights div{display:flex;align-items:flex-end;padding:8px 10px;font-weight:600;font-size:clamp(14px,1.5vw,20px);min-width:0}
+.weights .w1{flex:42;background:#101310;color:var(--green);border-radius:6px 2px 2px 6px}
+.weights .w2{flex:33;background:var(--green);color:#101310;border-radius:2px}
+.weights .w3{flex:17;background:var(--green-soft);color:#14512F;border-radius:2px}
+.weights .w4{flex:8;background:var(--white);color:var(--ink);border:1px solid var(--line-2);border-radius:2px 6px 6px 2px;padding-inline:4px;justify-content:center}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px clamp(24px,3vw,44px)}
+.cats h3 .pct{display:block;font-family:var(--display);font-size:38px;font-weight:400;line-height:1.1;letter-spacing:-.02em;margin-bottom:6px}
+.cats p{margin-top:8px;font-size:16px;color:var(--ink-2)}
+.cats ul{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2);display:grid;gap:4px;font-size:15px}
+.recheck{margin-top:clamp(56px,7vw,96px);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:32px clamp(32px,5vw,72px);align-items:start}
+.recheck h3{font-family:var(--display);font-size:clamp(28px,3vw,40px);font-weight:400;line-height:1.1;letter-spacing:-.015em}
+.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;counter-reset:t}
+.timeline li{position:relative;padding:26px 24px 0 0;border-top:2px solid var(--ink)}
+.timeline li::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--ink)}
+.timeline li:last-child::before{background:var(--green);box-shadow:0 0 0 2px var(--ink)}
+.timeline b{display:block;font-weight:600;font-size:17px}
+.timeline span{display:block;margin-top:6px;font-size:16px;color:var(--ink-2)}
+
+/* markets */
+.mk{border-top:1px solid var(--line-2)}
+.mk li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:baseline;padding-block:clamp(14px,1.6vw,20px);border-bottom:1px solid var(--line-2)}
+.mk .country{font-family:var(--display);font-size:clamp(28px,3vw,42px);line-height:1.1;letter-spacing:-.015em}
+.mk .lang{font-size:15px;color:var(--ink-2)}
+.mk-note{margin-top:20px;font-size:15px;color:var(--ink-2);max-width:72ch}
+
+/* niches */
+.niches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;background:var(--light)}
+.niche{background:var(--white);padding:clamp(20px,2vw,28px);display:flex;flex-direction:column;justify-content:flex-end;min-height:clamp(240px,23vw,340px)}
+.niche h3{font-family:var(--display);font-size:clamp(30px,3vw,44px);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.niche:nth-child(2){background:var(--green-soft)}
+.niche:nth-child(3){background:#101310;color:var(--on-dark)}
+.niche:nth-child(4){background:#E9ECE7}
+.niche p{margin-top:10px;font-size:15.5px}
+.niche:nth-child(3) p{color:var(--on-dark-2)}
+.niche:nth-child(1) p,.niche:nth-child(2) p,.niche:nth-child(4) p{color:#454C47}
+
+/* kit */
+.kit-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,72px);align-items:start}
+.window{background:var(--white);border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+.window-bar{display:flex;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.window-bar span:last-child{font-weight:400;color:var(--ink-2);white-space:nowrap}
+.tree li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:4px 10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.tree li:last-child{border-bottom:0}
+.tree svg{margin-top:3px;color:var(--ink-2)}
+.tree b{font-weight:600}
+.tree span{grid-column:2;font-size:15px;color:var(--ink-2)}
+.warn{padding:20px;background:var(--watch-soft);border-radius:8px;font-size:16px}
+.warn b{display:block;color:var(--watch-ink);margin-bottom:4px}
+.kit-side{display:grid;gap:22px}
+.kit-side .small{font-size:15px;color:var(--ink-2)}
+
+/* whatsapp */
+.wa-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(40px,6vw,96px);align-items:start}
+.phone{width:100%;max-width:400px;background:#0B100D;border:1px solid var(--dark-line);border-radius:30px;padding:10px}
+.screen{border-radius:22px;overflow:hidden;background:#151B17}
+.bar-top{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#1E2722}
+.avatar{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;border-radius:50%;background:var(--green);color:#101310;font-weight:700;font-size:14px}
+.who{font-size:15px;font-weight:600;line-height:1.2}
+.sub2{font-size:13px;color:var(--on-dark-2)}
+.chat{display:grid;gap:8px;padding:14px 12px 18px}
+.bubble{max-width:90%;padding:8px 11px;border-radius:9px;font-size:14.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.bubble.me{justify-self:end;background:#245C42}
+.bubble.bot{justify-self:start;background:#232B26}
+.time{display:block;text-align:right;font-size:12px;color:#B5BEB7;margin-top:2px}
+.zipfile{display:flex;align-items:center;gap:10px}
+.zipfile b{display:grid;place-items:center;flex-shrink:0;width:36px;height:42px;border-radius:4px;background:var(--green);color:#101310;font-size:11px}
+.zipfile small{display:block;font-size:13px;color:var(--on-dark-2)}
+.wa-side h3{font-size:17px;margin-bottom:12px}
+.cmds{border-top:1px solid var(--dark-line)}
+.cmd{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,6fr) auto;gap:4px 18px;align-items:center;padding-block:12px;border-bottom:1px solid var(--dark-line)}
+.cmd code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14.5px;color:var(--green)}
+.cmd span.d{font-size:15px;color:var(--on-dark-2)}
+.copy{min-width:72px;min-height:40px;padding:6px 10px;font:inherit;font-size:14px;color:var(--on-dark);background:transparent;border:1px solid #4A534D;border-radius:5px;cursor:pointer;transition:border-color 150ms ease}
+.copy.done{border-color:var(--green);color:var(--green)}
+@media (hover:hover) and (pointer:fine){.copy:hover{border-color:var(--on-dark)}}
+.wa-points{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px;margin-bottom:clamp(32px,4vw,48px)}
+.wa-points b{display:block;font-weight:600}
+.wa-points span{font-size:15.5px;color:var(--on-dark-2)}
+
+/* exclusivity + pricing */
+.pair{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(40px,6vw,96px);align-items:start}
+.pair h2{margin-bottom:22px}
+.pair .lede + .lede{margin-top:14px}
+#exclusivity{padding-bottom:0}
+.matrix{margin:0;min-width:0}
+.matrix table{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed}
+.matrix th{font-size:13px;font-weight:500;color:var(--ink-2);text-align:center;padding:2px}
+.matrix tbody th{text-align:left;padding-left:0;width:26%;overflow:hidden}
+.matrix thead th:first-child{width:26%}
+.matrix td{height:clamp(36px,3.6vw,52px);background:var(--white);border:1px solid var(--line-2);border-radius:3px}
+.matrix td.on{background:var(--green);border-color:var(--green)}
+.matrix figcaption{margin-top:12px;font-size:14.5px;color:var(--ink-2)}
+.price{background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:clamp(24px,3vw,40px);display:grid;gap:20px}
+.amount{font-family:var(--display);font-size:clamp(72px,8vw,112px);line-height:.9;letter-spacing:-.035em}
+.amount small{font-family:var(--body);font-size:18px;letter-spacing:0;color:var(--ink-2);margin-left:6px}
+.fee{font-size:17px;font-weight:500}
+.price ul{display:grid;gap:9px;padding-top:18px;border-top:1px solid var(--line);font-size:16px}
+.price li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px}
+.price li svg{margin-top:5px;color:var(--green-ink)}
+.price .btn{width:100%}
+.pay-note{font-size:14.5px;color:var(--ink-2)}
+.pay-note a{text-underline-offset:3px}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:32px clamp(32px,5vw,72px);align-items:start}
+.faq{border-top:1px solid var(--line-2)}
+.faq details{border-bottom:1px solid var(--line-2)}
+.faq summary{display:flex;justify-content:space-between;gap:20px;align-items:center;padding-block:18px;font-size:clamp(18px,1.5vw,20px);font-weight:500;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary svg{flex-shrink:0;transition:transform 200ms var(--ease)}
+.faq details[open] summary svg{transform:rotate(45deg)}
+.faq details p{padding-bottom:22px;color:var(--ink-2);max-width:66ch}
+
+/* final cta + footer */
+.final{text-align:left}
+.final h2{font-size:clamp(46px,7.4vw,112px);line-height:.98;max-width:13ch}
+.final .btn{margin-top:clamp(28px,3vw,44px)}
+footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-size:15px}
+.foot{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,3fr) minmax(0,5fr);gap:28px clamp(24px,4vw,56px);padding-top:32px;border-top:1px solid var(--dark-line)}
+.foot .brand{color:var(--on-dark)}
+.foot ul{display:grid;gap:6px}
+.foot a{text-underline-offset:3px}
+
+/* the single orchestrated moment: the hero assembles once */
+@media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .js .in{animation:rise 520ms var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
+}
 @media (prefers-reduced-motion:reduce){
-  .js .enter,.js .card.enter,.js .later{transform:none;transition-property:opacity;animation-duration:200ms}
-  .js .reveal{clip-path:none;opacity:0;transition:opacity 200ms ease} .js .reveal[data-visible]{opacity:1}
-  .js .reveal .msg{transform:none;transition-property:opacity}
-  .bar i{transition:none} .btn:active,.copy:active,nav a:active{transform:none}
+  .faq summary svg,.btn{transition:none}
+  .btn:active{transform:none}
 }
-.price .duvidas{font-size:13px;opacity:.85;justify-self:start}
+
+@media (max-width:1100px){
+  .nav a:not(.btn){font-size:14px;padding:8px 5px}
+  .row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .row-name{grid-column:1/-1}
+  .cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .niches{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .recheck,.faq-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:860px){
+  .hero-grid,.head,.kit-grid,.wa-grid,.pair{grid-template-columns:minmax(0,1fr)}
+  .head{align-items:start}
+  .phone{margin-inline:auto}
+  .menu{display:block}
+  .nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;padding:8px var(--gutter) 20px;background:var(--light);border-bottom:1px solid var(--line)}
+  .nav.open{display:flex}
+  .nav a:not(.btn){padding:13px 0;font-size:18px;color:var(--ink);border-bottom:1px solid var(--line)}
+  .nav .btn{margin:14px 0 0}
+  .top .wrap{position:relative}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .cta .btn{flex:1 1 100%}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .timeline{grid-template-columns:minmax(0,1fr);border-left:2px solid var(--ink);margin-left:5px}
+  .timeline li{border-top:0;padding:0 0 26px 22px}
+  .timeline li:last-child{padding-bottom:0}
+  .timeline li::before{left:-7px;top:6px}
+  .cats{grid-template-columns:minmax(0,1fr)}
+  .niche{min-height:180px}
+  .cmd{grid-template-columns:minmax(0,1fr) auto}
+  .cmd span.d{grid-column:1/-1;grid-row:2}
+  .wa-points{grid-template-columns:minmax(0,1fr)}
+  .foot{grid-template-columns:minmax(0,1fr)}
+}
 </style>
 <script>
-/* ── CONFIGURAÇÃO DE PAGAMENTO ─────────────────────────────────────
-   Cola aqui o Payment Link da Stripe (15 €/mês + 25 € de adesão).
-   Enquanto estiver vazio, o botão "Subscrever" abre o WhatsApp da Click. */
+/* ── PAYMENT CONFIGURATION ─────────────────────────────────────────
+   Paste the Stripe Payment Link here (€15/month + €25 joining fee).
+   While it is empty, the subscribe buttons open WhatsApp. */
 window.PROVENDROP_STRIPE_LINK = "";
 </script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <header class="top" id="top">
   <div class="wrap">
-    <a class="brand" href="#hoje" aria-label="ProvenDrop">
-      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="var(--go)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a class="brand" translate="no" href="#main" aria-label="ProvenDrop, back to top">
+      <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#101310"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#78C995" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       ProvenDrop
     </a>
-    <nav aria-label="Secções">
-      <a href="#hoje">Hoje</a><a href="#metodo">Método</a><a href="#whatsapp">WhatsApp</a><a href="#arquivo">Arquivo</a><a href="#acesso">Acesso</a>
+    <button class="menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg>
+    </button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#how-it-works">How it works</a>
+      <a href="#intelligence">Intelligence</a>
+      <a href="#markets">Markets</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-go btn-sm" href="#pricing">Get Access</a>
     </nav>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="hero">
-    <div>
-      <div class="eyebrow enter" style="--i:0">Coleções para dropshipping · EU, UK e EUA</div>
-      <h1 class="enter" style="--i:1">Coleções que já estão <em>a vender</em>. Com prova, todos os dias.</h1>
-      <p class="lead enter" style="--i:2">Lemos os anúncios da concorrência e a procura no Google em 6 países. Só recebes coleções que já estão a bater, confirmadas 24 horas depois, com o kit pronto para lançar.</p>
-      <div class="cta enter" style="--i:3">
-        <a class="btn primary" href="#hoje"><span class="label">Ver a lista de hoje</span></a>
-        <a class="btn" href="#acesso"><span class="label">Acesso por 15 €/mês</span></a>
+<main id="main">
+  <div class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <h1 class="in" style="--i:0">Stop guessing. Start launching proven collections.</h1>
+        <p class="lede in" style="--i:1">Discover ecommerce collections already backed by real advertising activity and validated market demand. Get daily opportunities and complete launch kits directly through WhatsApp.</p>
+        <div class="cta in" style="--i:2">
+          <a class="btn btn-go" href="#pricing">Get Daily Access</a>
+          <a class="btn btn-line" href="#how-it-works">Discover How It Works</a>
+        </div>
       </div>
+      <aside class="panel in" style="--i:2" aria-label="Example of a daily entry. Collection names, links and figures are reserved for members.">
+        <div class="panel-top"><span>Example of a daily entry</span><span>Members only</span></div>
+        <div>
+          <span class="status go">Approved</span>
+          <div class="panel-name" style="margin-top:12px"><span class="redact" style="width:86%" aria-hidden="true"></span><br><span class="redact" style="width:48%" aria-hidden="true"></span></div>
+          <p class="panel-sub" style="margin-top:12px">Niche, store and strongest market</p>
+        </div>
+        <div>
+          <div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10 ProvenDrop score</small></div>
+        </div>
+        <dl class="facts">
+            <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
+          </dl>
+        <ul class="strip" aria-hidden="true"><li class="ad">IT</li><li class="">ES</li><li class="ok">FR</li><li class="ad">DE</li><li class="">GB</li><li class="">US</li></ul>
+        <p class="panel-sub" style="margin:0">Names, links, figures and kits are sent to members on WhatsApp.</p>
+      </aside>
     </div>
-    <aside class="today enter" style="--i:2" aria-label="Resumo de hoje">
-      <div class="eyebrow">Lista de <span id="dia">—</span></div>
-      <div class="big num" id="countHoje">—</div>
-      <div class="muted" id="countSub" style="font-size:14px">coleções na lista de hoje</div>
-      <div class="row"><span>Aprovadas (verdes)</span><b class="num" id="countGo">—</b></div>
-      <div class="row"><span>No arquivo</span><b class="num" id="countArq">—</b></div>
-      <div class="row"><span>Atualizado</span><b class="num" id="upd">—</b></div>
-    </aside>
   </div>
 
-  <section id="hoje">
-    <div class="sec-head">
-      <div><h2>Coleções de hoje</h2><p>Cada cartão mostra a prova: há quanto tempo a concorrente anuncia, quantas pessoas alcançou e em quantos países a procura no Google está validada.</p></div>
-    </div>
-    <div class="cards" id="cardsHoje"><div class="empty">A carregar as coleções de hoje…</div></div>
-  </section>
-
-  <section id="metodo">
-    <div class="sec-head"><div><h2>Como uma coleção fica verde</h2><p>Quatro filtros, por esta ordem, para cada candidata. Se falhar um, não chega até ti.</p></div></div>
-    <div class="steps">
-      <div class="step later" style="--i:0"><div class="n">1 · Anúncios</div><h3>A concorrência já está a pagar</h3><p>Lemos a Biblioteca de Anúncios da Meta em 7 países: anúncios ativos, há quantos dias, e o alcance real na Europa.</p></div>
-      <div class="step later" style="--i:1"><div class="n">2 · Procura</div><h3>As pessoas estão a procurar</h3><p>Google Trends em Itália, Espanha, França, Alemanha, Reino Unido e EUA, comparado com a categoria do produto.</p></div>
-      <div class="step later" style="--i:2"><div class="n">3 · Loja</div><h3>É genérica, não é marca</h3><p>Só lojas com produtos que encontras em fornecedor. Marcas com design próprio ficam de fora.</p></div>
-      <div class="step later" style="--i:3"><div class="n">4 · 24 horas</div><h3>Confirmada no dia seguinte</h3><p>Voltamos a medir no dia seguinte. Se os anúncios caírem, a coleção não é aprovada.</p></div>
-    </div>
-  </section>
-
-  <section id="whatsapp">
-    <div class="sec-head">
-      <div><h2>Também chega pelo WhatsApp</h2><p>O assistente da Click Dynamics envia a lista todas as manhãs às 9h e responde a comandos a qualquer hora, em conversa ou em grupo.</p></div>
-    </div>
-    <div class="wa-grid">
-      <div class="phone reveal" id="phone" aria-label="Exemplo de conversa no WhatsApp">
-        <div class="bar-top"><div class="avatar">C</div><div><div class="who">Assistente Clickdynamics</div><div class="sub">bot · WhatsApp</div></div></div>
-        <div class="msg me" style="--i:0">/pr hoje<span class="time">09:00</span></div>
-        <div class="msg bot" id="waMsg" style="--i:1">A carregar…<span class="time">09:00</span></div>
-        <div class="msg bot" style="--i:2"><div class="file"><b>ZIP</b><div id="waFile">Coleção aprovada.zip<br><span class="muted">Imagens · Vídeos · Google Ads</span></div></div><span class="time">09:00</span></div>
+  <section class="dark" id="intelligence">
+    <div class="wrap">
+      <div class="head">
+        <h2>The evidence behind every collection</h2>
+        <p class="lede">Each entry shows how long a competitor has been advertising the collection, how many people the ads reached and where demand holds up. The details are reserved for members.</p>
       </div>
-      <div>
-        <div class="cmds" role="list" id="cmds">
-          <div class="cmd" role="listitem"><code>/pr hoje</code><span>As coleções do dia, com o zip de cada aprovada.</span><button class="copy" type="button" data-cmd="/pr hoje"><span class="label">Copiar</span></button></div>
-          <div class="cmd" role="listitem"><code>/pr verdes</code><span>As últimas 10 coleções aprovadas.</span><button class="copy" type="button" data-cmd="/pr verdes"><span class="label">Copiar</span></button></div>
-          <div class="cmd" role="listitem"><code>/pr ativas</code><span>Aprovadas que a concorrente ainda está a anunciar.</span><button class="copy" type="button" data-cmd="/pr ativas"><span class="label">Copiar</span></button></div>
-          <div class="cmd" role="listitem"><code>/pr homem · mulher · joalharia · decor</code><span>Só o nicho que te interessa.</span><button class="copy" type="button" data-cmd="/pr homem"><span class="label">Copiar</span></button></div>
-          <div class="cmd" role="listitem"><code>/pr ES · IT · FR · DE · GB · US</code><span>Coleções aprovadas para esse país.</span><button class="copy" type="button" data-cmd="/pr ES"><span class="label">Copiar</span></button></div>
-          <div class="cmd" role="listitem"><code>/pr ajuda</code><span>A lista de comandos.</span><button class="copy" type="button" data-cmd="/pr ajuda"><span class="label">Copiar</span></button></div>
+      <div class="legend" style="margin-bottom:18px" aria-label="Market strip legend">
+        <span><i class="l-ok"></i>Approved for this market</span>
+        <span><i class="l-ad"></i>Ads seen</span>
+        <span><i></i>No ads recorded</span>
+      </div>
+      <div class="file-list">
+        <article class="row" aria-label="Example of an approved entry. Details are reserved for members.">
+          <div class="row-name"><span class="status go">Approved</span><h3><span class="redact" style="width:78%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
+          <div><dl class="facts">
+            <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
+          </dl><div class="row-mk"><p class="cap">Search demand by market</p><ul class="strip" aria-hidden="true"><li class="ad">IT</li><li class="">ES</li><li class="ok">FR</li><li class="ok">DE</li><li class="">GB</li><li class="">US</li></ul></div></div>
+          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Comes with the collection link and a complete launch kit.</p></div>
+        </article>
+        <article class="row" aria-label="Example of an observing entry. Details are reserved for members.">
+          <div class="row-name"><span class="status watch">Observing</span><h3><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
+          <div><dl class="facts">
+            <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+            <div><dt>EU reach</dt><dd><span class="redact" style="width:5ch" aria-hidden="true"></span></dd></div>
+          </dl><div class="row-mk"><p class="cap">Search demand by market</p><ul class="strip" aria-hidden="true"><li class="">IT</li><li class="ad">ES</li><li class="">FR</li><li class="">DE</li><li class="">GB</li><li class="">US</li></ul></div></div>
+          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Promising but not approved yet, so it has no kit.</p></div>
+        </article>
+      </div>
+      <p class="members-note">Members can also ask for recent approved collections at any time, by niche or by country, on WhatsApp.</p>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="head">
+        <h2>How a collection earns its place</h2>
+        <p class="lede">Candidates are scored on 13 metrics across four weighted categories. Brands, intellectual-property risks and non-compliant offers are removed.</p>
+      </div>
+      <div class="weights" role="img" aria-label="Current weighting: advertising evidence 42 percent, search demand 33 percent, store and collection quality 17 percent, risk assessment 8 percent">
+        <div class="w1">42%</div><div class="w2">33%</div><div class="w3">17%</div><div class="w4">8%</div>
+      </div>
+      <div class="cats">
+        <div>
+          <h3><span class="pct">42%</span>Advertising evidence</h3>
+          <p>Are competitors paying to advertise this collection, and for how long?</p>
+          <ul><li>EU audience reach</li><li>Advertising duration</li><li>Active ads and variations</li><li>Creative diversity</li><li>Other stores on the same theme</li></ul>
         </div>
-        <p class="muted" style="font-size:14px;margin-top:14px">O zip traz um guia de uma página, as fotos de referência, o texto para gerar 20 imagens de anúncio no ChatGPT, 4 vídeos prontos a gerar e as palavras-chave de Google Ads para o país onde a coleção está a bater.</p>
+        <div>
+          <h3><span class="pct">33%</span>Search demand</h3>
+          <p>Are people searching for it in each market, and is interest growing?</p>
+          <ul><li>Google demand by country</li><li>Recent momentum</li><li>Fit across markets</li></ul>
+        </div>
+        <div>
+          <h3><span class="pct">17%</span>Store and collection quality</h3>
+          <p>Is the store investing, and can the collection be replicated?</p>
+          <ul><li>Store strength</li><li>Collection cohesion</li><li>Social signals</li></ul>
+        </div>
+        <div>
+          <h3><span class="pct">8%</span>Risk assessment</h3>
+          <p>Could it cause legal or advertising-policy problems?</p>
+          <ul><li>Legal and IP risk</li><li>Advertising-policy risk</li></ul>
+        </div>
+      </div>
+
+      <div class="recheck">
+        <div>
+          <h3>Then we check again, 24 hours later</h3>
+        </div>
+        <ol class="timeline">
+          <li><b>Day one</b><span>The collection is measured, scored and given a status.</span></li>
+          <li><b>24 hours later</b><span>Active ads and reach are measured again, and the collection link is tested.</span></li>
+          <li><b>The result</b><span>If the ads hold, it is confirmed. If they fall or the link fails, its status is downgraded.</span></li>
+        </ol>
       </div>
     </div>
   </section>
 
-  <section id="arquivo">
-    <div class="sec-head"><div><h2>Arquivo de verdes</h2><p>Todas as coleções aprovadas desde o início, e se a concorrente ainda as anuncia hoje.</p></div></div>
-    <div class="filters">
-      <select id="fNicho" aria-label="Filtrar por nicho"><option value="">Todos os nichos</option><option>Joalharia</option><option>House Decor</option><option>Roupa Feminina</option><option>Roupa Masculina</option></select>
-      <select id="fPais" aria-label="Filtrar por país"><option value="">Todos os países</option><option>ES</option><option>IT</option><option>FR</option><option>DE</option><option>GB</option><option>US</option></select>
-      <select id="fVivas" aria-label="Filtrar por estado"><option value="">Todas</option><option value="sim">Ainda a anunciar</option></select>
+  <section id="markets" style="padding-top:0">
+    <div class="wrap">
+      <div class="head">
+        <h2>Six markets, measured separately</h2>
+        <p class="lede">A collection can be strong in one country and weak in another. Advertising activity and search demand are read for each market, so you know where to start.</p>
+      </div>
+      <ul class="mk">
+        <li><span class="country">Italy</span><span class="lang">Searches in Italian</span></li>
+        <li><span class="country">Spain</span><span class="lang">Searches in Spanish</span></li>
+        <li><span class="country">France</span><span class="lang">Searches in French</span></li>
+        <li><span class="country">Germany</span><span class="lang">Searches in German</span></li>
+        <li><span class="country">United Kingdom</span><span class="lang">Searches in English</span></li>
+        <li><span class="country">United States</span><span class="lang">Searches in English</span></li>
+      </ul>
+      <p class="mk-note">EU reach comes from Meta’s EU ad transparency data, which does not cover the UK or the US.</p>
     </div>
-    <div id="arqBox"></div>
   </section>
 
-  <section id="acesso">
-    <div class="access">
-      <div>
-        <div class="sec-head" style="margin-bottom:10px"><div><h2>Acesso</h2></div></div>
-        <p>Lugares limitados por nicho e país, para que a mesma coleção não chegue a demasiadas lojas ao mesmo tempo.</p>
-        <p>Subscreves aqui, com cartão, num pagamento seguro da Stripe. Logo a seguir mostramos-te os passos para entrar no grupo do WhatsApp, e ficas com acesso no mesmo dia.</p>
-        <p>Cancelas quando quiseres, sem fidelização.</p>
+  <section id="niches" style="padding-top:0">
+    <div class="wrap">
+      <div class="head">
+        <h2>Four niches, one collection each</h2>
+        <p class="lede">The research looks for one strong collection per niche, from generic stores rather than brands with their own designs.</p>
       </div>
-      <div class="price later">
-        <div class="eyebrow" style="color:inherit;opacity:.75">ProvenDrop</div>
-        <div class="amount num">15 € <small>/ mês</small></div>
-        <ul>
-          <li>Coleções aprovadas todos os dias</li>
-          <li>Zip pronto a usar em cada coleção</li>
-          <li>Comandos no WhatsApp e envio às 9h</li>
-          <li>Arquivo completo de verdes</li>
-        </ul>
-        <div class="fine">+ 25 € de adesão, uma vez.</div>
-        <a class="btn go" id="btnSubscrever" href="https://wa.me/351920117648?text=Quero%20entrar%20no%20ProvenDrop" target="_blank" rel="noopener"><span class="label">Subscrever</span></a>
-        <a class="duvidas" href="https://wa.me/351920117648?text=Tenho%20uma%20d%C3%BAvida%20sobre%20o%20ProvenDrop" target="_blank" rel="noopener">Dúvidas? Fala com a Click no WhatsApp</a>
-        <div class="contact">+351 920 117 648</div>
+      <ul class="niches">
+        <li class="niche">
+          <div><h3>Women’s jewellery</h3><p>Earrings, necklaces and pieces that sell as collections.</p></div>
+        </li>
+        <li class="niche">
+          <div><h3>Home decoration</h3><p>Lamps, cushions, decor and seasonal collections.</p></div>
+        </li>
+        <li class="niche">
+          <div><h3>Women’s fashion</h3><p>Coats, knitwear and seasonal outerwear.</p></div>
+        </li>
+        <li class="niche">
+          <div><h3>Men’s fashion</h3><p>Jackets, coats and menswear collections.</p></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="kit" style="padding-top:0">
+    <div class="wrap">
+      <div class="head">
+        <h2>Ready-to-launch kits</h2>
+        <p class="lede">Each confirmed collection comes with one ZIP: the instructions and references to build your ads, and the research behind the decision.</p>
       </div>
+      <div class="kit-grid">
+        <div class="window">
+          <div class="window-bar"><span>Approved collection.zip</span><span>Sample structure</span></div>
+          <ul class="tree">
+            <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b>LEIA-ME.txt</b><span>One page: the collection, where to sell it, pricing and the first three steps.</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b>1 - Imagens</b><span>Reference photographs and the instructions for generating 20 advertising images.</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b>2 - Videos</b><span>A reference photograph and a ready prompt for each of 4 UGC videos.</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b>3 - Google Ads.txt</b><span>Keywords, negative keywords, Shopping titles and landing-page copy.</span></li>
+            <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b>Analise completa.md</b><span>The complete research analysis for the collection.</span></li>
+          </ul>
+        </div>
+        <div class="kit-side">
+          <div class="warn"><b>Competitor photographs are references only</b>Use them to generate your own creatives and to find the products with your supplier. Never publish them in your ads.</div>
+          <p class="small">Kit documents are currently written in Portuguese. File names above match the real kit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dark" id="whatsapp">
+    <div class="wrap">
+      <div class="head">
+        <h2>Delivered where you already work</h2>
+        <p class="lede">The research reaches your phone on WhatsApp. There is no other platform to learn and no dashboard to log in to.</p>
+      </div>
+      <div class="wa-grid">
+        <div class="phone" role="img" aria-label="Example WhatsApp conversation showing the daily list and a ZIP file">
+          <div class="screen">
+            <div class="bar-top"><div class="avatar" aria-hidden="true">C</div><div><div class="who">Click Dynamics assistant</div><div class="sub2">Example conversation</div></div></div>
+            <div class="chat">
+              <div class="bubble bot">Today’s list
+
+1. <span class="redact" style="width:11em" aria-hidden="true"></span>
+Niche and market
+Approved, score <span class="redact" style="width:2em" aria-hidden="true"></span>
+<span class="redact" style="width:1.5em" aria-hidden="true"></span> active ads, <span class="redact" style="width:1.5em" aria-hidden="true"></span> days
+EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span class="time">09:00</span></div>
+              <div class="bubble bot"><div class="zipfile"><b>ZIP</b><div>Collection.zip<small>Images, videos, Google Ads</small></div></div><span class="time">09:00</span></div>
+              <div class="bubble me">/pr homem<span class="time">09:04</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="wa-side">
+          <div class="wa-points">
+            <div><b>9 AM, every day</b><span>The day’s list arrives with each collection’s evidence and kit.</span></div>
+            <div><b>Commands at any time</b><span>Filter by niche or country, or ask for approved collections again.</span></div>
+          </div>
+          <h3>Available commands</h3>
+          <div class="cmds" role="list" id="cmds">
+            <div class="cmd" role="listitem"><code translate="no">/pr hoje</code><span class="d">The day’s collections, with a ZIP for each approved one.</span><button class="copy" type="button" data-cmd="/pr hoje" aria-label="Copy command /pr hoje"><span class="label" aria-live="polite">Copy</span></button></div>
+            <div class="cmd" role="listitem"><code translate="no">/pr verdes</code><span class="d">The last 10 approved collections.</span><button class="copy" type="button" data-cmd="/pr verdes" aria-label="Copy command /pr verdes"><span class="label" aria-live="polite">Copy</span></button></div>
+            <div class="cmd" role="listitem"><code translate="no">/pr ativas</code><span class="d">Approved collections still being advertised.</span><button class="copy" type="button" data-cmd="/pr ativas" aria-label="Copy command /pr ativas"><span class="label" aria-live="polite">Copy</span></button></div>
+            <div class="cmd" role="listitem"><code translate="no">/pr homem, mulher, joalharia, decor</code><span class="d">Only the niche you want.</span><button class="copy" type="button" data-cmd="/pr homem" aria-label="Copy command /pr homem"><span class="label" aria-live="polite">Copy</span></button></div>
+            <div class="cmd" role="listitem"><code translate="no">/pr ES, IT, FR, DE, GB, US</code><span class="d">Approved collections for that country.</span><button class="copy" type="button" data-cmd="/pr ES" aria-label="Copy command /pr ES"><span class="label" aria-live="polite">Copy</span></button></div>
+            <div class="cmd" role="listitem"><code translate="no">/pr ajuda</code><span class="d">The list of commands.</span><button class="copy" type="button" data-cmd="/pr ajuda" aria-label="Copy command /pr ajuda"><span class="label" aria-live="polite">Copy</span></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="exclusivity">
+    <div class="wrap">
+      <div class="pair">
+        <div>
+          <h2>Limited by niche and country</h2>
+          <p class="lede">Memberships are limited so the same collection does not reach too many stores in the same market at once.</p>
+          <p class="lede">When you join, you tell us your niche and countries. If your combination is full, we offer you another one or refund your payment.</p>
+        </div>
+        <figure class="matrix">
+          <table role="img" aria-label="Diagram: memberships are limited per combination of niche and country. One example combination, women’s jewellery in France, is highlighted.">
+            <thead><tr><th></th><th>IT</th><th>ES</th><th>FR</th><th>DE</th><th>GB</th><th>US</th></tr></thead>
+            <tbody>
+              <tr><th>Jewellery</th><td></td><td></td><td class="on"></td><td></td><td></td><td></td></tr>
+              <tr><th>Home</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><th>Women’s</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><th>Men’s</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+          <figcaption>Each square is one combination. Example highlighted: jewellery in France.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <div class="pair">
+        <div>
+          <h2>One plan, everything included</h2>
+          <p class="lede">No tiers and no long-term commitment. Cancel whenever you want.</p>
+        </div>
+        <div class="price">
+          <div class="amount">€15<small>/ month</small></div>
+          <div class="fee">+ €25 one-time joining fee</div>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Daily validated collections</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>WhatsApp delivery and commands</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>A complete launch kit for each approved collection</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Access to the approved archive</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Four niches and six markets</li>
+          </ul>
+          <a class="btn btn-go" id="btnSubscrever" data-subscribe href="https://wa.me/351920117648?text=I%27d%20like%20to%20join%20ProvenDrop" target="_blank" rel="noopener">Get Access</a>
+          <p class="pay-note" id="payNote">Sign-up is handled on WhatsApp for now. The button opens a chat with us.</p>
+          <p class="pay-note"><a href="https://wa.me/351920117648?text=I%20have%20a%20question%20about%20ProvenDrop" target="_blank" rel="noopener">Questions? Message us on WhatsApp</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:0">
+    <div class="wrap">
+      <div class="faq-grid">
+        <h2>Questions</h2>
+        <div class="faq">
+          <details><summary>What exactly is ProvenDrop?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>An ecommerce market intelligence service. We research collections from stores already advertising in international markets, validate them and send you the results on WhatsApp. It is not a store, a product catalogue or a dashboard.</p></details>
+          <details><summary>How are collections validated?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Each candidate is scored on 13 metrics across advertising evidence, search demand, store and collection quality, and risk. Brands are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
+          <details><summary>How many collections do I receive?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Normally 1 to 4 a day. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
+          <details><summary>Which countries are covered?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Italy, Spain, France, Germany, the United Kingdom and the United States.</p></details>
+          <details><summary>Which niches are available?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
+          <details><summary>What is included in the ZIP?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A one-page guide, reference photographs, instructions for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete analysis. The photographs are references only and must not be published in ads.</p></details>
+          <details><summary>How does WhatsApp delivery work?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>The list arrives at 9 AM with each collection’s evidence and kit. At any time you can send a command to filter by niche or country.</p></details>
+          <details><summary>Can I cancel my subscription?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Yes, whenever you want, with no minimum term. The welcome page you see after paying explains how to manage your subscription.</p></details>
+          <details><summary>Why are memberships limited?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dark final" id="join">
+    <div class="wrap">
+      <h2>Less guessing. More informed launches.</h2>
+      <a class="btn btn-go" data-subscribe href="https://wa.me/351920117648?text=I%27d%20like%20to%20join%20ProvenDrop" target="_blank" rel="noopener">Join ProvenDrop</a>
     </div>
   </section>
 </main>
 
-<footer><div class="wrap">ProvenDrop · As fotos e as lojas mostradas são da concorrência e servem só de referência. Nunca publicar as fotos de outras lojas nos anúncios.</div></footer>
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" translate="no" href="#main">ProvenDrop</a>
+        <p style="margin-top:8px">Ecommerce market intelligence, delivered on WhatsApp.</p>
+      </div>
+      <ul>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#intelligence">Intelligence</a></li>
+        <li><a href="#markets">Markets</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div>
+        <p><a href="https://wa.me/351920117648">+351 920 117 648</a></p>
+        <p style="margin-top:8px">Competitor photographs in the kit are for reference only. Never publish other stores’ photographs in your ads.</p>
+      </div>
+    </div>
+  </div>
+</footer>
 
 <script>
 document.documentElement.classList.add("js");
 (function(){
-  var b=document.getElementById("btnSubscrever"), l=window.PROVENDROP_STRIPE_LINK;
-  if(b && l){ b.href=l; b.removeAttribute("target"); b.removeAttribute("rel"); }
+  var l=window.PROVENDROP_STRIPE_LINK;
+  if(!l) return;
+  document.querySelectorAll("[data-subscribe]").forEach(function(b){ b.href=l; b.removeAttribute("target"); b.removeAttribute("rel"); });
+  var n=document.getElementById("payNote");
+  if(n) n.textContent="Secure card payment by Stripe. Setup steps appear right after you pay.";
 })();
 
 (function(){
   const $ = s => document.querySelector(s);
-  const fmt = n => (n==null||isNaN(n)) ? "—" : Math.round(n).toLocaleString("pt-PT");
-  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const isGo = it => /aprovad/i.test(it.estado||"") || /🟢/.test(it.veredito||"");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const pr = new Intl.PluralRules("pt-PT");
-  const plural = (n, one, other) => pr.select(n)==="one" ? one : other;
-  let DATA = {hoje:[], verdes:[]};
 
-  /* "há 2 h" até uma semana; depois a data absoluta (ui-cheatsheet) */
-  function when(iso){
-    if(!iso) return "—";
-    const d = new Date(iso); if(isNaN(d)) return iso.replace("T"," ");
-    const diff = (Date.now()-d)/1000;
-    if(diff < 0 || diff > 7*86400) return d.toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});
-    if(diff < 3600) return "há "+Math.max(1,Math.round(diff/60))+" min";
-    if(diff < 86400) return "há "+Math.round(diff/3600)+" h";
-    const days=Math.round(diff/86400); return "há "+days+" "+plural(days,"dia","dias");
-  }
-
-  /* cabeçalho: orla só quando há conteúdo por baixo */
+  /* navigation */
   const top = $("#top");
   const onScroll = () => top.classList.toggle("scrolled", scrollY > 8);
   addEventListener("scroll", onScroll, {passive:true}); onScroll();
+  const menu = $("#menuBtn"), nav = $("#nav");
+  function setMenu(open){ nav.classList.toggle("open",open); menu.setAttribute("aria-expanded",open); menu.setAttribute("aria-label",open?"Close menu":"Open menu"); }
+  menu.addEventListener("click",()=>setMenu(!nav.classList.contains("open")));
+  nav.addEventListener("click",e=>{ if(e.target.closest("a")) setMenu(false); });
+  addEventListener("keydown",e=>{ if(e.key==="Escape" && nav.classList.contains("open")){ setMenu(false); menu.focus(); } });
 
-  function card(it,i){
-    const go = isGo(it);
-    const pais = it.mercado_destaque || (it.paises_ads||[])[0] || "—";
-    const zip = it.zip_url ? `<a class="btn primary" href="${esc(it.zip_url)}" target="_blank" rel="noopener"><span class="label">Descarregar zip</span></a>`
-                           : `<span class="btn" aria-disabled="true"><span class="label">${go ? "Zip a caminho" : "Sem zip (a observar)"}</span></span>`;
-    const s = Math.min(1,(it.score||0)/10);
-    return `<article class="card enter" style="--i:${i}">
-      <div class="card-top"><span class="chip">${esc(it.nicho)}</span><span class="stamp ${go?"go":"wait"}">${go?"Aprovada":"A observar"}</span></div>
-      <div><h3>${esc(it.colecao)}</h3><div class="shop">${esc(it.loja)} · a bater em <b>${esc(pais)}</b></div></div>
-      <dl class="proof">
-        <div><dt>Anúncios ativos</dt><dd class="num">${fmt(it.anuncios_ativos)}</dd></div>
-        <div><dt>Dias a anunciar</dt><dd class="num">${fmt(it.dias_ativo)}</dd></div>
-        <div><dt>Alcance na UE</dt><dd class="num">${fmt(it.alcance_eu)}</dd></div>
-        <div><dt>Países com procura</dt><dd class="num">${it.trends_validados ?? "—"}/6</dd></div>
-      </dl>
-      <div class="score">Score <span class="bar"><i class="${go?"":"wait"}" data-s="${s}"></i></span> <b class="num">${(+it.score||0).toFixed(1)}</b></div>
-      <div class="actions"><a class="btn" href="${esc(it.link)}" target="_blank" rel="noopener"><span class="label">Ver coleção</span></a>${zip}</div>
-    </article>`;
-  }
-
-  function waText(){
-    const its = DATA.hoje;
-    if(!its.length) return "Hoje não há coleções aprovadas.";
-    return `PR ${DATA.dia} — coleções a bater\n\n` + its.map((it,i)=>`${i+1}. ${it.colecao} — ${it.nicho}\n${isGo(it)?"🟢 Aprovada":"🟡 A observar"} · score ${(+it.score).toFixed(1)}\n${fmt(it.anuncios_ativos)} anúncios · ${fmt(it.dias_ativo)} dias`).join("\n\n");
-  }
-
-  /* arquivo: re-render instantâneo (filtros são uso frequente → sem animação) */
-  function renderArq(){
-    const n=$("#fNicho").value, p=$("#fPais").value, v=$("#fVivas").value;
-    const rows = DATA.verdes.filter(r => (!n||r.nicho===n) && (!p||r.mercado_destaque===p||String(r.mercados_verdes||"").includes(p)) && (!v||r.ainda_a_anunciar===v));
-    const box = $("#arqBox");
-    if(!DATA.verdes.length){ box.innerHTML = `<div class="empty">O arquivo começa com a primeira coleção confirmada. Cada coleção aprovada fica aqui guardada, com a indicação diária de se a concorrente ainda a anuncia.</div>`; return; }
-    if(!rows.length){ box.innerHTML = `<div class="empty">Nenhuma coleção com estes filtros.</div>`; return; }
-    box.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Aprovada</th><th>Coleção</th><th>Nicho</th><th>País</th><th>Score</th><th>Ainda a anunciar</th><th></th></tr></thead><tbody>${
-      rows.slice().reverse().map(r=>`<tr><td class="num">${esc(r.data_aprovacao)}</td><td><b>${esc(r.colecao)}</b><br><span class="muted">${esc(r.loja)}</span></td><td>${esc(r.nicho)}</td><td>${esc(r.mercado_destaque)}</td><td class="num">${(+r.score).toFixed(1)}</td><td><span class="live ${r.ainda_a_anunciar==="sim"?"yes":"no"}"><i></i>${r.ainda_a_anunciar==="sim"?"sim":"não"}</span></td><td><a href="${esc(r.link_colecao||r.link)}" target="_blank" rel="noopener">Ver</a>${(r.link_zip||r.zip_url)?` · <a href="${esc(r.link_zip||r.zip_url)}" target="_blank" rel="noopener">Zip</a>`:""}</td></tr>`).join("")
-    }</tbody></table></div>`;
-  }
-
-  /* revelar uma vez ao entrar no ecrã; nunca voltar a animar */
-  function show(el){
-    el.setAttribute("data-visible","");
-    el.querySelectorAll(".bar i[data-s]").forEach(b=>b.style.setProperty("--s",b.dataset.s));
-  }
-  const io = ("IntersectionObserver" in window) ? new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ show(e.target); io.unobserve(e.target);} }),{rootMargin:"0px 0px -60px 0px"}) : null;
-  function watch(){ document.querySelectorAll(".reveal:not([data-visible]),.later:not([data-visible]),.card:not([data-visible])").forEach(el=> io ? io.observe(el) : show(el)); }
-  /* completo em repouso: o que o observador não alcançou aparece à mesma */
-  setTimeout(()=>document.querySelectorAll(".reveal:not([data-visible]),.later:not([data-visible]),.card:not([data-visible])").forEach(show), 1800);
-
-  function render(){
-    const n = DATA.hoje.length, g = DATA.hoje.filter(isGo).length;
-    $("#dia").textContent = DATA.dia || "—";
-    $("#countHoje").textContent = n;
-    $("#countSub").textContent = plural(n,"coleção na lista de hoje","coleções na lista de hoje");
-    $("#countGo").textContent = g;
-    $("#countArq").textContent = DATA.verdes.length;
-    $("#upd").textContent = when(DATA.atualizado);
-    $("#cardsHoje").innerHTML = n ? DATA.hoje.map(card).join("") : `<div class="empty">Hoje não há coleções aprovadas. A lista nova sai ao fim da tarde.</div>`;
-    const m = $("#waMsg"); m.textContent = waText(); const t=document.createElement("span"); t.className="time"; t.textContent="09:00"; m.appendChild(t);
-    const first = DATA.hoje.find(isGo); if(first){ $("#waFile").innerHTML = `${esc(first.colecao)}.zip<br><span class="muted">Imagens · Vídeos · Google Ads</span>`; }
-    renderArq();
-    watch();
-  }
-
-  /* copiar comando: estado muda uma vez por clique → crossfade com blur, 200ms */
+  /* copy command */
   async function copy(btn){
     const text = btn.dataset.cmd, label = btn.querySelector(".label");
     let ok = false;
     try{ await navigator.clipboard.writeText(text); ok = true; }
     catch{ const r=document.createRange(); r.selectNodeContents(btn.closest(".cmd").querySelector("code")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
-    btn.classList.add("swap");
-    setTimeout(()=>{ label.textContent = ok ? "Copiado" : "Seleciona e copia"; btn.classList.add("done"); btn.classList.remove("swap"); }, reduce?0:120);
+    label.textContent = ok ? "Copied" : "Selected";
+    btn.classList.add("done");
     clearTimeout(btn._t);
-    btn._t = setTimeout(()=>{ btn.classList.add("swap"); setTimeout(()=>{ label.textContent="Copiar"; btn.classList.remove("done","swap"); }, reduce?0:120); }, 1800);
+    btn._t = setTimeout(()=>{ label.textContent="Copy"; btn.classList.remove("done"); }, reduce?2400:1800);
   }
   $("#cmds").addEventListener("click", e => { const b = e.target.closest(".copy"); if(b) copy(b); });
-
-  ["#fNicho","#fPais","#fVivas"].forEach(s=>$(s).addEventListener("change",renderArq));
-  fetch("data.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{DATA=Object.assign({hoje:[],verdes:[]},d);render();})
-    .catch(()=>{$("#cardsHoje").innerHTML=`<div class="empty">Não foi possível carregar a lista de hoje. Tenta recarregar a página.</div>`;renderArq();watch();});
 })();
 </script>
 </body>
