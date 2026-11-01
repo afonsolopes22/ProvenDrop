@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Welcome to ProvenDrop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F4F6F2; --surface:#FFFFFF; --ink:#121A14; --muted:#5C675E; --line:#DDE2DA; --line-strong:#C7CEC4;
+  --go:#178246; --go-ink:#0F5F32; --go-soft:#E3F3E9;
+  --wait:#B4731A; --wait-soft:#FBEFDA;
+  --wa:#0B5C4B; --wa-bubble:#DCF3E4;
+  --header:rgba(244,246,242,.72);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  /* motion tokens — never approximate */
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
+  --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+  --t-press:160ms; --t-ui:200ms; --t-enter:320ms; --t-reveal:600ms;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
+  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --wait:#E6A94B; --wait-soft:#3A2C14;
+  --wa:#7FD3B8; --wa-bubble:#173B30;
+  --header:rgba(14,21,18,.72); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
+  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --wait:#E6A94B; --wait-soft:#3A2C14;
+  --wa:#7FD3B8; --wa-bubble:#173B30;
+  --header:rgba(14,21,18,.72); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 64px}
+a{color:inherit}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.05}
+h1 em{font-style:normal;color:var(--go)}
+.lead{color:var(--muted);font-size:18px;margin:14px 0 0;max-width:56ch}
+.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-block;margin-bottom:28px}
+ol.steps{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:14px;counter-reset:s}
+ol.steps>li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 20px 64px;position:relative}
+ol.steps>li::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-family:var(--mono);font-weight:500;display:grid;place-items:center}
+ol.steps h2{font-size:21px;font-weight:700;line-height:1.2}
+ol.steps p,ol.steps li li{color:var(--muted)}
+ol.steps p{margin:8px 0 0}
+ol.steps ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
+code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--go);background:var(--go);color:var(--bg);transition:transform 160ms cubic-bezier(.23,1,.32,1)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
+.num{font-family:var(--mono);user-select:all}
+.rules{margin-top:28px;background:var(--wait-soft);border-radius:16px;padding:20px}
+.rules h2{font-size:19px;color:var(--ink)}
+.rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
+.note{margin-top:16px;color:var(--muted);font-size:14px}
+footer{margin-top:36px;color:var(--muted);font-size:14px}
+</style>
+<script>
+/* Stripe customer portal link (manage or cancel the subscription). Empty = the button opens WhatsApp. */
+window.PROVENDROP_PORTAL_LINK = "";
+</script>
+</head>
+<body>
+<main class="wrap">
+  <a class="brand" href="./">ProvenDrop</a>
+  <h1>Payment received. <em>Welcome.</em></h1>
+  <p class="lead">You are two minutes away from receiving collections. Follow these steps in order.</p>
+
+  <ol class="steps">
+    <li>
+      <h2>Save the assistant’s number</h2>
+      <p>It is the Click Dynamics assistant on WhatsApp: <span class="num">+351 920 117 648</span>. Save it as “ProvenDrop” so the messages do not end up with unknown senders.</p>
+    </li>
+    <li>
+      <h2>Send us your niche and your countries</h2>
+      <p>Tap the button and complete the message. Use the same email you paid with, so we can confirm your subscription.</p>
+      <a class="btn" id="btnEntrar" href="#" target="_blank" rel="noopener">Send a WhatsApp message</a>
+      <p>We reply the same day and add you to the group. Places are limited by niche and country; if yours is already full, we offer you another one or refund your payment.</p>
+    </li>
+    <li>
+      <h2>Receive the list every morning</h2>
+      <p>At 9 AM the day’s list reaches the group: the link to each collection, how many ads the competitor has active and for how many days, how many people they reached, and the ZIP. At any time you can ask for:</p>
+      <ul>
+        <li><code>/pr hoje</code> today’s collections</li>
+        <li><code>/pr verdes</code> the latest approved collections</li>
+        <li><code>/pr homem</code> · <code>mulher</code> · <code>joalharia</code> · <code>decor</code> one niche only</li>
+        <li><code>/pr ES</code> · <code>IT</code> · <code>FR</code> · <code>DE</code> · <code>GB</code> · <code>US</code> one country only</li>
+        <li><code>/pr ajuda</code> the list of commands</li>
+      </ul>
+      <p class="note">The assistant and the kit documents are currently written in Portuguese. The commands above are typed exactly as shown.</p>
+    </li>
+    <li>
+      <h2>Launch a collection in 1–2 days</h2>
+      <ul>
+        <li><b>Choose</b> an approved collection in your niche. The country next to its name is where it is performing: start there.</li>
+        <li><b>Find the products</b> with your supplier using the reference photographs in the ZIP (folder <i>1 - Imagens</i>).</li>
+        <li><b>Create the images</b>: paste the text from <i>Colar no ChatGPT.txt</i> into ChatGPT together with the photographs, and generate the advertising images.</li>
+        <li><b>Create the videos</b> with the folder <i>2 - Videos</i>: it has a photograph and a ready prompt for each video.</li>
+        <li><b>Google Ads</b>: the file <i>3 - Google Ads.txt</i> brings the keywords, negative keywords, titles and landing-page copy for that country.</li>
+        <li>Read <i>LEIA-ME.txt</i> first: it explains everything on one page.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="rules">
+    <h2>Rules that protect you</h2>
+    <ul>
+      <li>The photographs in the ZIP belong to competitors and are <b>for reference only</b>. Never publish them in your ads.</li>
+      <li>Do not copy competitors’ ad copy: use it as inspiration.</li>
+      <li>No fake discounts, countdowns, invented “stock running out” or health claims. Meta and Google block accounts for this.</li>
+      <li>Shipping in 11–15 days? Seasonal collections (Christmas, Mother’s Day…) launch at least 4 weeks ahead.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
+    <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=I%27d%20like%20to%20manage%20my%20ProvenDrop%20subscription" target="_blank" rel="noopener">Manage subscription</a>
+  </footer>
+</main>
+<script>
+(function(){
+  var t="Hi! I have just subscribed to ProvenDrop.\nPayment email: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ";
+  document.getElementById("btnEntrar").href="https://wa.me/351920117648?text="+encodeURIComponent(t);
+  var p=window.PROVENDROP_PORTAL_LINK; if(p){var g=document.getElementById("btnGerir");g.href=p;}
+})();
+</script>
+</body>
+</html>

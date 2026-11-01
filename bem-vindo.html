@@ -43,15 +43,12 @@ ol.steps p,ol.steps li li{color:var(--ink-2)}
 ol.steps p{margin-top:8px}
 ol.steps ul{margin:10px 0 0;padding-left:18px;display:grid;gap:5px}
 ol.steps b{color:var(--ink);font-weight:600}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;background:var(--light);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
 .btn:active{transform:scale(.98)}
 .btn-go{background:var(--green);color:#101310}
 .btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
 .btn[hidden]{display:none}
 @media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
-.pending{margin-top:14px;display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:8px;background:var(--light);border:1px solid var(--line);font-size:15px;color:var(--ink-2)}
-.pending::before{content:"";flex-shrink:0;width:10px;height:10px;margin-top:6px;border-radius:50%;border:1.5px solid var(--watch)}
 .rules{margin-top:32px;background:var(--watch-soft);border-radius:14px;padding:22px}
 .rules h2{font-size:21px}
 .rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:#4A4030}
@@ -61,15 +58,15 @@ footer p+p{margin-top:8px}
 :focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
 </style>
 <script>
-/* ── DIRECT ONBOARDING CONFIGURATION ──────────────────────────────
-   This page is the after-payment page of the ProvenDrop Direct
-   Stripe product only. Members via Click never land here. */
+/* ── AFTER-PAYMENT PAGE (direct subscription) ─────────────────────
+   The Stripe Payment Link of the ProvenDrop subscription redirects
+   here. Click Dynamics customers never land on this page: their link
+   goes to bem-vindo-click.html. */
 
-/* Stripe customer portal link (manage or cancel the subscription).
-   Empty = the button is hidden and the page points to the receipt. */
-window.PROVENDROP_PORTAL_LINK = "";
+/* Delivery time (Europe/Lisbon), e.g. "9:00". Replaces every [HOUR]. Keep in sync with index.html. */
+window.PROVENDROP_DAILY_TIME = "";
 
-/* Public contact e-mail for Direct members. Empty = no contact button. */
+/* Optional public contact e-mail. Empty = no contact line. */
 window.PROVENDROP_CONTACT_EMAIL = "";
 </script>
 </head>
@@ -79,34 +76,32 @@ window.PROVENDROP_CONTACT_EMAIL = "";
     <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#101310"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#78C995" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     ProvenDrop
   </a>
-  <span class="tag">ProvenDrop Direct</span>
-  <h1>Payment received. <em>Welcome to ProvenDrop.</em></h1>
-  <p class="lede">You joined ProvenDrop directly. Your membership is managed by ProvenDrop, and your onboarding happens with us, not through a third-party channel. Here is what happens next.</p>
+  <span class="tag">Subscription active</span>
+  <h1>Payment received. <em>Welcome.</em></h1>
+  <p class="lede">Your access is on its way to the e-mail address you paid with. Four steps and you are launching.</p>
 
   <ol class="steps">
     <li>
-      <h2>Check the inbox you paid with</h2>
-      <p>Stripe has sent your receipt to the e-mail address you used at checkout. That address identifies your membership: every message from ProvenDrop about your membership goes there.</p>
+      <h2>Open your e-mail</h2>
+      <p>We sent you a link to enter your member area. Check the spam folder too. The link is personal and expires after a while; if it has expired, request a new one on the sign-in page.</p>
+      <a class="btn btn-go" href="app.html">Go to the sign-in page</a>
     </li>
     <li>
-      <h2>Confirm your niche and your markets</h2>
-      <p>ProvenDrop will contact you at that address to confirm your niche (women’s jewellery, home decoration, women’s or men’s fashion) and the countries you sell in, and to complete your onboarding. You can also write first:</p>
-      <a class="btn btn-go" id="btnContact" href="#" hidden>Write to ProvenDrop</a>
+      <h2>Choose your niche and your countries</h2>
+      <p>On your first sign-in, pick your niche (women’s jewellery, home decoration, women’s or men’s fashion) and the countries you sell in, so what matters to you comes first.</p>
       <p class="note">Memberships are limited by niche and country. If your combination is already full, we offer you another one or refund your payment.</p>
     </li>
     <li>
-      <h2>Receive your research and Launch Kits</h2>
-      <p>Approved collections and their Launch Kits are delivered to you directly by ProvenDrop: the collection link, its evidence and score, and the kit with image prompts, UGC video prompts, visual references and the Google Ads material.</p>
-      <div class="pending">A private member platform is in development. As a Direct member you receive access when it becomes available. Nothing else is needed from you until then.</div>
+      <h2>Tomorrow at <span data-fill="hour">[HOUR]</span>, the day’s collections arrive</h2>
+      <p>In your member area and in your e-mail: each collection with its proof, and the Launch Kit for the approved ones. Store links and kits appear only in the member area, after you sign in.</p>
     </li>
     <li>
       <h2>Launch a collection in 1–2 days</h2>
       <ul>
-        <li><b>Choose</b> an approved collection in your niche. The country next to its name is where it is performing: start there.</li>
-        <li><b>Find the products</b> with your supplier using the reference photographs in the kit (folder <i>1 - Imagens</i>).</li>
-        <li><b>Create the images</b>: paste the text from <i>Colar no ChatGPT.txt</i> into your image model together with the photographs, and generate the 20 advertising images.</li>
-        <li><b>Create the videos</b> with the folder <i>2 - Videos</i>: a photograph and a ready prompt for each of the 4 UGC videos.</li>
-        <li><b>Google Ads</b>: the file <i>3 - Google Ads.txt</i> brings the keywords, negative keywords, Shopping titles and landing-page copy for that country.</li>
+        <li><b>Download the kit</b> of an approved collection in your niche. The country next to its name is where it is performing: start there.</li>
+        <li><b>Find the products</b> with your supplier using the reference photographs (folder <i>1 - Imagens</i>).</li>
+        <li><b>Paste the prompts into ChatGPT</b> (<i>Colar no ChatGPT.txt</i>) together with the photographs, and generate the 20 advertising images. Folder <i>2 - Videos</i> has a photograph and a prompt for each of the 4 UGC videos.</li>
+        <li><b>Launch Google Ads</b> with <i>3 - Google Ads.txt</i>: keywords, negative keywords, Shopping titles and landing-page copy for that country.</li>
         <li>Read <i>LEIA-ME.txt</i> first: it explains everything on one page.</li>
       </ul>
       <p class="note">Kit documents are currently written in Portuguese.</p>
@@ -124,24 +119,18 @@ window.PROVENDROP_CONTACT_EMAIL = "";
   </div>
 
   <footer>
-    <p>No minimum term: cancel whenever you want.</p>
-    <p id="manageText">To change your niche or cancel your subscription, contact ProvenDrop using the details on your payment receipt.</p>
-    <a class="btn btn-line" id="btnManage" href="#" hidden>Manage subscription</a>
+    <p>No minimum term: cancel whenever you want, in your member area (“Manage subscription”).</p>
+    <p id="contactLine" hidden></p>
   </footer>
 </main>
 <script>
 (function(){
+  var hour=String(window.PROVENDROP_DAILY_TIME||"").trim();
+  if(hour){ document.querySelectorAll('[data-fill="hour"]').forEach(function(e){ e.textContent=hour; }); }
   var mail=String(window.PROVENDROP_CONTACT_EMAIL||"").trim();
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
-    var c=document.getElementById("btnContact");
-    c.href="mailto:"+mail+"?subject="+encodeURIComponent("ProvenDrop Direct: my niche and markets")+"&body="+encodeURIComponent("Hi! I have just joined ProvenDrop Direct.\nPayment e-mail: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ");
-    c.hidden=false;
-    document.getElementById("manageText").textContent="To change your niche or cancel your subscription, write to "+mail+".";
-  }
-  var p=String(window.PROVENDROP_PORTAL_LINK||"").trim();
-  if(/^https:\/\//.test(p)){
-    var g=document.getElementById("btnManage"); g.href=p; g.hidden=false;
-    document.getElementById("manageText").textContent="Manage or cancel your subscription at any time in the Stripe customer portal.";
+    var c=document.getElementById("contactLine");
+    c.innerHTML='Questions? Write to <a href="mailto:'+mail+'">'+mail+'</a>.'; c.hidden=false;
   }
 })();
 </script>
