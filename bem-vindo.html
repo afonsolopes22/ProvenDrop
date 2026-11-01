@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="pt-PT">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Bem-vindo ao ProvenDrop</title>
+<title>Welcome to ProvenDrop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -18,7 +19,7 @@
   --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  /* motion tokens — nunca aproximar */
+  /* motion tokens — never approximate */
   --ease-out:cubic-bezier(0.23,1,0.32,1);
   --ease-in-out:cubic-bezier(0.77,0,0.175,1);
   --t-press:160ms; --t-ui:200ms; --t-enter:320ms; --t-reveal:600ms;
@@ -61,72 +62,74 @@ code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px soli
 .rules{margin-top:28px;background:var(--wait-soft);border-radius:16px;padding:20px}
 .rules h2{font-size:19px;color:var(--ink)}
 .rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
+.note{margin-top:16px;color:var(--muted);font-size:14px}
 footer{margin-top:36px;color:var(--muted);font-size:14px}
 </style>
 <script>
-/* Link do portal de cliente da Stripe (gerir/cancelar a subscrição). Vazio = o botão abre o WhatsApp. */
+/* Stripe customer portal link (manage or cancel the subscription). Empty = the button opens WhatsApp. */
 window.PROVENDROP_PORTAL_LINK = "";
 </script>
 </head>
 <body>
 <main class="wrap">
   <a class="brand" href="./">ProvenDrop</a>
-  <h1>Pagamento feito. <em>Bem-vindo.</em></h1>
-  <p class="lead">Faltam dois minutos para começares a receber as coleções. Segue estes passos pela ordem.</p>
+  <h1>Payment received. <em>Welcome.</em></h1>
+  <p class="lead">You are two minutes away from receiving collections. Follow these steps in order.</p>
 
   <ol class="steps">
     <li>
-      <h2>Guarda o número do assistente</h2>
-      <p>É o assistente da Click Dynamics no WhatsApp: <span class="num">+351 920 117 648</span>. Guarda-o como "ProvenDrop" para as mensagens não irem parar aos desconhecidos.</p>
+      <h2>Save the assistant’s number</h2>
+      <p>It is the Click Dynamics assistant on WhatsApp: <span class="num">+351 920 117 648</span>. Save it as “ProvenDrop” so the messages do not end up with unknown senders.</p>
     </li>
     <li>
-      <h2>Manda-nos o teu nicho e os teus países</h2>
-      <p>Carrega no botão e completa a mensagem. Usa o mesmo e-mail com que pagaste, para confirmarmos a subscrição.</p>
-      <a class="btn" id="btnEntrar" href="#" target="_blank" rel="noopener">Enviar mensagem no WhatsApp</a>
-      <p>Respondemos no mesmo dia e juntamos-te ao grupo. Os lugares são limitados por nicho e país; se o teu já estiver cheio, propomos outro ou devolvemos o pagamento.</p>
+      <h2>Send us your niche and your countries</h2>
+      <p>Tap the button and complete the message. Use the same email you paid with, so we can confirm your subscription.</p>
+      <a class="btn" id="btnEntrar" href="#" target="_blank" rel="noopener">Send a WhatsApp message</a>
+      <p>We reply the same day and add you to the group. Places are limited by niche and country; if yours is already full, we offer you another one or refund your payment.</p>
     </li>
     <li>
-      <h2>Recebe a lista todas as manhãs</h2>
-      <p>Às 9h chega ao grupo a lista do dia: o link de cada coleção, quantos anúncios e há quantos dias a concorrente os tem ativos, quantas pessoas alcançou e o zip. A qualquer hora podes pedir:</p>
+      <h2>Receive the list every morning</h2>
+      <p>At 9 AM the day’s list reaches the group: the link to each collection, how many ads the competitor has active and for how many days, how many people they reached, and the ZIP. At any time you can ask for:</p>
       <ul>
-        <li><code>/pr hoje</code> as coleções do dia</li>
-        <li><code>/pr verdes</code> as últimas aprovadas</li>
-        <li><code>/pr homem</code> · <code>mulher</code> · <code>joalharia</code> · <code>decor</code> só um nicho</li>
-        <li><code>/pr ES</code> · <code>IT</code> · <code>FR</code> · <code>DE</code> · <code>GB</code> · <code>US</code> só um país</li>
-        <li><code>/pr ajuda</code> a lista de comandos</li>
+        <li><code>/pr hoje</code> today’s collections</li>
+        <li><code>/pr verdes</code> the latest approved collections</li>
+        <li><code>/pr homem</code> · <code>mulher</code> · <code>joalharia</code> · <code>decor</code> one niche only</li>
+        <li><code>/pr ES</code> · <code>IT</code> · <code>FR</code> · <code>DE</code> · <code>GB</code> · <code>US</code> one country only</li>
+        <li><code>/pr ajuda</code> the list of commands</li>
       </ul>
+      <p class="note">The assistant and the kit documents are currently written in Portuguese. The commands above are typed exactly as shown.</p>
     </li>
     <li>
-      <h2>Lança uma coleção em 1-2 dias</h2>
+      <h2>Launch a collection in 1–2 days</h2>
       <ul>
-        <li><b>Escolhe</b> uma 🟢 do teu nicho. O país ao lado do nome é onde está a bater: começa por aí.</li>
-        <li><b>Encontra os produtos</b> no teu fornecedor com as fotos de referência do zip (pasta <i>1 - Imagens</i>).</li>
-        <li><b>Cria as imagens</b>: cola o texto de <i>Colar no ChatGPT.txt</i> no ChatGPT, junto com as fotos, e gera as imagens de anúncio.</li>
-        <li><b>Cria os vídeos</b> com a pasta <i>2 - Videos</i>: tem uma foto e o texto pronto para cada vídeo.</li>
-        <li><b>Google Ads</b>: o ficheiro <i>3 - Google Ads.txt</i> traz as palavras-chave, as negativas, os títulos e o texto da página para esse país.</li>
-        <li>Lê primeiro o <i>LEIA-ME.txt</i>: explica tudo numa página.</li>
+        <li><b>Choose</b> an approved collection in your niche. The country next to its name is where it is performing: start there.</li>
+        <li><b>Find the products</b> with your supplier using the reference photographs in the ZIP (folder <i>1 - Imagens</i>).</li>
+        <li><b>Create the images</b>: paste the text from <i>Colar no ChatGPT.txt</i> into ChatGPT together with the photographs, and generate the advertising images.</li>
+        <li><b>Create the videos</b> with the folder <i>2 - Videos</i>: it has a photograph and a ready prompt for each video.</li>
+        <li><b>Google Ads</b>: the file <i>3 - Google Ads.txt</i> brings the keywords, negative keywords, titles and landing-page copy for that country.</li>
+        <li>Read <i>LEIA-ME.txt</i> first: it explains everything on one page.</li>
       </ul>
     </li>
   </ol>
 
   <div class="rules">
-    <h2>Regras que te protegem</h2>
+    <h2>Rules that protect you</h2>
     <ul>
-      <li>As fotos do zip são da concorrência e servem <b>só de referência</b>. Nunca as publiques nos anúncios.</li>
-      <li>Não copies os textos dos anúncios da concorrência: usa-os como ideia.</li>
-      <li>Sem descontos falsos, contadores ou "stock a acabar" inventados, nem promessas de saúde. A Meta e a Google bloqueiam contas por isso.</li>
-      <li>Envio de 11-15 dias? Coleções de época (Natal, Dia da Mãe…) lançam-se pelo menos 4 semanas antes.</li>
+      <li>The photographs in the ZIP belong to competitors and are <b>for reference only</b>. Never publish them in your ads.</li>
+      <li>Do not copy competitors’ ad copy: use it as inspiration.</li>
+      <li>No fake discounts, countdowns, invented “stock running out” or health claims. Meta and Google block accounts for this.</li>
+      <li>Shipping in 11–15 days? Seasonal collections (Christmas, Mother’s Day…) launch at least 4 weeks ahead.</li>
     </ul>
   </div>
 
   <footer>
-    <p>Recebes o recibo do pagamento por e-mail. Para mudar de nicho ou cancelar a subscrição:</p>
-    <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=Quero%20gerir%20a%20minha%20subscri%C3%A7%C3%A3o%20ProvenDrop" target="_blank" rel="noopener">Gerir a subscrição</a>
+    <p>You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
+    <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=I%27d%20like%20to%20manage%20my%20ProvenDrop%20subscription" target="_blank" rel="noopener">Manage subscription</a>
   </footer>
 </main>
 <script>
 (function(){
-  var t="Olá! Acabei de subscrever o ProvenDrop.\nE-mail do pagamento: \nNicho (joalharia, decoração, roupa de mulher ou de homem): \nPaíses onde vendo: \nNome da loja (opcional): ";
+  var t="Hi! I have just subscribed to ProvenDrop.\nPayment email: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ";
   document.getElementById("btnEntrar").href="https://wa.me/351920117648?text="+encodeURIComponent(t);
   var p=window.PROVENDROP_PORTAL_LINK; if(p){var g=document.getElementById("btnGerir");g.href=p;}
 })();

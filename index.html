@@ -107,16 +107,28 @@ h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
 .row-note{font-size:15px;color:var(--on-dark-2);max-width:32ch}
 .members-note{margin-top:24px;color:var(--on-dark-2);max-width:62ch}
 
+/* live numbers from the public sheet */
+.upd{font-size:14px;color:var(--on-dark-2);margin-top:8px}
+.panel-top .upd{margin:0}
+.row-name .shop b{font-weight:600;color:var(--on-dark)}
+.archive{margin-top:clamp(56px,7vw,96px)}
+.archive h3{font-family:var(--display);font-size:clamp(28px,3vw,40px);font-weight:400;line-height:1.1;letter-spacing:-.015em}
+.archive-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px 20px;margin-bottom:22px}
+.archive-head p{margin-top:6px;color:var(--on-dark-2);font-size:16px;max-width:52ch}
+.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th{padding:10px 14px 10px 0;text-align:left;font-size:13px;font-weight:500;color:var(--on-dark-2);border-bottom:1px solid var(--dark-line)}
+.dt td{padding:14px 14px 14px 0;border-bottom:1px solid var(--dark-line);vertical-align:top}
+.dt .n{font-variant-numeric:tabular-nums}
+.dt .sub{display:block;font-size:14px;color:var(--on-dark-2)}
+
 /* six-market strip */
 .strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:0;padding:0;list-style:none}
 .strip li{position:relative;display:grid;place-items:center;height:32px;border-radius:3px;border:1px solid var(--dark-line);color:#8D968F;font-size:12.5px;font-weight:600}
-.strip .ad{border-color:#5F6B63;color:var(--on-dark)}
 .strip .ok{background:var(--green);border-color:var(--green);color:#101310}
 .legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--on-dark-2)}
 .legend span{display:inline-flex;align-items:center;gap:8px}
 .legend i{width:14px;height:14px;border-radius:2px;border:1px solid var(--dark-line)}
 .legend .l-ok{background:var(--green);border-color:var(--green)}
-.legend .l-ad{border-color:#5F6B63}
 
 /* daily intelligence: the evidence file */
 .file-list{border-top:1px solid var(--dark-line)}
@@ -150,15 +162,26 @@ h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
 
 /* markets */
 .mk{border-top:1px solid var(--line-2)}
-.mk li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:baseline;padding-block:clamp(14px,1.6vw,20px);border-bottom:1px solid var(--line-2)}
+.mk li{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,2fr) minmax(0,5fr);gap:6px 24px;align-items:baseline;padding-block:clamp(14px,1.6vw,20px);border-bottom:1px solid var(--line-2)}
+.mk .state{font-size:15px;color:var(--ink-2)}
+.mk .state:empty{display:none}
+.mk .top-mk{color:var(--green-ink);font-weight:600}
 .mk .country{font-family:var(--display);font-size:clamp(28px,3vw,42px);line-height:1.1;letter-spacing:-.015em}
 .mk .lang{font-size:15px;color:var(--ink-2)}
 .mk-note{margin-top:20px;font-size:15px;color:var(--ink-2);max-width:72ch}
 
 /* niches */
 .niches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;background:var(--light)}
-.niche{background:var(--white);padding:clamp(20px,2vw,28px);display:flex;flex-direction:column;justify-content:flex-end;min-height:clamp(240px,23vw,340px)}
-.niche h3{font-family:var(--display);font-size:clamp(30px,3vw,44px);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.niche{background:var(--white);padding:clamp(20px,2vw,28px);display:flex;flex-direction:column;gap:22px;min-height:clamp(300px,26vw,400px)}
+.niche svg{width:44px;height:44px;flex-shrink:0}
+.niche h3{font-family:var(--display);font-size:clamp(30px,3vw,44px);font-weight:400;line-height:1.05;letter-spacing:-.02em;margin-top:auto}
+.niche .terms{margin-top:12px;display:grid;gap:3px;font-size:15px;line-height:1.35;color:#454C47}
+.niche:nth-child(3) .terms{color:var(--on-dark-2)}
+.niche .terms li{display:grid;grid-template-columns:2.6ch minmax(0,1fr);gap:8px}
+.niche .terms li span:first-child{font-size:12px;letter-spacing:.04em;opacity:.7;padding-top:3px}
+.niche .count{margin-top:14px;padding-top:12px;border-top:1px solid rgba(0,0,0,.12);font-size:14px;color:#454C47}
+.niche:nth-child(3) .count{border-top-color:var(--dark-line);color:var(--on-dark-2)}
+.niche .count:empty{display:none}
 .niche:nth-child(2){background:var(--green-soft)}
 .niche:nth-child(3){background:#101310;color:var(--on-dark)}
 .niche:nth-child(4){background:#E9ECE7}
@@ -257,7 +280,7 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
 @media (prefers-reduced-motion:no-preference){
   html{scroll-behavior:smooth}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .js .in{animation:rise 520ms var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
+  .js:not(.settled) .in{animation:rise 520ms var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
 }
 @media (prefers-reduced-motion:reduce){
   .faq summary svg,.btn{transition:none}
@@ -292,10 +315,19 @@ footer{background:var(--dark);color:var(--on-dark-2);padding-block:0 40px;font-s
   .timeline li:last-child{padding-bottom:0}
   .timeline li::before{left:-7px;top:6px}
   .cats{grid-template-columns:minmax(0,1fr)}
-  .niche{min-height:180px}
+  .niche{min-height:0}
+  .niche:nth-child(1) .terms,.niche:nth-child(2) .terms,.niche:nth-child(3) .terms,.niche:nth-child(4) .terms{display:none}
   .cmd{grid-template-columns:minmax(0,1fr) auto}
   .cmd span.d{grid-column:1/-1;grid-row:2}
   .wa-points{grid-template-columns:minmax(0,1fr)}
+  .mk li{grid-template-columns:minmax(0,1fr) auto}
+  .mk .state{grid-column:1/-1}
+  /* archive table becomes a stacked list on phones */
+  .dt thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .dt,.dt tbody,.dt tr,.dt td{display:block;width:100%}
+  .dt tr{padding-block:14px;border-bottom:1px solid var(--dark-line)}
+  .dt td{padding:3px 0;border:0;display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px}
+  .dt td::before{content:attr(data-l);font-size:14px;color:var(--on-dark-2)}
   .foot{grid-template-columns:minmax(0,1fr)}
 }
 </style>
@@ -340,8 +372,8 @@ window.PROVENDROP_STRIPE_LINK = "";
           <a class="btn btn-line" href="#how-it-works">Discover How It Works</a>
         </div>
       </div>
-      <aside class="panel in" style="--i:2" aria-label="Example of a daily entry. Collection names, links and figures are reserved for members.">
-        <div class="panel-top"><span>Example of a daily entry</span><span>Members only</span></div>
+      <aside class="panel in" id="heroPanel" style="--i:2" aria-label="Latest daily entry. Collection names, stores and links are reserved for members.">
+        <div class="panel-top"><span id="heroTop">Example of a daily entry</span><span class="upd" id="heroUpd">Members only</span></div>
         <div>
           <span class="status go">Approved</span>
           <div class="panel-name" style="margin-top:12px"><span class="redact" style="width:86%" aria-hidden="true"></span><br><span class="redact" style="width:48%" aria-hidden="true"></span></div>
@@ -355,8 +387,8 @@ window.PROVENDROP_STRIPE_LINK = "";
             <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
           </dl>
-        <ul class="strip" aria-hidden="true"><li class="ad">IT</li><li class="">ES</li><li class="ok">FR</li><li class="ad">DE</li><li class="">GB</li><li class="">US</li></ul>
-        <p class="panel-sub" style="margin:0">Names, links, figures and kits are sent to members on WhatsApp.</p>
+        <ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul>
+        <p class="panel-sub" style="margin:0">Names, stores, links and kits are sent to members on WhatsApp.</p>
       </aside>
     </div>
   </div>
@@ -365,21 +397,20 @@ window.PROVENDROP_STRIPE_LINK = "";
     <div class="wrap">
       <div class="head">
         <h2>The evidence behind every collection</h2>
-        <p class="lede">Each entry shows how long a competitor has been advertising the collection, how many people the ads reached and where demand holds up. The details are reserved for members.</p>
+        <p class="lede">Each entry shows how long a competitor has been advertising the collection, how many people the ads reached and where demand holds up. Names, stores and links are reserved for members.<span class="upd" id="listUpd" style="display:block"></span></p>
       </div>
       <div class="legend" style="margin-bottom:18px" aria-label="Market strip legend">
-        <span><i class="l-ok"></i>Approved for this market</span>
-        <span><i class="l-ad"></i>Ads seen</span>
-        <span><i></i>No ads recorded</span>
+        <span><i class="l-ok"></i>Strongest market</span>
+        <span><i></i>Other markets</span>
       </div>
-      <div class="file-list">
+      <div class="file-list" id="cardsHoje">
         <article class="row" aria-label="Example of an approved entry. Details are reserved for members.">
           <div class="row-name"><span class="status go">Approved</span><h3><span class="redact" style="width:78%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
           <div><dl class="facts">
             <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
-          </dl><div class="row-mk"><p class="cap">Search demand by market</p><ul class="strip" aria-hidden="true"><li class="ad">IT</li><li class="">ES</li><li class="ok">FR</li><li class="ok">DE</li><li class="">GB</li><li class="">US</li></ul></div></div>
+          </dl><div class="row-mk"><p class="cap">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
           <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Comes with the collection link and a complete launch kit.</p></div>
         </article>
         <article class="row" aria-label="Example of an observing entry. Details are reserved for members.">
@@ -388,11 +419,21 @@ window.PROVENDROP_STRIPE_LINK = "";
             <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>EU reach</dt><dd><span class="redact" style="width:5ch" aria-hidden="true"></span></dd></div>
-          </dl><div class="row-mk"><p class="cap">Search demand by market</p><ul class="strip" aria-hidden="true"><li class="">IT</li><li class="ad">ES</li><li class="">FR</li><li class="">DE</li><li class="">GB</li><li class="">US</li></ul></div></div>
+          </dl><div class="row-mk"><p class="cap">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li class="ok">ES</li><li>FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
           <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Promising but not approved yet, so it has no kit.</p></div>
         </article>
       </div>
       <p class="members-note">Members can also ask for recent approved collections at any time, by niche or by country, on WhatsApp.</p>
+
+      <div class="archive" id="archive" hidden>
+        <div class="archive-head">
+          <div>
+            <h3>Approved archive</h3>
+            <p>Every approved collection so far, in numbers, and whether the competitor is still advertising it.</p>
+          </div>
+        </div>
+        <div id="arqBox"></div>
+      </div>
     </div>
   </section>
 
@@ -447,13 +488,13 @@ window.PROVENDROP_STRIPE_LINK = "";
         <h2>Six markets, measured separately</h2>
         <p class="lede">A collection can be strong in one country and weak in another. Advertising activity and search demand are read for each market, so you know where to start.</p>
       </div>
-      <ul class="mk">
-        <li><span class="country">Italy</span><span class="lang">Searches in Italian</span></li>
-        <li><span class="country">Spain</span><span class="lang">Searches in Spanish</span></li>
-        <li><span class="country">France</span><span class="lang">Searches in French</span></li>
-        <li><span class="country">Germany</span><span class="lang">Searches in German</span></li>
-        <li><span class="country">United Kingdom</span><span class="lang">Searches in English</span></li>
-        <li><span class="country">United States</span><span class="lang">Searches in English</span></li>
+      <ul class="mk" id="mkList">
+        <li data-mk="IT"><span class="country">Italy</span><span class="lang">Searches in Italian</span><span class="state"></span></li>
+        <li data-mk="ES"><span class="country">Spain</span><span class="lang">Searches in Spanish</span><span class="state"></span></li>
+        <li data-mk="FR"><span class="country">France</span><span class="lang">Searches in French</span><span class="state"></span></li>
+        <li data-mk="DE"><span class="country">Germany</span><span class="lang">Searches in German</span><span class="state"></span></li>
+        <li data-mk="GB"><span class="country">United Kingdom</span><span class="lang">Searches in English</span><span class="state"></span></li>
+        <li data-mk="US"><span class="country">United States</span><span class="lang">Searches in English</span><span class="state"></span></li>
       </ul>
       <p class="mk-note">EU reach comes from Meta’s EU ad transparency data, which does not cover the UK or the US.</p>
     </div>
@@ -466,17 +507,21 @@ window.PROVENDROP_STRIPE_LINK = "";
         <p class="lede">The research looks for one strong collection per niche, from generic stores rather than brands with their own designs.</p>
       </div>
       <ul class="niches">
-        <li class="niche">
-          <div><h3>Women’s jewellery</h3><p>Earrings, necklaces and pieces that sell as collections.</p></div>
+        <li class="niche" data-niche="Joalharia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>
+          <div><h3>Women’s jewellery</h3><ul class="terms" aria-label="Search terms used for this niche"><li><span>IT</span><span>gioielli, orecchini</span></li><li><span>FR</span><span>bijoux</span></li><li><span>DE</span><span>Schmuck</span></li><li><span>ES</span><span>pendientes</span></li></ul><p class="count" id="cntJoalharia"></p></div>
         </li>
-        <li class="niche">
-          <div><h3>Home decoration</h3><p>Lamps, cushions, decor and seasonal collections.</p></div>
+        <li class="niche" data-niche="House Decor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8l4 10H4L8 2Z"/><path d="M12 12v6"/><path d="M8 22v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2H8Z"/></svg>
+          <div><h3>Home decoration</h3><ul class="terms" aria-label="Search terms used for this niche"><li><span>IT</span><span>decorazioni casa</span></li><li><span>FR</span><span>déco maison</span></li><li><span>DE</span><span>Deko</span></li><li><span>ES</span><span>decoración</span></li></ul><p class="count" id="cntHouseDecor"></p></div>
         </li>
-        <li class="niche">
-          <div><h3>Women’s fashion</h3><p>Coats, knitwear and seasonal outerwear.</p></div>
+        <li class="niche" data-niche="Roupa Feminina">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2 7 4 3 6l1 8h3v8h10v-8h3l1-8-4-2-2-2"/><path d="M9 2a3 3 0 0 0 6 0"/><path d="M12 8v14"/><path d="M9 2 7 14M15 2l2 12"/></svg>
+          <div><h3>Women’s fashion</h3><ul class="terms" aria-label="Search terms used for this niche"><li><span>IT</span><span>cappotti, maglioni donna</span></li><li><span>FR</span><span>manteau femme</span></li><li><span>DE</span><span>Damen</span></li><li><span>ES</span><span>abrigos</span></li></ul><p class="count" id="cntRoupaFeminina"></p></div>
         </li>
-        <li class="niche">
-          <div><h3>Men’s fashion</h3><p>Jackets, coats and menswear collections.</p></div>
+        <li class="niche" data-niche="Roupa Masculina">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2 4 4l-2 9h4v9h12v-9h4L20 4l-4-2"/><path d="M8 2l4 6 4-6"/><path d="M12 8v14"/><path d="M6 15h2M16 15h2"/></svg>
+          <div><h3>Men’s fashion</h3><ul class="terms" aria-label="Search terms used for this niche"><li><span>IT</span><span>giacche uomo</span></li><li><span>FR</span><span>veste homme</span></li><li><span>DE</span><span>Herren Jacken</span></li><li><span>ES</span><span>chaquetas hombre</span></li></ul><p class="count" id="cntRoupaMasculina"></p></div>
         </li>
       </ul>
     </div>
@@ -518,7 +563,7 @@ window.PROVENDROP_STRIPE_LINK = "";
           <div class="screen">
             <div class="bar-top"><div class="avatar" aria-hidden="true">C</div><div><div class="who">Click Dynamics assistant</div><div class="sub2">Example conversation</div></div></div>
             <div class="chat">
-              <div class="bubble bot">Today’s list
+              <div class="bubble bot" id="waMsg">Today’s list
 
 1. <span class="redact" style="width:11em" aria-hidden="true"></span>
 Niche and market
@@ -649,6 +694,7 @@ EU reach: <span class="redact" style="width:4em" aria-hidden="true"></span><span
 
 <script>
 document.documentElement.classList.add("js");
+setTimeout(function(){ document.documentElement.classList.add("settled"); }, 1500);
 (function(){
   var l=window.PROVENDROP_STRIPE_LINK;
   if(!l) return;
@@ -683,6 +729,153 @@ document.documentElement.classList.add("js");
     btn._t = setTimeout(()=>{ label.textContent="Copy"; btn.classList.remove("done"); }, reduce?2400:1800);
   }
   $("#cmds").addEventListener("click", e => { const b = e.target.closest(".copy"); if(b) copy(b); });
+
+  /* ── live numbers from the public Google Sheet ───────────────────
+     Only numbers, niches, markets and statuses are published there.
+     Collection names, stores and links never reach this page.
+     If the sheet fails or is empty, the placeholders above stay. */
+  const SHEET_ID = "1o-qSJJKxNz0XOGfOBRAB9GByGaq4rfLPdwprb_-QLvg";
+  const MARKETS = ["IT","ES","FR","DE","GB","US"];
+  const COUNTRY = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States"};
+  const NICHE = {"joalharia":"Women’s jewellery","house decor":"Home decoration","roupa feminina":"Women’s fashion","roupa masculina":"Men’s fashion"};
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const niche = v => NICHE[String(v||"").trim().toLowerCase()] || esc(String(v||"").trim());
+  const market = v => { const c = String(v||"").trim().toUpperCase(); return MARKETS.includes(c) ? c : ""; };
+  const num = v => {
+    if (typeof v === "number") return isFinite(v) ? v : null;
+    let t = String(v ?? "").trim().replace(/\s/g,""); if(!t) return null;
+    if (t.includes(",") && t.includes(".")) t = t.replace(/\./g,"").replace(",",".");
+    else if (t.includes(",")) t = t.replace(",",".");
+    const n = parseFloat(t); return isNaN(n) ? null : n;
+  };
+  const fmt = n => n == null ? "No data" : Math.round(n).toLocaleString("en-GB");
+  const score = n => n == null ? "No data" : (Math.round(n*10)/10).toFixed(1);
+  const yes = v => /^(sim|s|yes|y|true|1)$/i.test(String(v||"").trim());
+  const status = r => /descart/i.test(r.estado||"") ? null : /aprov/i.test(r.estado||"") ? "go" : "watch";
+  function date(v){
+    if (v instanceof Date) return v;
+    const t = String(v ?? "").trim(); let m;
+    if ((m = t.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?/))) return new Date(+m[1],+m[2],+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0));
+    if ((m = t.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/))) return new Date(+m[1],m[2]-1,+m[3],+(m[4]||12),+(m[5]||0));
+    if ((m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2}))?/))) return new Date(+m[3],m[2]-1,+m[1],+(m[4]||12),+(m[5]||0));
+    const d = new Date(t); return isNaN(d) ? null : d;
+  }
+  const dayText = v => { const d = date(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : ""; };
+  function ago(v){
+    const d = date(v); if(!d) return "";
+    const diff = (Date.now()-d)/1000;
+    if (diff < 0 || diff > 7*86400) return "Updated "+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+    if (diff < 3600) return "Updated "+Math.max(1,Math.round(diff/60))+" min ago";
+    if (diff < 86400) return "Updated "+Math.round(diff/3600)+" h ago";
+    const days = Math.round(diff/86400); return "Updated "+days+(days===1?" day ago":" days ago");
+  }
+
+  /* JSONP: the gviz endpoint has no CORS headers, so it is loaded as a script */
+  function gviz(sheet){
+    return new Promise((resolve, reject) => {
+      const cb = "pd_"+sheet+"_"+Math.random().toString(36).slice(2,8);
+      const el = document.createElement("script");
+      const done = (fn, v) => { clearTimeout(t); delete window[cb]; el.remove(); fn(v); };
+      const t = setTimeout(() => done(reject, new Error("timeout")), 8000);
+      window[cb] = d => done(resolve, d);
+      el.onerror = () => done(reject, new Error("load"));
+      el.src = "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:json;responseHandler:"+cb+"&headers=1&sheet="+encodeURIComponent(sheet);
+      document.head.appendChild(el);
+    }).then(d => {
+      if (!d || !d.table || d.status === "error") throw new Error("bad");
+      const cols = (d.table.cols||[]).map(c => String(c.label||c.id||"").trim().toLowerCase());
+      return (d.table.rows||[]).map(r => {
+        const o = {}; (r.c||[]).forEach((c,i) => { if(cols[i]) o[cols[i]] = c ? (c.v ?? null) : null; }); return o;
+      }).filter(o => Object.values(o).some(v => v !== null && v !== ""));
+    });
+  }
+
+  const strip = mk => `<ul class="strip" aria-hidden="true">${MARKETS.map(c => `<li${c===mk?' class="ok"':''}>${c}</li>`).join("")}</ul>`;
+  const badge = st => st==="go" ? `<span class="status go">Approved</span>` : `<span class="status watch">Observing</span>`;
+  const facts = r => `<dl class="facts">
+            <div><dt>Active ads</dt><dd>${fmt(num(r.anuncios_ativos))}</dd></div>
+            <div><dt>Days advertising</dt><dd>${fmt(num(r.dias_ativo))}</dd></div>
+            <div><dt>EU reach</dt><dd>${fmt(num(r.alcance_eu))}</dd></div>
+          </dl>`;
+  const redact = w => `<span class="redact" style="width:${w}" aria-hidden="true"></span>`;
+  const where = r => { const mk = market(r.mercado_destaque); return mk ? `, strongest in ${COUNTRY[mk]}` : ""; };
+  const validated = r => { const n = num(r.trends_validados); return n == null ? "Search demand: no data" : `Search demand validated in ${Math.round(n)} of 6 markets`; };
+
+  function row(r){
+    const st = status(r), mk = market(r.mercado_destaque);
+    return `<article class="row" aria-label="${st==="go"?"Approved":"Observing"} collection. Name, store and link are reserved for members.">
+      <div class="row-name">${badge(st)}<h3>${redact(st==="go"?"78%":"64%")}</h3><p class="shop"><b>${niche(r.nicho)}</b>${where(r)}</p></div>
+      <div>${facts(r)}<div class="row-mk"><p class="cap">${validated(r)}</p>${strip(mk)}</div></div>
+      <div class="row-score"><div class="score-big">${score(num(r.score))}<small>/ 10</small></div><p class="row-note">${st==="go"?"Comes with the collection link and a complete launch kit.":"Promising but not approved yet, so it has no kit."}</p></div>
+    </article>`;
+  }
+
+  function renderHoje(rows, upd){
+    rows = rows.filter(r => status(r)).sort((a,b) => (num(a.ordem)||0) - (num(b.ordem)||0));
+    if (!rows.length) return false;
+    const first = rows.find(r => status(r)==="go") || rows[0];
+    const st = status(first), mk = market(first.mercado_destaque);
+    const day = dayText(first.dia);
+    $("#heroTop").textContent = day ? "List for "+day : "Latest list";
+    $("#heroUpd").textContent = ago(upd) || "Members only";
+    $("#heroPanel").setAttribute("aria-label", "Latest daily entry: "+(st==="go"?"approved":"observing")+", "+niche(first.nicho)+", score "+score(num(first.score))+" out of 10. Name, store and link are reserved for members.");
+    $("#heroPanel").innerHTML = `
+        <div class="panel-top"><span>${$("#heroTop").textContent}</span><span class="upd">${esc($("#heroUpd").textContent)}</span></div>
+        <div>${badge(st)}<div class="panel-name" style="margin-top:12px">${redact("86%")}<br>${redact("48%")}</div><p class="panel-sub" style="margin-top:12px"><b style="color:var(--on-dark);font-weight:500">${niche(first.nicho)}</b>${where(first)}</p></div>
+        <div><div class="score-big">${score(num(first.score))}<small>/ 10 ProvenDrop score</small></div></div>
+        ${facts(first)}
+        <div><p class="panel-sub" style="margin:0 0 8px">${validated(first)}</p>${strip(mk)}</div>
+        <p class="panel-sub" style="margin:0">Names, stores, links and kits are sent to members on WhatsApp.</p>`;
+    $("#cardsHoje").innerHTML = rows.map(row).join("");
+    const u = ago(upd); $("#listUpd").textContent = u ? u + (day ? ", list for "+day : "") : (day ? "List for "+day : "");
+    const wa = $("#waMsg"); if (wa) {
+      wa.textContent = (day ? "List for "+day : "Today’s list") + "\n\n" + rows.map((r,i) => `${i+1}. `).join("\u0000").split("\u0000").map((h,i) => {
+        const r = rows[i]; return `${h}[name for members]\n${niche(r.nicho)}${where(r)}\n${status(r)==="go"?"Approved":"Observing"}, score ${score(num(r.score))}\n${fmt(num(r.anuncios_ativos))} active ads, ${fmt(num(r.dias_ativo))} days\nEU reach: ${fmt(num(r.alcance_eu))}`;
+      }).join("\n\n");
+      wa.innerHTML = esc(wa.textContent).replace(/\[name for members\]/g, redact("9em"));
+      const t = document.createElement("span"); t.className = "time"; t.textContent = "09:00"; wa.appendChild(t);
+    }
+    return true;
+  }
+
+  function renderArquivo(rows){
+    rows = rows.filter(r => market(r.mercado_destaque) || r.nicho);
+    if (!rows.length) return;
+    const box = $("#arqBox");
+    box.innerHTML = `<table class="dt"><thead><tr><th scope="col">Approved</th><th scope="col">Niche</th><th scope="col">Market</th><th scope="col">Score</th><th scope="col">Ads at approval</th><th scope="col">Days advertising</th><th scope="col">EU reach</th><th scope="col">Still advertising</th></tr></thead><tbody>${
+      rows.slice().reverse().map(r => { const mk = market(r.mercado_destaque); const chk = dayText(r.ultima_verificacao); return `<tr>
+        <td data-l="Approved"><span>${esc(dayText(r.data_aprovacao)||"No date")}</span></td>
+        <td data-l="Niche"><span>${niche(r.nicho)}</span></td>
+        <td data-l="Market"><span>${mk ? COUNTRY[mk] : "No data"}</span></td>
+        <td class="n" data-l="Score"><span>${score(num(r.score))}</span></td>
+        <td class="n" data-l="Ads at approval"><span>${fmt(num(r.anuncios_na_aprovacao))}</span></td>
+        <td class="n" data-l="Days advertising"><span>${fmt(num(r.dias_ativo_na_aprovacao))}</span></td>
+        <td class="n" data-l="EU reach"><span>${fmt(num(r.alcance_eu))}</span></td>
+        <td data-l="Still advertising"><span>${yes(r.ainda_a_anunciar) ? "Yes" : "No"}${num(r.anuncios_ultima_verificacao)!=null ? `<span class="sub">${fmt(num(r.anuncios_ultima_verificacao))} ads${chk ? ", checked "+esc(chk) : ""}</span>` : ""}</span></td>
+      </tr>`; }).join("")
+    }</tbody></table>`;
+    $("#archive").hidden = false;
+    /* counts per niche and per market, only from what the sheet says */
+    const byN = {}, byM = {};
+    rows.forEach(r => { const k = String(r.nicho||"").trim().toLowerCase().replace(/\s+/g,""); if(k) byN[k]=(byN[k]||0)+1; const mk = market(r.mercado_destaque); if(mk) byM[mk]=(byM[mk]||0)+1; });
+    document.querySelectorAll(".niche[data-niche]").forEach(li => {
+      const n = byN[li.dataset.niche.toLowerCase().replace(/\s+/g,"")] || 0;
+      li.querySelector(".count").textContent = n ? `${n} approved ${n===1?"collection":"collections"} in the archive` : "";
+    });
+    const max = Math.max(0, ...Object.values(byM));
+    document.querySelectorAll("#mkList li").forEach(li => {
+      const n = byM[li.dataset.mk] || 0, st = li.querySelector(".state");
+      st.textContent = n ? `${n} approved ${n===1?"collection":"collections"}` : "";
+      st.classList.toggle("top-mk", n > 0 && n === max);
+    });
+  }
+
+  Promise.allSettled([gviz("hoje"), gviz("info"), gviz("arquivo")]).then(([h, i, a]) => {
+    const upd = i.status === "fulfilled" && i.value[0] ? Object.values(i.value[0])[0] : null;
+    if (h.status === "fulfilled") renderHoje(h.value, upd);
+    if (a.status === "fulfilled") renderArquivo(a.value);
+    /* anything that failed leaves the placeholders in place; nothing is invented */
+  });
 })();
 </script>
 </body>
