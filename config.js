@@ -20,6 +20,11 @@ window.PROVENDROP_CONFIG = {
      only with explicit approval (docs/STRIPE.md, "Modo real"). */
   STRIPE_LINK_DIRECT: "https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00",
 
+  /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee).
+     Created by scripts/stripe-teste.ps1; shown in the member area to former members.
+     Empty = the normal link is shown instead. */
+  STRIPE_LINK_RETURN: "",
+
   /* Stripe customer portal login link (https://billing.stripe.com/p/login/…).
      Empty = "Manage subscription" buttons hidden. TEST MODE link. */
   STRIPE_PORTAL_LINK: "https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00",
