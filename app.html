@@ -143,10 +143,14 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
   .dt td::before{content:attr(data-l);font-size:13.5px;color:var(--ink-2)}
 }
 </style>
+<!-- S6: strict CSP (no inline scripts: the logic lives in app.js) and SRI on the pinned supabase-js.
+     connect-src must match SUPABASE_URL in config.js. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src https://maljrfgnnhtrjunnwlre.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'self'; object-src 'none'">
 <!-- Supabase URL, anon key, portal link and delivery time come from config.js (public values only;
      access to data is decided by the RLS policies on the server). -->
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+<script src="app.js" defer></script>
 </head>
 <body>
 <header class="top">
@@ -197,7 +201,8 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
       <p class="lede" id="semTexto"></p>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
         <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
-        <a class="btn btn-line" href="./#join">Subscribe</a>
+        <a class="btn btn-go" id="semRegresso" href="#" target="_blank" rel="noopener" hidden>Subscribe again (monthly fee only)</a>
+        <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
       </div>
     </div>
   </section>
@@ -209,6 +214,7 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
         <div><h1 id="hojeTitulo">Today’s collections</h1><p id="hojeSub"></p></div>
         <p class="nota" id="hojeHora"></p>
       </div>
+      <div class="msg aviso" id="aviso" hidden></div>
       <div class="msg aviso" id="hojePrefs" hidden>You have not chosen your niche and your countries yet. <a href="#" data-go="prefs">Choose now</a>: what matters to you comes first.</div>
       <div class="feed" id="feed" style="margin-top:20px"></div>
     </div>
@@ -271,229 +277,6 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
   </div>
 </div>
 
-<script>
-(function(){
-  "use strict";
-  const $ = s => document.querySelector(s);
-  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const url = v => /^https?:\/\//i.test(String(v||"")) ? String(v) : "";
-  const MARKETS = ["IT","ES","FR","DE","GB","US"];
-  const PAIS = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States"};
-  /* Niche values are stored as the Portuguese labels used by the research routine. */
-  const NICHOS = [["Joalharia","Women’s jewellery"],["House Decor","Home decoration"],["Roupa Feminina","Women’s fashion"],["Roupa Masculina","Men’s fashion"]];
-  const nicho = v => (NICHOS.find(n => n[0].toLowerCase() === String(v||"").trim().toLowerCase()) || [v, v])[1] || "";
-  const C = window.PROVENDROP_CONFIG || {};
-  const HORA = String(C.DAILY_TIME||"").trim();
-  const PORTAL = url(C.STRIPE_PORTAL_LINK);
-  const SIGNED_URL_SECONDS = 900;   /* kit download links are valid for 15 minutes */
-  const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("en-GB");
-  const score = n => n == null || n === "" ? "—" : (Math.round(Number(n)*10)/10).toFixed(1);
-  const parse = v => { if(!v) return null; const d = new Date(String(v).length === 10 ? v+"T12:00:00" : v); return isNaN(d) ? null : d; };
-  const dia = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : ""; };
-  const diaCurto = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}) : ""; };
-  const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
-  /* Days advertising: counted up to today when data_inicio (first day of the oldest active ad) exists; otherwise the value measured at analysis. */
-  const diasAgora = r => { const d = parse(r.data_inicio); if(!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
-  const dias = r => { const n = diasAgora(r); return n != null ? fmt(n) : `${fmt(r.dias_ativo)}<small class="at">at analysis</small>`; };
 
-  const views = ["vConfig","vLogin","vSemAcesso","vApp"];
-  function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
-  function msg(el, texto, tipo){ el.textContent = texto; el.className = "msg" + (tipo ? " "+tipo : ""); el.hidden = !texto; }
-
-  const SB_URL = String(C.SUPABASE_URL||"").trim(), SB_KEY = String(C.SUPABASE_ANON_KEY||"").trim();
-  if(!/^https:\/\//.test(SB_URL) || !SB_KEY || !window.supabase){ show("vConfig"); return; }
-  const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
-  let user = null, sub = null, feedRows = [], verdes = null;
-
-  /* ── session ────────────────────────────────────────────────────── */
-  $("#formLogin").addEventListener("submit", async e => {
-    e.preventDefault();
-    const email = $("#email").value.trim().toLowerCase(), m = $("#msgLogin"), b = $("#btnLogin");
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg(m, "Enter a valid e-mail address.", "erro");
-    b.disabled = true; msg(m, "Sending…");
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false } });
-    b.disabled = false;
-    if(error){
-      const semConta = /signup|not allowed|not found/i.test(error.message);
-      return msg(m, semConta ? "This e-mail has no subscription. Check the e-mail you paid with, or subscribe on the site." : "The link could not be sent: " + error.message, "erro");
-    }
-    msg(m, "We sent a link to " + email + ". Open it on this device. Check the spam folder too.");
-  });
-  $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.hash = ""; location.reload(); });
-
-  sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
-  sb.auth.getSession().then(({ data }) => entrar(data.session));
-
-  async function entrar(session){
-    user = session?.user || null;
-    if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
-    $("#whoEmail").textContent = user.email || ""; $("#who").hidden = false;
-    const { data, error } = await sb.from("subscritores").select("email,origem,estado,nichos,paises,guia_visto,criado_em").eq("user_id", user.id).maybeSingle();
-    sub = error ? null : data;
-    if(!sub || sub.origem !== "direto" || sub.estado !== "ativo") return semAcesso();
-    show("vApp");
-    renderConta(); renderPrefsForm();
-    if(!sub.guia_visto) abrirGuia(); else if(!(sub.nichos||[]).length) $("#hojePrefs").hidden = false;
-    carregarHoje();
-  }
-
-  function semAcesso(){
-    const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal");
-    if(!sub){ t.textContent = "No active subscription"; p.textContent = "This e-mail has an account but is not linked to an active ProvenDrop subscription. If you have just paid, wait a minute and reload the page."; }
-    else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed. Update your card in “Manage subscription” and your access comes back immediately."; }
-    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; p.textContent = "Your subscription was cancelled. You can subscribe again whenever you want."; }
-    else { t.textContent = "No access to the member area"; p.textContent = "Click customers receive the collections in the Click WhatsApp group, not in this area."; }
-    g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
-    show("vSemAcesso");
-  }
-
-  /* ── tabs ───────────────────────────────────────────────────────── */
-  const paineis = { hoje:"#tHoje", arquivo:"#tArquivo", prefs:"#tPrefs", conta:"#tConta" };
-  function go(tab){
-    Object.entries(paineis).forEach(([k, s]) => { $(s).hidden = k !== tab; });
-    document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-    if(tab === "arquivo" && !verdes) carregarArquivo();
-    scrollTo({ top: 0 });
-  }
-  $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) go(b.dataset.tab); });
-  document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
-
-  /* ── today ──────────────────────────────────────────────────────── */
-  async function carregarHoje(){
-    const feed = $("#feed");
-    feed.innerHTML = '<div class="empty">Loading…</div>';
-    const ult = await sb.from("feed_dia").select("dia").order("dia", { ascending: false }).limit(1).maybeSingle();
-    if(ult.error){ feed.innerHTML = '<div class="empty">The collections could not be loaded: ' + esc(ult.error.message) + '</div>'; return; }
-    if(!ult.data){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
-    const d = ult.data.dia;
-    const { data, error } = await sb.from("feed_dia").select("*").eq("dia", d).order("ordem");
-    if(error){ feed.innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
-    feedRows = data || [];
-    const hoje = new Date().toISOString().slice(0,10);
-    $("#hojeTitulo").textContent = d === hoje ? "Today’s collections" : "Collections for " + dia(d);
-    $("#hojeSub").textContent = d === hoje ? dia(d) : "There is no list for today yet; this is the most recent one.";
-    $("#hojeHora").textContent = HORA ? "New collections every day at " + HORA : "";
-    renderFeed();
-  }
-
-  function renderFeed(){
-    const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
-    const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
-    $("#feed").innerHTML = rows.length ? rows.map(cartao).join("") : '<div class="empty">No collections on this day.</div>';
-  }
-
-  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
-
-  function cartao(r){
-    const ok = aprovada(r), link = url(r.link_colecao), zip = url(r.zip_url), mk = String(r.mercado_destaque||"").toUpperCase();
-    const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = ok ? (r.zip_path ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>`
-                    : zip ? `<a class="btn btn-go" href="${esc(zip)}" target="_blank" rel="noopener">Download Launch Kit</a>`
-                    : `<span class="nota">Kit being prepared</span>`) : `<span class="nota">No kit: not approved yet</span>`;
-    return `<article class="card col${pref ? " pref-first" : ""}">
-      <div>
-        <span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Observing"}</span>
-        <h3>${esc(r.colecao || "Collection")}</h3>
-        <p class="shop"><b>${esc(nicho(r.nicho))}</b>${mk ? " · strongest in " + esc(PAIS[mk] || mk) : ""}<br>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>
-        ${r.nota ? `<p class="nota" style="margin-top:10px">${esc(r.nota)}</p>` : ""}
-      </div>
-      <div>
-        <dl class="facts">
-          <div><dt>Active ads</dt><dd>${fmt(r.anuncios_ativos)}</dd></div>
-          <div><dt>Days advertising</dt><dd>${dias(r)}</dd></div>
-          <div><dt>EU reach</dt><dd>${fmt(r.alcance_eu)}</dd></div>
-        </dl>
-        <p class="cap">${r.trends_validados != null ? `Search demand validated in ${esc(r.trends_validados)} of 6 markets` : "Search demand: no data"}</p>
-        ${strip(mk, r.mercados_verdes)}
-      </div>
-      <div class="side">
-        <div class="score">${score(r.score)}<small>/ 10</small></div>
-        ${kit}
-      </div>
-    </article>`;
-  }
-
-  /* kits: short-lived signed URL from the private bucket; only works for active members (RLS) */
-  document.addEventListener("click", async e => {
-    const b = e.target.closest("[data-zip]"); if(!b) return;
-    b.disabled = true; const t = b.textContent; b.textContent = "Preparing…";
-    const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, SIGNED_URL_SECONDS);
-    b.disabled = false; b.textContent = t;
-    if(error || !data?.signedUrl) return alert("The kit could not be prepared: " + (error?.message || "please try again"));
-    const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
-  });
-
-  /* ── archive ────────────────────────────────────────────────────── */
-  async function carregarArquivo(){
-    const box = $("#arqBox"); box.innerHTML = '<div class="empty">Loading…</div>';
-    const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
-    if(error){ box.innerHTML = '<div class="empty">' + esc(error.message) + '</div>'; return; }
-    verdes = data || [];
-    const nichos = [...new Set(verdes.map(r => r.nicho).filter(Boolean))], paises = [...new Set(verdes.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))];
-    $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
-    $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(PAIS[p] || p)}</option>`).join("");
-    renderArquivo();
-  }
-  ["#fNicho","#fPais","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
-  function renderArquivo(){
-    const n = $("#fNicho").value, p = $("#fPais").value, so = $("#fAtivas").checked;
-    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && (!so || r.ainda_a_anunciar === true));
-    if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th>Score</th><th>Ads</th><th>Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
-      const link = url(r.link_colecao), zip = url(r.zip_url), mk = String(r.mercado_destaque||"").toUpperCase();
-      const kit = r.zip_path ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : zip ? `<a class="btn btn-line btn-sm" href="${esc(zip)}" target="_blank" rel="noopener">Kit</a>` : "—";
-      return `<tr>
-        <td data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
-        <td data-l="Collection"><span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : esc(r.colecao)}<span class="sub">${esc(r.loja||"")}</span></span></td>
-        <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
-        <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
-        <td class="n" data-l="Score"><span>${score(r.score)}</span></td>
-        <td class="n" data-l="Ads"><span>${fmt(r.anuncios_ativos)} at approval${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
-        <td class="n" data-l="Days advertising"><span>${dias(r)}</span></td>
-        <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
-        <td data-l="Kit"><span>${kit}</span></td>
-      </tr>`; }).join("")}</tbody></table>`;
-  }
-
-  /* ── preferences ────────────────────────────────────────────────── */
-  function renderPrefsForm(){
-    const n = new Set(sub?.nichos||[]), p = new Set(sub?.paises||[]);
-    $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
-    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${PAIS[c]}</label>`).join("");
-  }
-  $("#formPrefs").addEventListener("submit", async e => {
-    e.preventDefault();
-    const nichos = [...document.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
-    const paises = [...document.querySelectorAll('input[name="pais"]:checked')].map(i => i.value);
-    const { error } = await sb.from("subscritores").update({ nichos, paises }).eq("user_id", user.id);
-    if(error) return msg($("#msgPrefs"), "The preferences could not be saved: " + error.message, "erro");
-    sub.nichos = nichos; sub.paises = paises; $("#hojePrefs").hidden = nichos.length > 0;
-    msg($("#msgPrefs"), "Preferences saved."); renderFeed();
-  });
-
-  /* ── subscription ───────────────────────────────────────────────── */
-  function renderConta(){
-    $("#contaEmail").textContent = sub.email; $("#contaEstado").textContent = { ativo:"Active", em_atraso:"Payment overdue", cancelado:"Cancelled" }[sub.estado] || sub.estado;
-    $("#contaDesde").textContent = dia(sub.criado_em) || "—";
-    const g = $("#contaPortal"); g.hidden = !PORTAL; if(PORTAL) g.href = PORTAL;
-    $("#contaNota").textContent = PORTAL ? "In “Manage subscription” you change your card, see your invoices and cancel. It asks for your e-mail and sends you a link to the portal." : "To change your card or cancel, reply to the welcome e-mail.";
-  }
-
-  /* ── guide ──────────────────────────────────────────────────────── */
-  function abrirGuia(){ $("#guia").hidden = false; $("#guiaOk").focus(); }
-  async function fecharGuia(tab){
-    $("#guia").hidden = true;
-    if(sub && !sub.guia_visto){ sub.guia_visto = true; await sb.from("subscritores").update({ guia_visto: true }).eq("user_id", user.id); }
-    if(!(sub?.nichos||[]).length && tab !== "prefs") $("#hojePrefs").hidden = false;
-    go(tab);
-  }
-  $("#guiaOk").addEventListener("click", () => fecharGuia("prefs"));
-  $("#guiaSaltar").addEventListener("click", () => fecharGuia("hoje"));
-  $("#guiaFechar").addEventListener("click", () => fecharGuia("hoje"));
-  $("#btnGuia").addEventListener("click", abrirGuia);
-  addEventListener("keydown", e => { if(e.key === "Escape" && !$("#guia").hidden) fecharGuia("hoje"); });
-})();
-</script>
 </body>
 </html>

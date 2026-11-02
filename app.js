@@ -1,0 +1,255 @@
+/* ProvenDrop · member area (app.html). Loaded as an external file so the page
+   can carry a strict Content-Security-Policy (no inline scripts). Values come
+   from config.js (public only); access is decided by the RLS policies. */
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const url = v => /^https?:\/\//i.test(String(v||"")) ? String(v) : "";
+  const MARKETS = ["IT","ES","FR","DE","GB","US"];
+  const PAIS = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States"};
+  /* Niche values are stored as the Portuguese labels used by the research routine. */
+  const NICHOS = [["Joalharia","Women’s jewellery"],["House Decor","Home decoration"],["Roupa Feminina","Women’s fashion"],["Roupa Masculina","Men’s fashion"]];
+  const nicho = v => (NICHOS.find(n => n[0].toLowerCase() === String(v||"").trim().toLowerCase()) || [v, v])[1] || "";
+  const C = window.PROVENDROP_CONFIG || {};
+  const HORA = String(C.DAILY_TIME||"").trim();
+  const PORTAL = url(C.STRIPE_PORTAL_LINK);
+  const LINK_RETURN = url(C.STRIPE_LINK_RETURN) || url(C.STRIPE_LINK_DIRECT);
+  const SIGNED_URL_SECONDS = 120;   /* S7: kit download links are valid for 2 minutes */
+  const TOLERANCIA_DIAS = 7;        /* M1: days of access after the first failed payment */
+  const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("en-GB");
+  const score = n => n == null || n === "" ? "—" : (Math.round(Number(n)*10)/10).toFixed(1);
+  const parse = v => { if(!v) return null; const d = new Date(String(v).length === 10 ? v+"T12:00:00" : v); return isNaN(d) ? null : d; };
+  const dia = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : ""; };
+  const diaCurto = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}) : ""; };
+  const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
+  /* Days advertising: counted up to today when data_inicio exists; otherwise the value measured at analysis. */
+  const diasAgora = r => { const d = parse(r.data_inicio); if(!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
+  const dias = r => { const n = diasAgora(r); return n != null ? fmt(n) : `${fmt(r.dias_ativo)}<small class="at">at analysis</small>`; };
+
+  /* Mirror of public.tem_acesso(): direct, not blocked, active or overdue for less than 7 days. */
+  const diasAtraso = s => s?.em_atraso_desde ? Math.floor((Date.now() - new Date(s.em_atraso_desde).getTime()) / 864e5) : null;
+  const temAcesso = s => !!s && s.origem === "direto" && !s.bloqueado_em && (s.estado === "ativo" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
+
+  const views = ["vConfig","vLogin","vSemAcesso","vApp"];
+  function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
+  function msg(el, texto, tipo){ el.textContent = texto; el.className = "msg" + (tipo ? " "+tipo : ""); el.hidden = !texto; }
+
+  const SB_URL = String(C.SUPABASE_URL||"").trim(), SB_KEY = String(C.SUPABASE_ANON_KEY||"").trim();
+  if(!/^https:\/\//.test(SB_URL) || !SB_KEY || !window.supabase){ show("vConfig"); return; }
+  /* S12: PKCE instead of implicit (no tokens in the URL fragment). */
+  const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { flowType: "pkce", detectSessionInUrl: true } });
+
+  let user = null, sub = null, feedRows = [], verdes = null;
+
+  /* ── session ────────────────────────────────────────────────────── */
+  /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
+     consumed here, by verifyOtp, so an e-mail scanner that opens the URL does not burn them. */
+  async function entrarPorTokenHash(){
+    const q = new URLSearchParams(location.search);
+    const th = q.get("token_hash"), tipo = q.get("type");
+    if(!th) return false;
+    history.replaceState(null, "", location.pathname);
+    const { error } = await sb.auth.verifyOtp({ token_hash: th, type: tipo === "recovery" ? "recovery" : "magiclink" });
+    if(error){ show("vLogin"); msg($("#msgLogin"), "This sign-in link is no longer valid. Request a new one below.", "erro"); }
+    return !error;
+  }
+
+  $("#formLogin").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("#email").value.trim().toLowerCase(), m = $("#msgLogin"), b = $("#btnLogin");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg(m, "Enter a valid e-mail address.", "erro");
+    b.disabled = true; msg(m, "Sending…");
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false } });
+    b.disabled = false;
+    /* S11: neutral answer, whether or not the e-mail has an account. */
+    if(error && !/signup|not allowed|not found|user/i.test(error.message)) return msg(m, "The link could not be sent right now. Please try again in a minute.", "erro");
+    msg(m, "If this e-mail has a ProvenDrop subscription, a sign-in link is on its way. Open it on this device. Check the spam folder too.");
+  });
+  $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.hash = ""; location.reload(); });
+
+  sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
+  entrarPorTokenHash().then(ok => { if(!ok) sb.auth.getSession().then(({ data }) => entrar(data.session)); });
+
+  const CAMPOS = "email,origem,estado,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em";
+  async function entrar(session){
+    user = session?.user || null;
+    if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
+    $("#whoEmail").textContent = user.email || ""; $("#who").hidden = false;
+    const { data, error } = await sb.from("subscritores").select(CAMPOS).eq("user_id", user.id).maybeSingle();
+    sub = error ? null : data;
+    if(!temAcesso(sub)) return semAcesso();
+    show("vApp");
+    renderConta(); renderPrefsForm(); renderAvisos();
+    if(!sub.guia_visto) abrirGuia(); else if(!(sub.nichos||[]).length) $("#hojePrefs").hidden = false;
+    carregarHoje();
+  }
+
+  function semAcesso(){
+    const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal"), r = $("#semRegresso"), s = $("#semSubscrever");
+    r.hidden = true; s.hidden = false;
+    if(!sub){ t.textContent = "No active subscription"; p.textContent = "This e-mail has an account but is not linked to an active ProvenDrop subscription. If you have just paid, wait a minute and reload the page."; }
+    else if(sub.bloqueado_em){ t.textContent = "Access suspended"; p.textContent = "Your access was suspended because of a payment dispute. Reply to any ProvenDrop e-mail and we sort it out with you."; s.hidden = true; }
+    else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
+    else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
+    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; p.textContent = sub.boas_vindas_em ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(LINK_RETURN && sub.boas_vindas_em){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
+    else { t.textContent = "No access to the member area"; p.textContent = "Click customers receive the collections in the Click WhatsApp group, not in this area."; }
+    g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
+    show("vSemAcesso");
+  }
+
+  /* Banners inside the area: overdue payment (days left) and scheduled end (B4). */
+  function renderAvisos(){
+    const a = $("#aviso"); a.hidden = true; a.textContent = "";
+    if(sub.estado === "em_atraso"){ const left = Math.max(0, TOLERANCIA_DIAS - (diasAtraso(sub) ?? 0)); a.textContent = "Your last payment failed. You keep access for " + left + " more " + (left === 1 ? "day" : "days") + ". Update your card in Subscription → Manage subscription."; a.hidden = false; }
+    else if(sub.acesso_fim){ a.textContent = "Your subscription is cancelled and ends on " + dia(sub.acesso_fim) + ". You keep access until then."; a.hidden = false; }
+  }
+
+  /* ── tabs ───────────────────────────────────────────────────────── */
+  const paineis = { hoje:"#tHoje", arquivo:"#tArquivo", prefs:"#tPrefs", conta:"#tConta" };
+  function go(tab){
+    Object.entries(paineis).forEach(([k, s]) => { $(s).hidden = k !== tab; });
+    document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+    if(tab === "arquivo" && !verdes) carregarArquivo();
+    scrollTo({ top: 0 });
+  }
+  $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) go(b.dataset.tab); });
+  document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
+
+  /* ── today ──────────────────────────────────────────────────────── */
+  async function carregarHoje(){
+    const feed = $("#feed");
+    feed.innerHTML = '<div class="empty">Loading…</div>';
+    const ult = await sb.from("feed_dia").select("dia").order("dia", { ascending: false }).limit(1).maybeSingle();
+    if(ult.error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
+    if(!ult.data){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
+    const d = ult.data.dia;
+    const { data, error } = await sb.from("feed_dia").select("*").eq("dia", d).order("ordem");
+    if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
+    feedRows = data || [];
+    const hoje = new Date().toISOString().slice(0,10);
+    $("#hojeTitulo").textContent = d === hoje ? "Today’s collections" : "Collections for " + dia(d);
+    $("#hojeSub").textContent = d === hoje ? dia(d) : "There is no list for today yet; this is the most recent one.";
+    $("#hojeHora").textContent = HORA ? "New collections every day at " + HORA : "";
+    renderFeed();
+  }
+
+  function renderFeed(){
+    const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
+    const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
+    $("#feed").innerHTML = rows.length ? rows.map(cartao).join("") : '<div class="empty">No collections on this day.</div>';
+  }
+
+  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
+
+  /* S7: kits only through the private bucket (zip_path); external zip links are never shown. */
+  function cartao(r){
+    const ok = aprovada(r), link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
+    const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
+    const kit = ok ? (r.zip_path ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>`
+                    : `<span class="nota">Kit being prepared</span>`) : `<span class="nota">No kit: not approved yet</span>`;
+    return `<article class="card col${pref ? " pref-first" : ""}">
+      <div>
+        <span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Observing"}</span>
+        <h3>${esc(r.colecao || "Collection")}</h3>
+        <p class="shop"><b>${esc(nicho(r.nicho))}</b>${mk ? " · strongest in " + esc(PAIS[mk] || mk) : ""}<br>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>
+        ${r.nota ? `<p class="nota" style="margin-top:10px">${esc(r.nota)}</p>` : ""}
+      </div>
+      <div>
+        <dl class="facts">
+          <div><dt>Active ads</dt><dd>${fmt(r.anuncios_ativos)}</dd></div>
+          <div><dt>Days advertising</dt><dd>${dias(r)}</dd></div>
+          <div><dt>EU reach</dt><dd>${fmt(r.alcance_eu)}</dd></div>
+        </dl>
+        <p class="cap">${r.trends_validados != null ? `Search demand validated in ${esc(r.trends_validados)} of 6 markets` : "Search demand: no data"}</p>
+        ${strip(mk, r.mercados_verdes)}
+      </div>
+      <div class="side">
+        <div class="score">${score(r.score)}<small>/ 10</small></div>
+        ${kit}
+      </div>
+    </article>`;
+  }
+
+  /* kits: short-lived signed URL from the private bucket; only works for members with access (RLS) */
+  document.addEventListener("click", async e => {
+    const b = e.target.closest("[data-zip]"); if(!b) return;
+    b.disabled = true; const t = b.textContent; b.textContent = "Preparing…";
+    const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, SIGNED_URL_SECONDS);
+    b.disabled = false; b.textContent = t;
+    if(error || !data?.signedUrl) return alert("The kit could not be prepared. Please try again.");
+    const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  /* ── archive ────────────────────────────────────────────────────── */
+  async function carregarArquivo(){
+    const box = $("#arqBox"); box.innerHTML = '<div class="empty">Loading…</div>';
+    const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
+    if(error){ box.innerHTML = '<div class="empty">The archive could not be loaded right now.</div>'; return; }
+    verdes = data || [];
+    const nichos = [...new Set(verdes.map(r => r.nicho).filter(Boolean))], paises = [...new Set(verdes.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))];
+    $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
+    $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(PAIS[p] || p)}</option>`).join("");
+    renderArquivo();
+  }
+  ["#fNicho","#fPais","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  function renderArquivo(){
+    const n = $("#fNicho").value, p = $("#fPais").value, so = $("#fAtivas").checked;
+    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && (!so || r.ainda_a_anunciar === true));
+    if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th>Score</th><th>Ads</th><th>Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+      const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
+      const kit = r.zip_path ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
+      return `<tr>
+        <td data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
+        <td data-l="Collection"><span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : esc(r.colecao)}<span class="sub">${esc(r.loja||"")}</span></span></td>
+        <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
+        <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
+        <td class="n" data-l="Score"><span>${score(r.score)}</span></td>
+        <td class="n" data-l="Ads"><span>${fmt(r.anuncios_ativos)} at approval${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td class="n" data-l="Days advertising"><span>${dias(r)}</span></td>
+        <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
+        <td data-l="Kit"><span>${kit}</span></td>
+      </tr>`; }).join("")}</tbody></table>`;
+  }
+
+  /* ── preferences ────────────────────────────────────────────────── */
+  function renderPrefsForm(){
+    const n = new Set(sub?.nichos||[]), p = new Set(sub?.paises||[]);
+    $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
+    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${PAIS[c]}</label>`).join("");
+  }
+  $("#formPrefs").addEventListener("submit", async e => {
+    e.preventDefault();
+    const nichos = [...document.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
+    const paises = [...document.querySelectorAll('input[name="pais"]:checked')].map(i => i.value);
+    const { error } = await sb.from("subscritores").update({ nichos, paises }).eq("user_id", user.id);
+    if(error) return msg($("#msgPrefs"), "The preferences could not be saved right now.", "erro");
+    sub.nichos = nichos; sub.paises = paises; $("#hojePrefs").hidden = nichos.length > 0;
+    msg($("#msgPrefs"), "Preferences saved."); renderFeed();
+  });
+
+  /* ── subscription ───────────────────────────────────────────────── */
+  function renderConta(){
+    $("#contaEmail").textContent = sub.email;
+    const estado = { ativo: sub.acesso_fim ? "Active until " + dia(sub.acesso_fim) + " (cancelled)" : "Active", em_atraso: "Payment overdue (" + Math.max(0, TOLERANCIA_DIAS - (diasAtraso(sub) ?? 0)) + " days of access left)", cancelado: "Cancelled", incompleto: "Payment not completed" }[sub.estado] || sub.estado;
+    $("#contaEstado").textContent = estado;
+    $("#contaDesde").textContent = dia(sub.criado_em) || "—";
+    const g = $("#contaPortal"); g.hidden = !PORTAL; if(PORTAL) g.href = PORTAL;
+    $("#contaNota").textContent = PORTAL ? "In “Manage subscription” you change your card, see your invoices and cancel. It asks for your e-mail and sends you a link to the portal." : "To change your card or cancel, reply to the welcome e-mail.";
+  }
+
+  /* ── guide ──────────────────────────────────────────────────────── */
+  function abrirGuia(){ $("#guia").hidden = false; $("#guiaOk").focus(); }
+  async function fecharGuia(tab){
+    $("#guia").hidden = true;
+    if(sub && !sub.guia_visto){ sub.guia_visto = true; await sb.from("subscritores").update({ guia_visto: true }).eq("user_id", user.id); }
+    if(!(sub?.nichos||[]).length && tab !== "prefs") $("#hojePrefs").hidden = false;
+    go(tab);
+  }
+  $("#guiaOk").addEventListener("click", () => fecharGuia("prefs"));
+  $("#guiaSaltar").addEventListener("click", () => fecharGuia("hoje"));
+  $("#guiaFechar").addEventListener("click", () => fecharGuia("hoje"));
+  $("#btnGuia").addEventListener("click", abrirGuia);
+  addEventListener("keydown", e => { if(e.key === "Escape" && !$("#guia").hidden) fecharGuia("hoje"); });
+})();
