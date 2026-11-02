@@ -15,12 +15,14 @@ window.PROVENDROP_CONFIG = {
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hbGpyZmdubmh0cmp1bm53bHJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1Njg4NTEsImV4cCI6MjEwOTE0NDg1MX0.wMbnDi7rG9nz4tVUYZ4Z_gEF28V3IJaSxnnjyydVzjU",
 
   /* Stripe Payment Link of the direct subscription (https://buy.stripe.com/…).
-     Must redirect to bem-vindo.html after payment. Empty = button disabled. */
-  STRIPE_LINK_DIRECT: "",
+     Redirects to bem-vindo.html after payment. Empty = button disabled.
+     TEST MODE link (plink_1UX9UkJMAlqVy4dKAXTumtyZ): replace by the live link
+     only with explicit approval (docs/STRIPE.md, "Modo real"). */
+  STRIPE_LINK_DIRECT: "https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00",
 
   /* Stripe customer portal login link (https://billing.stripe.com/p/login/…).
-     Empty = "Manage subscription" buttons hidden. */
-  STRIPE_PORTAL_LINK: "",
+     Empty = "Manage subscription" buttons hidden. TEST MODE link. */
+  STRIPE_PORTAL_LINK: "https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00",
 
   /* Time the daily collections are delivered, Europe/Lisbon, "HH:MM".
      Must match the HORA_ENVIO secret of the email-diario function

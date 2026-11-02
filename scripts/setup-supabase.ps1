@@ -61,18 +61,34 @@ function LerSegredo($nome, $ajuda) {
   try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($b).Trim() }
   finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
 }
+# Identificadores públicos (não secretos): mostram-se, e Enter aceita o valor proposto.
+function LerValor($nome, $proposto, $ajuda) {
+  Write-Host "  $nome  ($ajuda)" -ForegroundColor Gray
+  $v = Read-Host "  $nome [$proposto]"
+  if ([string]::IsNullOrWhiteSpace($v)) { return $proposto }
+  return $v.Trim()
+}
+
+# Valores de TESTE já criados no Stripe (vault: "Stripe — modo de teste (IDs e links).md").
+# No modo real substituem-se pelos ids reais (docs/STRIPE.md, "Modo real").
+$STRIPE_PRICE_DIRETO_TESTE       = "price_1UX9ThJMAlqVy4dKYnrmwGb3"
+$STRIPE_PRICE_CLICK_TESTE        = "price_1UX9UYJMAlqVy4dK2FZi3k9w"
+$STRIPE_PAYMENT_LINK_DIRETO_TESTE = "plink_1UX9UkJMAlqVy4dKAXTumtyZ"
+$EMAIL_FROM_PROPOSTO             = "ProvenDrop <noreply@provendrop.com>"
 
 $cronSecret = ""
 if (-not $SemSegredos) {
   Passo "Segredos (escritos sem eco; nunca gravados em disco)"
   $valores = [ordered]@{}
-  $valores["STRIPE_SECRET_KEY"]      = LerSegredo "STRIPE_SECRET_KEY"      "sk_test_… (Developers → API keys)"
-  $valores["STRIPE_WEBHOOK_SECRET"]  = LerSegredo "STRIPE_WEBHOOK_SECRET"  "whsec_… do endpoint (Workbench → Webhooks → Reveal)"
-  $valores["STRIPE_PRICE_DIRETO"]    = LerSegredo "STRIPE_PRICE_DIRETO"    "price_… do preço mensal ProvenDrop Direct"
-  $valores["STRIPE_PRICE_CLICK"]     = LerSegredo "STRIPE_PRICE_CLICK"     "price_… do preço mensal do produto da Click (vazio se não houver)"
+  $valores["STRIPE_SECRET_KEY"]      = LerSegredo "STRIPE_SECRET_KEY"      "sk_test_… (Programadores → Chaves de API → Chave secreta)"
+  $valores["STRIPE_WEBHOOK_SECRET"]  = LerSegredo "STRIPE_WEBHOOK_SECRET"  "whsec_… (Programadores → Webhooks → we_1UX9VN… → Segredo de assinatura → Revelar)"
   $valores["RESEND_API_KEY"]         = LerSegredo "RESEND_API_KEY"         "re_… (Resend → API Keys)"
-  $valores["EMAIL_FROM"]             = LerSegredo "EMAIL_FROM"             'ex.: ProvenDrop <noreply@mail.provendrop.pt>'
-  $valores["EMAIL_REPLY_TO"]         = LerSegredo "EMAIL_REPLY_TO"         "opcional: onde recebes as respostas"
+  Passo "Identificadores públicos (Enter = aceitar o valor de teste proposto)"
+  $valores["STRIPE_PRICE_DIRETO"]        = LerValor "STRIPE_PRICE_DIRETO"        $STRIPE_PRICE_DIRETO_TESTE        "price_… mensal ProvenDrop Direct"
+  $valores["STRIPE_PRICE_CLICK"]         = LerValor "STRIPE_PRICE_CLICK"         $STRIPE_PRICE_CLICK_TESTE         "price_… mensal ProvenDrop via Click"
+  $valores["STRIPE_PAYMENT_LINK_DIRETO"] = LerValor "STRIPE_PAYMENT_LINK_DIRETO" $STRIPE_PAYMENT_LINK_DIRETO_TESTE "plink_… do link Direct"
+  $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 $EMAIL_FROM_PROPOSTO              "remetente do domínio verificado no Resend; sem domínio: onboarding@resend.dev"
+  $valores["EMAIL_REPLY_TO"]             = LerValor "EMAIL_REPLY_TO"             ""                                "opcional: onde recebes as respostas"
 
   foreach ($k in @("STRIPE_SECRET_KEY")) { if ($valores[$k] -and $valores[$k] -notlike "sk_*") { Falhar "$k não parece uma secret key do Stripe (sk_…)" } }
   if ($valores["STRIPE_SECRET_KEY"] -like "sk_live_*") {
@@ -81,6 +97,8 @@ if (-not $SemSegredos) {
   }
   if ($valores["STRIPE_WEBHOOK_SECRET"] -and $valores["STRIPE_WEBHOOK_SECRET"] -notlike "whsec_*") { Falhar "STRIPE_WEBHOOK_SECRET tem de começar por whsec_" }
   foreach ($k in @("STRIPE_PRICE_DIRETO","STRIPE_PRICE_CLICK")) { if ($valores[$k] -and $valores[$k] -notlike "price_*") { Falhar "$k tem de começar por price_" } }
+  if ($valores["STRIPE_PAYMENT_LINK_DIRETO"] -and $valores["STRIPE_PAYMENT_LINK_DIRETO"] -notlike "plink_*") { Falhar "STRIPE_PAYMENT_LINK_DIRETO tem de começar por plink_" }
+  if ($valores["STRIPE_SECRET_KEY"] -like "sk_live_*" -and $valores["STRIPE_PRICE_DIRETO"] -eq $STRIPE_PRICE_DIRETO_TESTE) { Falhar "chave live com price_ de teste: no modo real os ids são outros (docs/STRIPE.md)" }
   if ($valores["RESEND_API_KEY"] -and $valores["RESEND_API_KEY"] -notlike "re_*") { Falhar "RESEND_API_KEY tem de começar por re_" }
 
   # CRON_SECRET aleatório (32 bytes → hex), partilhado com public.config.cron_secret
@@ -138,4 +156,4 @@ try {
 }
 
 Passo "Concluído"
-Write-Host "Falta (à mão): STRIPE_LINK_DIRECT e STRIPE_PORTAL_LINK em config.js; SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); depois o teste de docs/TESTE.md."
+Write-Host "Falta (à mão): SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); confirmar config.js; depois o teste de docs/TESTE.md."
