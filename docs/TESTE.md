@@ -14,7 +14,9 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | Nenhuma página pública contém o ID da folha proibida, lojas, links de coleções ou zips (`index.html` continua a ler só a folha pública; nomes em barras `.redact`) | ✅ |
 | `publicar_feed.py` (vault) gera o mesmo `texto_whatsapp` e os mesmos campos antigos; só acrescenta `zip_path` e `data_inicio` | ✅ (comparado com o `feed_bot.json` real, sem o reescrever) |
 | `publicar_plataforma.py --dry-run` com `--zips-dir` = raiz do vault encontra o zip da coleção aprovada e prepararia o upload para `kits/2026-11-01/…` | ✅ |
-| `scripts/setup-supabase.ps1` sem erros de sintaxe (parser do PowerShell) | ✅ (não executado: sem CLI nem segredos) |
+| `scripts/setup-supabase.ps1` sem erros de sintaxe (parser do PowerShell) | ✅ (executado pelo Afonso em 2026-11-02: link, segredos e deploy feitos) |
+| Migração `0003_boas_vindas.sql` aplicada com `supabase db query --linked` (CLI 2.122.0) e `stripe-webhook` com novo deploy (`--no-verify-jwt`) | ✅ 2026-11-02 |
+| Função publicada responde: POST sem assinatura → 400; `?reenviar_boas_vindas=` sem `x-cron-secret` → 401 `{"erro":"não autorizado"}`; GET → 405 | ✅ 2026-11-02 (curl) |
 | Edge Functions: sintaxe TypeScript verificada com o compilador TypeScript (transpileModule, sem erros); não executadas: sem Deno nem deploy | ✅ |
 
 ## 1. Pagamento Direct → acesso → cancelamento
@@ -25,8 +27,9 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 |---|---|---|---|
 | 1.1 | Abrir o site → **Subscribe** | Checkout de teste do Stripe com "ProvenDrop Direct · 15,00 €/mês" + "Joining fee 25,00 €" (total 40 €) | ⏳ |
 | 1.2 | Pagar com o cartão de teste `4242 4242 4242 4242`, validade futura, CVC qualquer, e-mail **teu** | Redireciona para `bem-vindo.html` ("Payment received. Welcome.") com `09:00` no passo 3 | ⏳ |
-| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; sem erros | ⏳ |
-| 1.4 | SQL Editor: `select email, origem, estado, user_id is not null as login from public.subscritores` | 1 linha: o teu e-mail, `direto`, `ativo`, `login = true` | ⏳ |
+| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; a resposta traz `boas_vindas: "enviadas"` num deles e `"ja_enviadas"` no outro; sem erros | ❌ 2026-11-02 (1.ª tentativa): `customer.subscription.created` falhou no Resend → 500, e o `checkout.session.completed` seguinte passou **sem e-mail** porque o `user_id` já estava gravado. **Corrigido** (migração 0003 + webhook, deploy 2026-11-02): as boas-vindas só contam como enviadas quando `boas_vindas_em` é gravado, depois de o Resend aceitar; uma falha do Resend regista `console.error`, devolve 200 e volta a tentar no evento seguinte. ⏳ repetir |
+| 1.4 | SQL Editor: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o teu e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido | ⏳ |
+| 1.4b | Se `boas_vindas_em` estiver null (Resend falhou): `curl -X POST "https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook?reenviar_boas_vindas=<o-teu-email>" -H "x-cron-secret: <CRON_SECRET>"` | `{ok:true, boas_vindas:"enviadas"}`; e-mail novo com magic link novo; `boas_vindas_em` passa a preenchido. Sem o cabeçalho → 401; e-mail de um subscritor click → 409 | ⏳ |
 | 1.5 | SQL Editor: `select * from public.stripe_eventos order by recebido_em` | um `evt_…` por evento, sem repetidos | ⏳ |
 | 1.6 | Caixa de correio | E-mail "Welcome to ProvenDrop: your access" (remetente `EMAIL_FROM`), botão **Sign in to ProvenDrop**, menciona `09:00` | ⏳ |
 | 1.7 | Clicar no botão | Abre `app.html` com sessão: guia de 1 minuto → **Choose my niche and countries** → guardar | ⏳ |

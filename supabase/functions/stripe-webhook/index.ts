@@ -9,12 +9,22 @@
 //   invoice.paid                     → estado ativo (recupera de em_atraso)
 //   invoice.payment_failed           → estado em_atraso
 //
+// Boas-vindas: enviadas sempre que origem = direto e subscritores.boas_vindas_em
+// é null (gera-se um magic link novo de cada vez); boas_vindas_em só é gravado
+// depois de o Resend aceitar a mensagem. Uma falha do Resend não impede o
+// registo do subscritor: fica no log (console.error), o evento devolve 200 e a
+// tentativa seguinte (próximo evento ou reenvio manual) volta a enviar.
+//
+// Reenvio manual:  POST …/stripe-webhook?reenviar_boas_vindas=<email>
+//   com o cabeçalho x-cron-secret: <CRON_SECRET>. Envia um magic link novo
+//   (mesmo que já tenha sido enviado antes) e grava boas_vindas_em.
+//
 // Deploy:  supabase functions deploy stripe-webhook --no-verify-jwt
 // Segredos (supabase secrets set): STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
 //   STRIPE_PRICE_DIRETO, STRIPE_PRICE_CLICK (price_…), STRIPE_PAYMENT_LINK_DIRETO
 //   (plink_…, opcional), RESEND_API_KEY, EMAIL_FROM, APP_URL, HORA_ENVIO,
-//   MAGIC_LINK_MINUTOS. SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são injetadas
-//   automaticamente pelo Supabase.
+//   MAGIC_LINK_MINUTOS, CRON_SECRET. SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
+//   são injetadas automaticamente pelo Supabase.
 //
 // Origem do cliente ("direto" | "click"), por esta ordem:
 //   1. metadata.origem da sessão de checkout / da subscrição (copiada do Payment Link);
@@ -42,6 +52,7 @@ const LINK_DIRETO = Deno.env.get("STRIPE_PAYMENT_LINK_DIRETO") ?? "";
 const PRICE_DIRETO = Deno.env.get("STRIPE_PRICE_DIRETO") ?? "";
 const PRICE_CLICK = Deno.env.get("STRIPE_PRICE_CLICK") ?? "";
 const MINUTOS = Deno.env.get("MAGIC_LINK_MINUTOS") ?? "60";
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
 
 /** "9" ou "09:00" → "09:00"; vazio → "[HOUR]" (nunca se inventa uma hora). */
 function horaTexto(): string {
@@ -59,6 +70,14 @@ const json = (b: unknown, status = 200) =>
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
+
+  // Modo manual: reenviar as boas-vindas a um subscritor direto (protegido por x-cron-secret).
+  const reenviar = new URL(req.url).searchParams.get("reenviar_boas_vindas");
+  if (reenviar !== null) {
+    if (!CRON_SECRET || req.headers.get("x-cron-secret") !== CRON_SECRET) return json({ erro: "não autorizado" }, 401);
+    return reenviarBoasVindas(reenviar.trim().toLowerCase());
+  }
+
   const assinatura = req.headers.get("stripe-signature") ?? "";
   const corpo = await req.text();
 
@@ -80,12 +99,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    let boasVindas: string | undefined;
     switch (evento.type) {
       case "checkout.session.completed":
-        await aoCompletarCheckout(evento.data.object as Stripe.Checkout.Session);
+        boasVindas = await aoCompletarCheckout(evento.data.object as Stripe.Checkout.Session);
         break;
       case "customer.subscription.created":
-        await aoCriarSubscricao(evento.data.object as Stripe.Subscription);
+        boasVindas = await aoCriarSubscricao(evento.data.object as Stripe.Subscription);
         break;
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
@@ -100,7 +120,7 @@ Deno.serve(async (req) => {
       default:
         // outros eventos são ignorados de propósito
     }
-    return json({ ok: true });
+    return json(boasVindas ? { ok: true, boas_vindas: boasVindas } : { ok: true });
   } catch (e) {
     console.error(evento.type, evento.id, (e as Error).message);
     // Liberta o id para o Stripe voltar a tentar.
@@ -158,47 +178,85 @@ function origemDaSubscricao(sub: Stripe.Subscription): Origem {
 }
 
 // ───────────────────────────────────────────────────────────────────────
-// Registo do subscritor
+// Registo do subscritor e boas-vindas
+
+/** Cria o utilizador de Auth se não existir e devolve o seu id (null se não for possível). */
+async function garantirUtilizador(email: string, userIdAtual: string | null): Promise<string | null> {
+  if (userIdAtual) return userIdAtual;
+  const criado = await admin.auth.admin.createUser({ email, email_confirm: true });
+  if (!criado.error) return criado.data.user?.id ?? null;
+  if (!/already|exists|registered/i.test(criado.error.message) && criado.error.code !== "email_exists") throw criado.error;
+  // Já existia: o generateLink devolve o utilizador sem enviar nada.
+  const l = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: APP_URL } });
+  if (l.error) throw l.error;
+  return l.data.user?.id ?? null;
+}
 
 /**
  * Garante a linha em public.subscritores. Para "direto" cria o utilizador de
- * Auth e envia as boas-vindas com magic link, mas só na primeira vez (quando a
- * linha ainda não tinha user_id): assim os eventos podem chegar por qualquer
- * ordem sem duplicar e-mails.
+ * Auth e, se boas_vindas_em ainda for null, tenta enviar as boas-vindas com um
+ * magic link novo. O registo nunca depende do e-mail: se o Resend falhar fica
+ * no log, boas_vindas_em continua null e o evento seguinte volta a tentar.
+ * Devolve "enviadas" | "falharam" | "ja_enviadas" | undefined (click).
  */
-async function garantirSubscritor(email: string, origem: Origem, customer: string | null, subscription: string | null, estado: Estado = "ativo") {
-  const atual = await admin.from("subscritores").select("id,user_id,origem").eq("email", email).maybeSingle();
+async function garantirSubscritor(email: string, origem: Origem, customer: string | null, subscription: string | null, estado: Estado = "ativo"): Promise<string | undefined> {
+  const atual = await admin.from("subscritores").select("id,user_id,boas_vindas_em").eq("email", email).maybeSingle();
   if (atual.error) throw atual.error;
 
   const registo: Record<string, unknown> = { email, origem, estado, stripe_customer_id: customer, stripe_subscription_id: subscription };
-  let linkEntrada: string | null = null;
-
-  if (origem === "direto" && !atual.data?.user_id) {
-    const criado = await admin.auth.admin.createUser({ email, email_confirm: true });
-    if (criado.error && !/already|exists|registered/i.test(criado.error.message) && criado.error.code !== "email_exists") {
-      throw criado.error;
-    }
-    // Magic link gerado no servidor e enviado pelo Resend (o SMTP do Supabase não é usado).
-    const link = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: APP_URL } });
-    if (link.error) throw link.error;
-    registo.user_id = link.data.user?.id ?? criado.data.user?.id ?? null;
-    linkEntrada = link.data.properties?.action_link ?? null;
+  if (origem === "direto") {
+    const uid = await garantirUtilizador(email, atual.data?.user_id ?? null);
+    if (uid) registo.user_id = uid;
   }
-
   const { error } = await admin.from("subscritores").upsert(registo, { onConflict: "email" });
   if (error) throw error;
 
-  if (linkEntrada) await enviarBoasVindas(email, linkEntrada);
+  if (origem !== "direto") return undefined;
+  if (atual.data?.boas_vindas_em) return "ja_enviadas";
+  return (await tentarBoasVindas(email)) ? "enviadas" : "falharam";
 }
 
-async function aoCompletarCheckout(s: Stripe.Checkout.Session) {
+/** Gera um magic link novo e envia as boas-vindas; só grava boas_vindas_em se o Resend aceitar. */
+async function tentarBoasVindas(email: string): Promise<boolean> {
+  try {
+    const link = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: APP_URL } });
+    if (link.error) throw link.error;
+    const url = link.data.properties?.action_link;
+    if (!url) throw new Error("magic link sem action_link");
+    await enviarBoasVindas(email, url);
+    const marca = await admin.from("subscritores").update({ boas_vindas_em: new Date().toISOString() }).eq("email", email);
+    if (marca.error) throw marca.error;
+    return true;
+  } catch (e) {
+    console.error(`boas-vindas para ${email} falharam (fica por enviar): ${(e as Error).message}`);
+    return false;
+  }
+}
+
+async function reenviarBoasVindas(email: string): Promise<Response> {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ erro: "e-mail inválido" }, 400);
+  const q = await admin.from("subscritores").select("origem,estado,user_id,boas_vindas_em").eq("email", email).maybeSingle();
+  if (q.error) return json({ erro: q.error.message }, 500);
+  if (!q.data) return json({ erro: "subscritor não encontrado" }, 404);
+  if (q.data.origem !== "direto") return json({ erro: "subscritor da porta click: não tem área nem boas-vindas" }, 409);
+  try {
+    const uid = await garantirUtilizador(email, q.data.user_id);
+    if (uid && uid !== q.data.user_id) await admin.from("subscritores").update({ user_id: uid }).eq("email", email);
+  } catch (e) {
+    return json({ erro: `utilizador de Auth: ${(e as Error).message}` }, 500);
+  }
+  const ok = await tentarBoasVindas(email);
+  return json({ ok, email, estado: q.data.estado, enviadas_antes_em: q.data.boas_vindas_em, boas_vindas: ok ? "enviadas" : "falharam (ver logs)" }, ok ? 200 : 502);
+}
+
+async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<string | undefined> {
   if (s.payment_status !== "paid" && s.payment_status !== "no_payment_required") return;
   const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
   if (!email) throw new Error(`sessão ${s.id} sem e-mail`);
   const origem = await origemDaSessao(s);
   const customer = typeof s.customer === "string" ? s.customer : s.customer?.id ?? null;
   const subscription = typeof s.subscription === "string" ? s.subscription : s.subscription?.id ?? null;
-  await garantirSubscritor(email, origem, customer, subscription);
+  return garantirSubscritor(email, origem, customer, subscription);
 }
 
 async function emailDoCliente(customer: string): Promise<string> {
@@ -207,16 +265,13 @@ async function emailDoCliente(customer: string): Promise<string> {
   return (c.email ?? "").trim().toLowerCase();
 }
 
-async function aoCriarSubscricao(sub: Stripe.Subscription) {
+async function aoCriarSubscricao(sub: Stripe.Subscription): Promise<string | undefined> {
   const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
-  // Se o checkout.session.completed já passou, basta alinhar o estado.
-  const existe = await admin.from("subscritores").select("id").or(`stripe_subscription_id.eq.${sub.id},stripe_customer_id.eq.${customer}`).limit(1);
-  if (existe.error) throw existe.error;
-  if ((existe.data?.length ?? 0) > 0) return aoAlterarSubscricao(sub);
-
   const email = await emailDoCliente(customer);
   if (!email) { console.warn(`subscrição ${sub.id} sem e-mail no cliente ${customer}`); return; }
-  await garantirSubscritor(email, origemDaSubscricao(sub), customer, sub.id, estadoDe(sub.status));
+  // Cria a linha se ainda não existir, alinha o estado e, se as boas-vindas
+  // ainda estiverem por enviar (o checkout pode ter falhado no Resend), tenta de novo.
+  return garantirSubscritor(email, origemDaSubscricao(sub), customer, sub.id, estadoDe(sub.status));
 }
 
 function estadoDe(status: Stripe.Subscription.Status): Estado {

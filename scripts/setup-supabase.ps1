@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Deploy da plataforma ProvenDrop Direto num comando (Windows PowerShell 5.1+).
 
@@ -8,7 +8,7 @@
     2. pede os segredos (sem eco), gera um CRON_SECRET aleatório, lê HORA_ENVIO de
        config.js (DAILY_TIME) e corre `supabase secrets set` sem gravar nada em disco;
     3. faz deploy das funções stripe-webhook (--no-verify-jwt) e email-diario;
-    4. aplica a migração 0002 e actualiza public.config (email_diario_url, cron_secret)
+    4. aplica as migrações 0002 e 0003 e actualiza public.config (email_diario_url, cron_secret)
        com `supabase db query`; se o CLI instalado não tiver esse comando, deixa um
        ficheiro SQL temporário para colares no SQL Editor e apaga-o no fim.
 
@@ -127,10 +127,11 @@ if (-not $SemDeploy) {
   if ($LASTEXITCODE -ne 0) { Falhar "deploy de email-diario falhou" }
 }
 
-# ── 4. SQL: migração 0002 + public.config ───────────────────────────────
-Passo "Migração 0002 e public.config"
+# ── 4. SQL: migrações 0002 e 0003 + public.config ──────────────────────
+Passo "Migrações 0002 e 0003 e public.config"
 $urlFn = "https://$ProjectRef.supabase.co/functions/v1/email-diario"
 $sql = (Get-Content "supabase\migrations\0002_kits_datas.sql" -Raw) + "`n"
+$sql += (Get-Content "supabase\migrations\0003_boas_vindas.sql" -Raw) + "`n"
 $sql += "update public.config set valor = '$urlFn' where chave = 'email_diario_url';`n"
 if ($cronSecret) { $sql += "update public.config set valor = '$cronSecret' where chave = 'cron_secret';`n" }
 $sql += "select chave, case when chave = 'cron_secret' then '(definido)' else valor end as valor from public.config;`n"
@@ -139,12 +140,8 @@ $tmp = Join-Path $env:TEMP ("provendrop-setup-" + [guid]::NewGuid().ToString("N"
 [IO.File]::WriteAllText($tmp, $sql, (New-Object Text.UTF8Encoding $false))
 try {
   $ok = $false
-  & supabase db query --project-ref $ProjectRef --file $tmp 2>$null
+  & supabase db query --linked --file $tmp 2>$null
   if ($LASTEXITCODE -eq 0) { $ok = $true }
-  else {
-    & supabase db query --linked --file $tmp 2>$null
-    if ($LASTEXITCODE -eq 0) { $ok = $true }
-  }
   if (-not $ok) {
     Write-Host "O CLI instalado não tem 'supabase db query'. Cola o conteúdo deste ficheiro no SQL Editor do projecto e corre-o:" -ForegroundColor Yellow
     Write-Host "  $tmp"

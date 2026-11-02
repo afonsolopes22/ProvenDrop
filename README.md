@@ -34,7 +34,8 @@ Os links do Stripe em `config.js` são os de **modo de teste**: o botão Subscri
 | `app.html` | Área pessoal (inglês): login por magic link, Today, Archive, Preferences, Subscription, guia de 1 minuto. Só usa a chave *anon*; o acesso é decidido pelas políticas RLS. Kits por URL assinada (15 min) do bucket privado. |
 | `supabase/migrations/0001_plataforma.sql` | Tabelas, RLS, bucket privado `kits`, job pg_cron (já aplicada). |
 | `supabase/migrations/0002_kits_datas.sql` | `data_inicio` em `feed_dia`/`verdes`; `feed_dia` em `envios_diarios` (aplicada pelo setup-supabase.ps1). |
-| `supabase/functions/stripe-webhook` | Webhook do Stripe: regista subscritores (origem por metadata → price_id → payment link), boas-vindas com magic link. |
+| `supabase/migrations/0003_boas_vindas.sql` | `subscritores.boas_vindas_em`: as boas-vindas só contam como enviadas quando o Resend aceita (aplicada 2026-11-02). |
+| `supabase/functions/stripe-webhook` | Webhook do Stripe: regista subscritores (origem por metadata → price_id → payment link), boas-vindas com magic link, repetidas até o Resend aceitar; reenvio manual `?reenviar_boas_vindas=<email>` com `x-cron-secret`. |
 | `supabase/functions/email-diario` | E-mail diário aos subscritores diretos ativos, à hora `HORA_ENVIO`, com a lista mais recente (sem lojas, links nem zips). |
 | `supabase/functions/_shared/email.ts` | Envio pelo Resend e molde HTML. |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
