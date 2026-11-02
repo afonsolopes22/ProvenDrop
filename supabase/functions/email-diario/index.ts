@@ -16,19 +16,18 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
+import { cronSecretOk } from "../_shared/auth.ts";
+import { semSegredos } from "../_shared/log.ts";
 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 const APP_URL = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
-const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
 const HORA_ENVIO = Number.parseInt((Deno.env.get("HORA_ENVIO") ?? "-1").split(":")[0], 10);
+const TOLERANCIA_DIAS = 7; // M1: em atraso há menos de 7 dias ainda recebe
 
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
-
-/** Nunca devolver chaves numa mensagem de erro (re_…, sk_…, whsec_…, JWT). */
-const semSegredos = (s: string) => s.replace(/\b(re|sk_test|sk_live|whsec)_[A-Za-z0-9_-]+/g, "$1_…").replace(/eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_.-]+/g, "eyJ…").slice(0, 400);
 
 interface Item {
   ordem: number; nicho: string | null; colecao: string | null; mercado_destaque: string | null;
@@ -78,36 +77,40 @@ function linhaHtml(i: Item): string {
 }
 
 Deno.serve(async (req) => {
-  if (!CRON_SECRET || req.headers.get("x-cron-secret") !== CRON_SECRET) return json({ erro: "não autorizado" }, 401);
+  if (!(await cronSecretOk(req))) return json({ erro: "não autorizado" }, 401); // S5
   const forcar = new URL(req.url).searchParams.get("forcar") === "1";
   const { dia, hora, ddmm } = agoraLisboa();
 
   if (!forcar && hora !== HORA_ENVIO) return json({ ok: true, saltado: "fora da hora", hora, hora_envio: HORA_ENVIO });
 
   const ja = await admin.from("envios_diarios").select("dia,feed_dia").eq("dia", dia).maybeSingle();
-  if (ja.error) return json({ erro: ja.error.message }, 500);
+  if (ja.error) return json({ erro: semSegredos(ja.error.message) }, 500);
   if (ja.data && !forcar) return json({ ok: true, saltado: "já enviado hoje" });
 
   // Lista mais recente (nunca de um dia futuro).
   const ult = await admin.from("feed_dia").select("dia").lte("dia", dia).order("dia", { ascending: false }).limit(1).maybeSingle();
-  if (ult.error) return json({ erro: ult.error.message }, 500);
+  if (ult.error) return json({ erro: semSegredos(ult.error.message) }, 500);
   if (!ult.data) return json({ ok: true, saltado: "sem feed", dia });
   const feedDia = ult.data.dia as string;
 
   const repetido = await admin.from("envios_diarios").select("dia").eq("feed_dia", feedDia).limit(1);
-  if (repetido.error) return json({ erro: repetido.error.message }, 500);
+  if (repetido.error) return json({ erro: semSegredos(repetido.error.message) }, 500);
   if ((repetido.data?.length ?? 0) > 0 && !forcar) return json({ ok: true, saltado: "lista já enviada", feed_dia: feedDia });
 
   const feed = await admin.from("feed_dia")
     .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,dias_ativo,data_inicio,zip_url,zip_path")
     .eq("dia", feedDia).order("ordem");
-  if (feed.error) return json({ erro: feed.error.message }, 500);
+  if (feed.error) return json({ erro: semSegredos(feed.error.message) }, 500);
   const itens = (feed.data ?? []) as Item[];
   if (!itens.length) return json({ ok: true, saltado: "feed vazio", feed_dia: feedDia });
 
+  // Quem tem acesso (espelho de public.tem_acesso): direto, não bloqueado, ativo
+  // ou em atraso há menos de 7 dias. Só quem já tem login (boas-vindas enviadas).
+  const limiteAtraso = new Date(Date.now() - TOLERANCIA_DIAS * 864e5).toISOString();
   const subs = await admin.from("subscritores").select("email")
-    .eq("origem", "direto").eq("estado", "ativo").not("user_id", "is", null);
-  if (subs.error) return json({ erro: subs.error.message }, 500);
+    .eq("origem", "direto").is("bloqueado_em", null).not("user_id", "is", null)
+    .or(`estado.eq.ativo,and(estado.eq.em_atraso,em_atraso_desde.gt.${limiteAtraso})`);
+  if (subs.error) return json({ erro: semSegredos(subs.error.message) }, 500);
 
   const n = itens.length;
   const subject = `ProvenDrop · ${ddmm}: ${n} ${n === 1 ? "collection" : "collections"} today`;
@@ -133,6 +136,6 @@ Deno.serve(async (req) => {
   }
 
   const reg = await admin.from("envios_diarios").upsert({ dia, feed_dia: feedDia, enviados, enviado_em: new Date().toISOString() });
-  if (reg.error) return json({ erro: reg.error.message }, 500);
+  if (reg.error) return json({ erro: semSegredos(reg.error.message) }, 500);
   return json({ ok: true, dia, feed_dia: feedDia, colecoes: n, destinatarios: mensagens.length, enviados });
 });
