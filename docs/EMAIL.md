@@ -46,7 +46,7 @@ Sem domínio verificado o Resend só envia para o e-mail da própria conta (modo
 
 ### Ainda sem domínio próprio: modo de teste do Resend
 
-Enquanto `provendrop.com` não estiver comprado e verificado, responde `onboarding@resend.dev` quando o `setup-supabase.ps1` pedir `EMAIL_FROM`. Limite: **só entrega ao e-mail com que criaste a conta Resend**; para qualquer outro destinatário a API devolve erro 403 e a função regista a falha. Serve para o teste completo (`docs/TESTE.md`) feito com o teu próprio e-mail; **não serve para clientes**. Quando o domínio estiver verificado, volta a correr o `setup-supabase.ps1` e aceita o valor proposto `ProvenDrop <noreply@provendrop.com>` (Enter nos segredos deixa-os como estão).
+Enquanto `provendrop.com` não estiver comprado e verificado, o `setup-supabase.ps1` propõe `ProvenDrop <onboarding@resend.dev>` (Enter aceita). Limite: **só entrega ao e-mail com que criaste a conta Resend**; para qualquer outro destinatário a API devolve erro 403, o webhook deixa `boas_vindas_em` a null e volta a tentar, e o `email-diario` responde `502 {"erro": …}` sem registar o dia. Serve para o teste completo (`docs/TESTE.md`) feito com o teu próprio e-mail; **não serve para clientes**. Quando o domínio estiver verificado, volta a correr o `setup-supabase.ps1` e escreve `ProvenDrop <noreply@provendrop.com>` quando pedir `EMAIL_FROM` (Enter nos segredos deixa-os como estão).
 
 ## 5. Link de entrada da página de login (SMTP do Supabase)
 

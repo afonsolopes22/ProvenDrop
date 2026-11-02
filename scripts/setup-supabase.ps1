@@ -74,7 +74,10 @@ function LerValor($nome, $proposto, $ajuda) {
 $STRIPE_PRICE_DIRETO_TESTE       = "price_1UX9ThJMAlqVy4dKYnrmwGb3"
 $STRIPE_PRICE_CLICK_TESTE        = "price_1UX9UYJMAlqVy4dK2FZi3k9w"
 $STRIPE_PAYMENT_LINK_DIRETO_TESTE = "plink_1UX9UkJMAlqVy4dKAXTumtyZ"
-$EMAIL_FROM_PROPOSTO             = "ProvenDrop <noreply@provendrop.com>"
+# Enquanto provendrop.com não estiver verificado no Resend, o remetente de teste é o
+# único que o Resend aceita (e só entrega ao e-mail da conta). Com o domínio verificado,
+# escreve "ProvenDrop <noreply@provendrop.com>" quando o script pedir EMAIL_FROM.
+$EMAIL_FROM_PROPOSTO             = "ProvenDrop <onboarding@resend.dev>"
 
 $cronSecret = ""
 if (-not $SemSegredos) {
@@ -87,7 +90,7 @@ if (-not $SemSegredos) {
   $valores["STRIPE_PRICE_DIRETO"]        = LerValor "STRIPE_PRICE_DIRETO"        $STRIPE_PRICE_DIRETO_TESTE        "price_… mensal ProvenDrop Direct"
   $valores["STRIPE_PRICE_CLICK"]         = LerValor "STRIPE_PRICE_CLICK"         $STRIPE_PRICE_CLICK_TESTE         "price_… mensal ProvenDrop via Click"
   $valores["STRIPE_PAYMENT_LINK_DIRETO"] = LerValor "STRIPE_PAYMENT_LINK_DIRETO" $STRIPE_PAYMENT_LINK_DIRETO_TESTE "plink_… do link Direct"
-  $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 $EMAIL_FROM_PROPOSTO              "remetente do domínio verificado no Resend; sem domínio: onboarding@resend.dev"
+  $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 $EMAIL_FROM_PROPOSTO              "teste do Resend (só entrega ao e-mail da conta); com domínio verificado: ProvenDrop <noreply@provendrop.com>"
   $valores["EMAIL_REPLY_TO"]             = LerValor "EMAIL_REPLY_TO"             ""                                "opcional: onde recebes as respostas"
 
   foreach ($k in @("STRIPE_SECRET_KEY")) { if ($valores[$k] -and $valores[$k] -notlike "sk_*") { Falhar "$k não parece uma secret key do Stripe (sk_…)" } }
@@ -140,7 +143,13 @@ $tmp = Join-Path $env:TEMP ("provendrop-setup-" + [guid]::NewGuid().ToString("N"
 [IO.File]::WriteAllText($tmp, $sql, (New-Object Text.UTF8Encoding $false))
 try {
   $ok = $false
-  & supabase db query --linked --file $tmp 2>$null
+  # O CLI escreve "Initialising login role..." no stderr: não é erro. Captura-se tudo
+  # com a preferência de erro relaxada (em PowerShell 5.1 o stderr redirecionado de um
+  # executável vira ErrorRecord e, com Stop, abortaria o script) e filtra-se essa linha.
+  $eap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+  $saida = & supabase db query --linked --file $tmp 2>&1 | ForEach-Object { "$_" } | Where-Object { $_ -notmatch "Initialising login role" }
+  $ErrorActionPreference = $eap
+  if ($saida) { $saida | ForEach-Object { Write-Host $_ } }
   if ($LASTEXITCODE -eq 0) { $ok = $true }
   if (-not $ok) {
     Write-Host "O CLI instalado não tem 'supabase db query'. Cola o conteúdo deste ficheiro no SQL Editor do projecto e corre-o:" -ForegroundColor Yellow
