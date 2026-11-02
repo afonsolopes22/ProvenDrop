@@ -27,6 +27,9 @@ const HORA_ENVIO = Number.parseInt((Deno.env.get("HORA_ENVIO") ?? "-1").split(":
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 
+/** Nunca devolver chaves numa mensagem de erro (re_…, sk_…, whsec_…, JWT). */
+const semSegredos = (s: string) => s.replace(/\b(re|sk_test|sk_live|whsec)_[A-Za-z0-9_-]+/g, "$1_…").replace(/eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_.-]+/g, "eyJ…").slice(0, 400);
+
 interface Item {
   ordem: number; nicho: string | null; colecao: string | null; mercado_destaque: string | null;
   paises_ads: string[] | null; estado: string | null; alcance_eu: number | null;
@@ -118,7 +121,16 @@ Deno.serve(async (req) => {
   );
 
   const mensagens: Mensagem[] = (subs.data ?? []).map((s) => ({ to: s.email, subject, html, text }));
-  const enviados = mensagens.length ? await enviarEmails(mensagens) : 0;
+  let enviados = 0;
+  try {
+    enviados = mensagens.length ? await enviarEmails(mensagens) : 0;
+  } catch (e) {
+    // Erro do Resend (domínio não verificado, destinatário recusado em modo de teste, chave inválida…):
+    // resposta JSON legível, sem a chave, e sem registar o dia como enviado.
+    const erro = semSegredos((e as Error).message);
+    console.error(`email-diario ${feedDia}: ${erro}`);
+    return json({ erro, feed_dia: feedDia, destinatarios: mensagens.length }, 502);
+  }
 
   const reg = await admin.from("envios_diarios").upsert({ dia, feed_dia: feedDia, enviados, enviado_em: new Date().toISOString() });
   if (reg.error) return json({ erro: reg.error.message }, 500);
