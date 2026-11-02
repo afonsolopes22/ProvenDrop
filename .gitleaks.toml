@@ -1,0 +1,19 @@
+# gitleaks · ProvenDrop (S15). Regras predefinidas + permissões para os
+# identificadores públicos que vivem de propósito no repositório.
+title = "ProvenDrop"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores públicos por desenho"
+paths = [
+  '''docs/.*\.md''',          # ids prod_/price_/plink_/we_ e links de teste, documentados
+]
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hbGpyZmdubmh0cmp1bm53bHJlIiwicm9sZSI6ImFub24i''',  # anon key do Supabase (pública)
+  '''sk_test_…|whsec_…|re_…|sk_live_…''',   # reticências nos docs e nos comentários
+  '''buy\.stripe\.com/test_[A-Za-z0-9]+''',
+  '''billing\.stripe\.com/p/login/test_[A-Za-z0-9]+''',
+  '''sha384-[A-Za-z0-9+/=]+''',              # SRI
+]

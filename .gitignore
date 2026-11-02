@@ -1,4 +1,4 @@
-# segredos: nunca no repositório
+# segredos: nunca no repositório (S14/S15)
 .env
 .env.*
 !.env.example
@@ -7,6 +7,17 @@ supabase/.env.*
 !supabase/.env.example
 *.key
 *.pem
+*service_key*
+.provendrop/
+
+# dados privados do research: nunca no repositório público
+data.json
+feed_bot.json
+*.zip
+*.csv
+*.bak
+*.bak-*
+
 # ficheiros locais do Supabase CLI
 supabase/.temp/
 supabase/.branches/
@@ -14,3 +25,14 @@ supabase/.branches/
 # ferramentas locais
 .claude/
 .claude-flow/
+.mcp.json
+.agentsroom/handoff-transcript-*.txt
+.agentsroom/handoff-summary-*.md
+.agentsroom/fork-context-*.txt
+.agentsroom/transfer-context-*.txt
+.agentsroom/*cache*.json
+.agentsroom/agents-local.json
+.agentsroom/agent-mail/
+
+# acidentes de shell (ex.: ficheiro vazio "32")
+/32
