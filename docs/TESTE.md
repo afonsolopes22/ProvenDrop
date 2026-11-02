@@ -25,20 +25,20 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 1.1 | Abrir o site → **Subscribe** | Checkout de teste do Stripe com "ProvenDrop Direct · 15,00 €/mês" + "Joining fee 25,00 €" (total 40 €) | ⏳ |
-| 1.2 | Pagar com o cartão de teste `4242 4242 4242 4242`, validade futura, CVC qualquer, e-mail **teu** | Redireciona para `bem-vindo.html` ("Payment received. Welcome.") com `09:00` no passo 3 | ⏳ |
-| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; a resposta traz `boas_vindas: "enviadas"` num deles e `"ja_enviadas"` no outro; sem erros | ❌ 2026-11-02 (1.ª tentativa): `customer.subscription.created` falhou no Resend → 500, e o `checkout.session.completed` seguinte passou **sem e-mail** porque o `user_id` já estava gravado. **Corrigido** (migração 0003 + webhook, deploy 2026-11-02): as boas-vindas só contam como enviadas quando `boas_vindas_em` é gravado, depois de o Resend aceitar; uma falha do Resend regista `console.error`, devolve 200 e volta a tentar no evento seguinte. ⏳ repetir |
-| 1.4 | SQL Editor: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o teu e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido | ⏳ |
+| 1.1 | Abrir o site → **Subscribe** | Checkout de teste do Stripe com "ProvenDrop Direct · 15,00 €/mês" + "Joining fee 25,00 €" (total 40 €) | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.2 | Pagar com o cartão de teste `4242 4242 4242 4242`, validade futura, CVC qualquer, e-mail **teu** | Redireciona para `bem-vindo.html` ("Payment received. Welcome.") com `09:00` no passo 3 | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; a resposta traz `boas_vindas: "enviadas"` num deles e `"ja_enviadas"` no outro; sem erros | ❌ 2026-11-02 (1.ª tentativa): `customer.subscription.created` falhou no Resend → 500, e o `checkout.session.completed` seguinte passou **sem e-mail** porque o `user_id` já estava gravado. **Corrigido** (migração 0003 + webhook, deploy 2026-11-02): as boas-vindas só contam como enviadas quando `boas_vindas_em` é gravado, depois de o Resend aceitar; uma falha do Resend regista `console.error`, devolve 200 e volta a tentar no evento seguinte. ⏳ confirmar: no Stripe → Webhooks → endpoint → o `customer.subscription.created` falhado → **Reenviar**; esperado 200 com `boas_vindas: "enviadas"` (ou `"ja_enviadas"` se o reenvio manual já tiver corrido) e o `evt_…` a aparecer em `stripe_eventos` |
+| 1.4 | SQL Editor: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o teu e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido | ✅ 2026-11-02 (site local, modo de teste) |
 | 1.4b | Se `boas_vindas_em` estiver null (Resend falhou): `curl -X POST "https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook?reenviar_boas_vindas=<o-teu-email>" -H "x-cron-secret: <CRON_SECRET>"` | `{ok:true, boas_vindas:"enviadas"}`; e-mail novo com magic link novo; `boas_vindas_em` passa a preenchido. Sem o cabeçalho → 401; e-mail de um subscritor click → 409 | ⏳ |
-| 1.5 | SQL Editor: `select * from public.stripe_eventos order by recebido_em` | um `evt_…` por evento, sem repetidos | ⏳ |
-| 1.6 | Caixa de correio | E-mail "Welcome to ProvenDrop: your access" (remetente `EMAIL_FROM`), botão **Sign in to ProvenDrop**, menciona `09:00` | ⏳ |
-| 1.7 | Clicar no botão | Abre `app.html` com sessão: guia de 1 minuto → **Choose my niche and countries** → guardar | ⏳ |
-| 1.8 | Separador **Today** | As coleções publicadas pela rotina (`feed_dia`), com nome, loja, link, números; aprovadas com **Download Launch Kit** | ⏳ |
-| 1.9 | **Download Launch Kit** | Abre uma URL assinada do bucket `kits` e descarrega o zip (link válido 15 min). Se a coleção só tiver `zip_url`, abre o link externo | ⏳ |
-| 1.10 | **Archive** | Tabela de aprovadas, filtros por nicho/mercado/ainda a anunciar, botão **Kit** | ⏳ |
-| 1.11 | **Subscription** → **Manage subscription** | Portal do Stripe (pede o e-mail, envia link) → **Cancel subscription** → confirmar | ⏳ |
-| 1.12 | Logs do webhook + SQL | `customer.subscription.updated`/`deleted` → `estado = cancelado` (ou `ativo` com `cancel_at_period_end` até ao fim do período, se o portal estiver configurado assim; nesse caso ver 1.13) | ⏳ |
-| 1.13 | Recarregar `app.html` | "Subscription cancelled" e sem acesso; SQL `select count(*) from feed_dia` com a sessão do utilizador devolve 0 (RLS). Para testar sem esperar o fim do período: Stripe → cliente → subscrição → **Cancel subscription** → **Immediately** | ⏳ |
+| 1.5 | SQL Editor: `select * from public.stripe_eventos order by recebido_em` | um `evt_…` por evento, sem repetidos | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.6 | Caixa de correio | E-mail "Welcome to ProvenDrop: your access" (remetente `EMAIL_FROM`), botão **Sign in to ProvenDrop**, menciona `09:00` | ❌ 2026-11-02: não chegou (o Resend falhou no `customer.subscription.created`; ver 1.3). **Corrigido** pelo ponto 2 (migração 0003 + webhook): agora repete-se até o Resend aceitar e há reenvio manual (1.4b). ⏳ confirmar com um reenvio ou um pagamento novo |
+| 1.7 | Clicar no botão | Abre `app.html` com sessão: guia de 1 minuto → **Choose my niute and countries** → guardar | ✅ 2026-11-02 (site local, modo de teste). Encontrado e corrigido no mesmo dia: o texto de cada passo do guia caía na coluna de 32 px (letra a letra) e os botões ficavam fora do ecrã; agora `b`/`span` ficam na 2.ª coluna, o cartão tem `max-height` com scroll e um botão ✕ |
+| 1.8 | Separador **Today** | As coleções publicadas pela rotina (`feed_dia`), com nome, loja, link, números; aprovadas com **Download Launch Kit** | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.9 | **Download Launch Kit** | Abre uma URL assinada do bucket `kits` e descarrega o zip (link válido 15 min). Se a coleção só tiver `zip_url`, abre o link externo | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.10 | **Archive** | Tabela de aprovadas, filtros por nicho/mercado/ainda a anunciar, botão **Kit** | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.11 | **Subscription** → **Manage subscription** | Portal do Stripe (pede o e-mail, envia link) → **Cancel subscription** → confirmar | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.12 | Logs do webhook + SQL | `customer.subscription.updated`/`deleted` → `estado = cancelado` (ou `ativo` com `cancel_at_period_end` até ao fim do período, se o portal estiver configurado assim; nesse caso ver 1.13) | ✅ 2026-11-02 (site local, modo de teste) |
+| 1.13 | Recarregar `app.html` | "Subscription cancelled" e sem acesso; SQL `select count(*) from feed_dia` com a sessão do utilizador devolve 0 (RLS). Para testar sem esperar o fim do período: Stripe → cliente → subscrição → **Cancel subscription** → **Immediately** | ✅ 2026-11-02 (site local, modo de teste) |
 | 1.14 | Página de login com um e-mail sem subscrição → **Send sign-in link** | "This e-mail has no subscription…" | ⏳ |
 | 1.15 | Página de login com o e-mail do teste → **Send sign-in link** | E-mail "Your ProvenDrop sign-in link" pelo SMTP do Resend (EMAIL.md §5); o link abre a área | ⏳ |
 
@@ -56,9 +56,10 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 3.1 | Com 1 subscritor `direto` `ativo` (do teste 1, antes de cancelar) e feed publicado, forçar: `curl -X POST "https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/email-diario?forcar=1" -H "x-cron-secret: <CRON_SECRET>"` | JSON `{ok:true, feed_dia:"…", colecoes:N, destinatarios:1, enviados:1}` | ⏳ |
-| 3.2 | Caixa de correio | Assunto "ProvenDrop · dd/mm: N collections today"; uma linha por coleção com **nome da coleção, mercado, ads, days, people, kit ready**; botão **Open today's collections** → `app.html` | ⏳ |
-| 3.3 | Inspeccionar o e-mail | **Sem** nomes de lojas, **sem** links de coleções, **sem** links de zips (o único link é `app.html`) | ⏳ |
+| 3.0 | Erro do Resend (ex.: destinatário recusado em modo de teste) | `502 {"erro": "…", "feed_dia": …}` legível, sem a chave; `envios_diarios` sem linha nova | ⏳ (antes: "Internal Server Error" sem corpo; corrigido 2026-11-02) |
+| 3.1 | Com 1 subscritor `direto` `ativo` (do teste 1, antes de cancelar) e feed publicado, forçar: `curl -X POST "https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/email-diario?forcar=1" -H "x-cron-secret: <CRON_SECRET>"` | JSON `{ok:true, feed_dia:"…", colecoes:N, destinatarios:1, enviados:1}` | ✅ 2026-11-02 (site local, modo de teste) |
+| 3.2 | Caixa de correio | Assunto "ProvenDrop · dd/mm: N collections today"; uma linha por coleção com **nome da coleção, mercado, ads, days, people, kit ready**; botão **Open today's collections** → `app.html` | ✅ 2026-11-02 (site local, modo de teste) |
+| 3.3 | Inspeccionar o e-mail | **Sem** nomes de lojas, **sem** links de coleções, **sem** links de zips (o único link é `app.html`) | ✅ 2026-11-02 (site local, modo de teste) |
 | 3.4 | Sem `x-cron-secret` ou com valor errado | 401 `{"erro":"não autorizado"}` | ⏳ |
 | 3.5 | Chamada sem `forcar` fora das 09:00 | `{ok:true, saltado:"fora da hora"}` | ⏳ |
 | 3.6 | SQL `select * from public.envios_diarios` | 1 linha por dia de envio, com `feed_dia` | ⏳ |

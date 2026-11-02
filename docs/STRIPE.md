@@ -88,6 +88,10 @@ Cola-os só quando o `scripts\setup-supabase.ps1` os pedir (sem eco). Se um dele
 
 Cada `evt_…` é processado uma vez (tabela `stripe_eventos`); se a função falhar, liberta o id e o Stripe volta a tentar. Sem `STRIPE_WEBHOOK_SECRET` configurado a função devolve 500 a tudo; com assinatura inválida, 400.
 
+## Nome que aparece no Checkout
+
+No teste de 2026-11-02 o Checkout mostrou **"Área restrita de ProvenDrop"** como nome da loja. É o nome do *Sandbox* (a área restrita de teste), não o da conta: o Checkout em modo de teste usa o nome da área restrita. Em modo real o Checkout, o portal de cliente, os recibos e as faturas mostram o **Nome público da empresa** de **Definições → Dados públicos** (Settings → Public details → *Public business name*). Antes de passar a modo real, confirmar aí que está `ProvenDrop` (e que o e-mail de apoio e o site estão preenchidos: aparecem no rodapé do Checkout e nos recibos). Na área restrita, se incomodar, o nome muda-se no selector de conta → ⋯ → *Mudar o nome*; não tem efeito no modo real.
+
 ## Modo real (só com aprovação explícita)
 
 Com o interruptor **Modo de teste** desligado, repetir exactamente a estrutura de teste:
