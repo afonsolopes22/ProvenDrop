@@ -7,10 +7,10 @@ Falta, por esta ordem:
 | # | Passo | Documento | Resultado |
 |---|---|---|---|
 | 1 | Instalar o Supabase CLI e `supabase login` | abaixo | CLI pronto |
-| 2 | Stripe: `scripts\stripe-teste.ps1` uma vez (link de regresso + eventos de disputa/reembolso), depois copiar `sk_test_` e `whsec_` quando o setup os pedir | [STRIPE.md](STRIPE.md) | `STRIPE_LINK_RETURN` em `config.js`; os dois segredos à mão |
+| 2 | Stripe: `scripts\stripe-teste.ps1` uma vez (link de regresso + eventos de disputa/reembolso), depois copiar `sk_test_` e `whsec_` quando o setup os pedir | [STRIPE.md](STRIPE.md) | `STRIPE_LINK_RETURN` em `config.local.js`; os dois segredos à mão |
 | 3 | Resend: conta, API key; sem domínio, `onboarding@resend.dev`; SMTP no Supabase Auth | [EMAIL.md](EMAIL.md) | `re_…`, remetente |
 | 4 | `scripts\setup-supabase.ps1` | abaixo | segredos definidos, funções no ar, migração 0002 e `public.config` actualizados |
-| 5 | Confirmar `config.js` | abaixo | botão Subscribe e portal activos (links de teste) |
+| 5 | Confirmar `config.js` (links vazios) e criar `config.local.js` | abaixo | site publicado com Subscribe desativado; em `localhost` o Subscribe abre o Checkout de teste |
 | 6 | Teste completo em modo de teste | [TESTE.md](TESTE.md) | todos os passos verdes |
 | 7 | Commit e PR; merge só com aprovação | README | site publicado |
 | 8 | Quando `provendrop.com` for comprado: DNS do GitHub Pages e do Resend, `CNAME`, URLs no Stripe e no Supabase | [DOMINIO.md](DOMINIO.md) | site e e-mail no domínio próprio |
@@ -58,19 +58,25 @@ Gate de segredos local (S15), uma vez: `pip install pre-commit` e `pre-commit in
 
 ## 5. `config.js`
 
-Só valores públicos; os de Stripe já estão preenchidos com os links de **teste**:
+Só valores públicos. **Decisão S1 (2026-11-02):** em `main` os três links do Stripe ficam **vazios** até ao modo real (Subscribe desativado no site publicado); os links de **teste** vivem em `config.local.js`, que está no `.gitignore` e que `config.js` só carrega quando a página é servida em `localhost`/`127.0.0.1`:
 
-| Chave | Valor | De onde |
-|---|---|---|
-| `STRIPE_LINK_DIRECT` | `https://buy.stripe.com/test_cNidRa…` (já está) | STRIPE.md a) |
-| `STRIPE_PORTAL_LINK` | `https://billing.stripe.com/p/login/test_cNidRa…` (já está) | STRIPE.md c) |
-| `STRIPE_LINK_RETURN` | URL impresso pelo `scripts\stripe-teste.ps1` (só mensalidade, para ex-membros) | STRIPE.md |
+| Chave | `config.js` (em `main`) | `config.local.js` (só local) | De onde |
+|---|---|---|---|
+| `STRIPE_LINK_DIRECT` | vazio até ao modo real | `https://buy.stripe.com/test_cNidRa…` | STRIPE.md a) |
+| `STRIPE_PORTAL_LINK` | vazio até ao modo real | `https://billing.stripe.com/p/login/test_cNidRa…` | STRIPE.md c) |
+| `STRIPE_LINK_RETURN` | vazio até ao modo real | URL impresso pelo `scripts\stripe-teste.ps1` (só mensalidade, para ex-membros) | STRIPE.md |
 | `DAILY_TIME` | `09:00` | decidido em 2026-11-02; tem de bater com `HORA_ENVIO` |
 | `PRICE_MONTHLY` / `PRICE_JOINING` | `15` / `25` | iguais aos preços do Stripe |
 | `CONTACT_EMAIL` | opcional | aparece no rodapé e nas páginas de boas-vindas |
 | `CTR` | vazio até haver campanhas documentadas | README |
 
-Com os links de teste, o botão **Subscribe** do site abre o Checkout de teste: é assim que se faz o passo 6. **Antes de publicar para clientes**, trocam-se pelos links reais (aprovação explícita).
+Criar o ficheiro local: copiar `config.local.example.js` para `config.local.js` (já traz os dois links de teste; acrescentar o de regresso) e servir o site a partir da raiz do repositório:
+
+```powershell
+python -m http.server 8000
+```
+
+Em `http://localhost:8000/index.html` o botão **Subscribe** abre o Checkout de teste: é assim que se faz o passo 6. No GitHub Pages (e no domínio) `config.local.js` nem é pedido e o Subscribe fica desativado. **Antes de publicar para clientes**, escrevem-se os links reais em `config.js` (aprovação explícita).
 
 ## Onde fica cada coisa (resumo)
 

@@ -11,6 +11,7 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | `index.html`, `bem-vindo.html`, `bem-vindo-click.html`, `app.html` carregam a 1440 e 390 px, sem overflow nem erros de consola, com `config.js` real | ✅ (Playwright, Chrome, servidor local) |
 | Com `config.js` **vazio**: botão Subscribe desativado ("Subscriptions are not open on this page yet"), bloco CTR escondido, `[HOUR]` visível nas 4 páginas, `app.html` mostra "The member area is not active yet" | ✅ |
 | Com `config.js` real: `09:00` em todos os `[HOUR]`, preço €15 + €25, `app.html` abre o ecrã de login (Supabase ligado) | ✅ |
+| **S1** (`config.js` com os 3 links do Stripe vazios, como em `main`): em `localhost` com `config.local.js` o Subscribe abre o Checkout de **teste** e o portal está ativo; num host que não é local (`provendrop.test`, simulado) `config.local.js` **não é pedido**, Subscribe desativado, "Manage subscription" escondido/WhatsApp | ✅ 2026-11-02 (Playwright: `127.0.0.1:8000` pede `config.local.js` e o Subscribe aponta para `buy.stripe.com/test_…`; `provendrop.test` servido do disco: 0 pedidos a `config.local.js`, `aria-disabled`, WhatsApp; sem erros de consola nas 3 páginas, CSP de `app.html` incluída) |
 | Nenhuma página pública contém o ID da folha proibida, lojas, links de coleções ou zips (`index.html` continua a ler só a folha pública; nomes em barras `.redact`) | ✅ |
 | `publicar_feed.py` (vault) gera o mesmo `texto_whatsapp` e os mesmos campos antigos; só acrescenta `zip_path` e `data_inicio` | ✅ (comparado com o `feed_bot.json` real, sem o reescrever) |
 | `publicar_plataforma.py --dry-run` com `--zips-dir` = raiz do vault encontra o zip da coleção aprovada e prepararia o upload para `kits/2026-11-01/…` | ✅ |
@@ -21,7 +22,7 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 
 ## 1. Pagamento Direct → acesso → cancelamento
 
-Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-supabase.ps1` corrido; `config.js` com `STRIPE_LINK_DIRECT` e `STRIPE_PORTAL_LINK` de teste; site publicado numa branch ou servido localmente com o mesmo `config.js`.
+Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-supabase.ps1` corrido; `config.local.js` criado a partir de `config.local.example.js` (links de teste; S1: `config.js` fica com os links vazios); site servido em `localhost` a partir da raiz do repo (`python -m http.server 8000`), porque é só aí que `config.local.js` é carregado.
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
@@ -73,6 +74,7 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 | 4.2 | `app.html` sem sessão, com o DevTools → Network | Só pedidos a `config.js`, `app.js`, fontes e `supabase.min.js` (com SRI); nenhum dado de `feed_dia`/`verdes` (RLS) | ✅ 2026-11-02 (revisão de segurança, ao vivo) |
 | 4.3 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/rest/v1/feed_dia?select=*" -H "apikey: <anon>"` | `[]` ou erro de permissão; nunca linhas | ✅ 2026-11-02: 401 permission denied em `feed_dia`, `verdes`, `subscritores`, `config`, `stripe_eventos`, `envios_diarios` |
 | 4.4 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/storage/v1/object/kits/<caminho>" -H "apikey: <anon>"` | 400/403; o bucket é privado | ✅ 2026-11-02: listagem do bucket devolve `[]` |
+| 4.5 | Site **publicado** (GitHub Pages ou domínio): `index.html`, `bem-vindo-click.html`, `app.html` com DevTools → Network | S1: Subscribe desativado ("Subscriptions are not open on this page yet"); "Manage subscription" abre o WhatsApp / está escondido; **nenhum pedido** a `config.local.js` | ⏳ no site publicado (simulado em local, ver §0) |
 
 ## 6. Cenários de pagamento (PAGAMENTOS.md), depois das correções de 2026-11-02
 

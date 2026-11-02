@@ -10,6 +10,9 @@ supabase/.env.*
 *service_key*
 .provendrop/
 
+# links de TESTE do Stripe para o site servido em localhost (S1); o exemplo fica no repo
+config.local.js
+
 # dados privados do research: nunca no repositório público
 data.json
 feed_bot.json

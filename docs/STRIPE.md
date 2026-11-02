@@ -13,17 +13,17 @@ Rótulos dos menus: o Dashboard do Stripe em português (Europa). Entre parênte
 | Produto **ProvenDrop Direct**, 15 €/mês | `prod_VYFz5Sh2acJSKc` · `price_1UX9ThJMAlqVy4dKYnrmwGb3` | segredo `STRIPE_PRICE_DIRETO` |
 | Produto **ProvenDrop via Click**, 15 €/mês | `prod_VYG0mJkH0A457H` · `price_1UX9UYJMAlqVy4dK2FZi3k9w` | segredo `STRIPE_PRICE_CLICK` |
 | Produto **Adesão ProvenDrop**, 25 € uma vez (nos dois links) | `prod_VYG0gDziJ4fFAJ` · `price_1UX9UOJMAlqVy4dKxdL2r2wj` | só no Stripe |
-| Payment Link **Direct** | `plink_1UX9UkJMAlqVy4dKAXTumtyZ` · `https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.js` → `STRIPE_LINK_DIRECT`; segredo `STRIPE_PAYMENT_LINK_DIRETO` |
+| Payment Link **Direct** | `plink_1UX9UkJMAlqVy4dKAXTumtyZ` · `https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.local.js` → `STRIPE_LINK_DIRECT` (S1: em `config.js` fica vazio até ao modo real); segredo `STRIPE_PAYMENT_LINK_DIRETO` |
 | Payment Link **via Click** (o que a Click envia aos clientes dela) | `plink_1UX9UxJMAlqVy4dKAbyhkQk7` · `https://buy.stripe.com/test_9B64gA2oygWv0yu7mhfbq01` | só a Click o usa |
-| Portal de cliente | configuração `bpc_1UX9V9JMAlqVy4dKReL66kNG` · `https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.js` → `STRIPE_PORTAL_LINK` |
+| Portal de cliente | configuração `bpc_1UX9V9JMAlqVy4dKReL66kNG` · `https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.local.js` → `STRIPE_PORTAL_LINK` (vazio em `config.js` até ao modo real) |
 | Webhook | `we_1UX9VNJMAlqVy4dKeelqzvJL` → `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook` | segredo `STRIPE_WEBHOOK_SECRET` (o `whsec_` deste endpoint) |
-| Payment Link **Direct de regresso** (só mensalidade, sem adesão; metadata `origem=direto`, `tipo=regresso`) | criado por `scripts\stripe-teste.ps1` (ver abaixo) | `config.js` → `STRIPE_LINK_RETURN` |
+| Payment Link **Direct de regresso** (só mensalidade, sem adesão; metadata `origem=direto`, `tipo=regresso`) | criado por `scripts\stripe-teste.ps1` (ver abaixo) | `config.local.js` → `STRIPE_LINK_RETURN` (vazio em `config.js` até ao modo real) |
 
-`config.js` já traz os links; o `setup-supabase.ps1` pede os ids e os segredos (Enter = não alterar; sem valores de teste por omissão, A6). Os ids de teste estão no vault ("Stripe — modo de teste").
+**Decisão S1 (2026-11-02):** `config.js` em `main` tem os três links do Stripe **vazios** (Subscribe desativado no site publicado). Os links de teste ficam em `config.local.js` (no `.gitignore`; modelo em `config.local.example.js`), que `config.js` só carrega quando o site é servido em `localhost`. O `setup-supabase.ps1` pede os ids e os segredos (Enter = não alterar; sem valores de teste por omissão, A6). Os ids de teste estão no vault ("Stripe — modo de teste").
 
 ### `scripts\stripe-teste.ps1` (uma vez, em modo de teste)
 
-Pede a chave `sk_test_` sem eco (recusa `sk_live_`) e, pela API: (1) cria o Payment Link de regresso com o preço mensal Direct, `metadata[origem]=direto`, `metadata[tipo]=regresso`, redirecionamento para `bem-vindo.html` e sem códigos promocionais; se já existir um link com essa metadata, reutiliza-o; imprime o URL para `config.js → STRIPE_LINK_RETURN`; (2) acrescenta ao endpoint `we_1UX9VN…` os eventos `charge.dispute.created` e `charge.refunded` (A4), ficando com **8** eventos. Não cria produtos nem preços. Registar o `plink_` novo na nota do vault.
+Pede a chave `sk_test_` sem eco (recusa `sk_live_`) e, pela API: (1) cria o Payment Link de regresso com o preço mensal Direct, `metadata[origem]=direto`, `metadata[tipo]=regresso`, redirecionamento para `bem-vindo.html` e sem códigos promocionais; se já existir um link com essa metadata, reutiliza-o; imprime o URL para `config.local.js → STRIPE_LINK_RETURN`; (2) acrescenta ao endpoint `we_1UX9VN…` os eventos `charge.dispute.created` e `charge.refunded` (A4), ficando com **8** eventos. Não cria produtos nem preços. Registar o `plink_` novo na nota do vault.
 
 ## a) Produto "ProvenDrop Direct" e o seu Payment Link: confirmar
 
@@ -36,7 +36,7 @@ Pede a chave `sk_test_` sem eco (recusa `sk_live_`) e, pela API: (1) cria o Paym
 - **Opções**: recolhe o e-mail (sempre); códigos promocionais permitidos; sem telefone.
 - **Metadados** (Metadata): `origem` = `direto`. (Se um dia o campo não aparecer no editor, o webhook reconhece na mesma pelo `price_` de `STRIPE_PRICE_DIRETO`.)
 - **Depois do pagamento** (After the payment) → **Não mostrar a página de confirmação** → redirecionar para `https://afonsolopes22.github.io/ProvenDrop/bem-vindo.html`.
-- O URL do link está em `config.js` → `STRIPE_LINK_DIRECT`; o id `plink_…` fica em `STRIPE_PAYMENT_LINK_DIRETO`.
+- O URL do link está em `config.local.js` → `STRIPE_LINK_DIRECT` (só para testes em `localhost`; em `config.js` fica vazio até ao modo real); o id `plink_…` fica em `STRIPE_PAYMENT_LINK_DIRETO`.
 
 ## b) Payment Link da Click: confirmar
 
@@ -51,7 +51,7 @@ Quem paga por este link fica em `subscritores` com `origem = click` e o estado d
 ## c) Portal de cliente: confirmar
 
 **Definições** (engrenagem) → **Faturação** (Billing) → **Portal do cliente** (Customer portal):
-- Link de entrada activo: `https://billing.stripe.com/p/login/test_cNidRa…` → `config.js` → `STRIPE_PORTAL_LINK`.
+- Link de entrada activo: `https://billing.stripe.com/p/login/test_cNidRa…` → `config.local.js` → `STRIPE_PORTAL_LINK` (vazio em `config.js` até ao modo real).
 - Funcionalidades: **cancelar subscrição** (no fim do período), **actualizar método de pagamento**, **histórico de faturas**, actualizar e-mail e morada. Sem mudança de plano. Regressa a `app.html`.
 
 O cliente entra no portal com o e-mail com que pagou; o Stripe envia-lhe um link de acesso. Cancelar no portal → `customer.subscription.updated` com `cancel_at_period_end = true` (continua `ativo` até ao fim do mês pago) e, no fim, `customer.subscription.deleted` → `cancelado`.

@@ -46,7 +46,7 @@ O estado de cada achado depois das correções está na secção **Estado dos ac
 2. Pedir ao GitHub que apague as vistas em cache dos commits antigos: github.com/contact → "Sensitive data removal", indicando `afonsolopes22/ProvenDrop` e os commits `2d44049` e `e1d6a14` (hashes completos com `git rev-parse`). Dizer que a história já foi reescrita. Perguntar se existem forks.
 3. Neste PC, para largar as cópias antigas: `git reflog expire --expire=now --all`, depois `git gc --prune=now`. Irreversível; só o Afonso decide quando.
 4. Supabase → Authentication → Sign In / Providers → desativar **Allow new users to sign up** (S4). Confirmar em URL Configuration → Redirect URLs que só existem as URLs exatas de `app.html`.
-5. Não passar o site a produção com os links de teste (S1). Antes do merge, decidir: (a) site de produção apenas com links reais e webhook live; (b) manter o teste num projeto Supabase separado. Apagar os subscritores de teste (`docs/TESTE.md §5`).
+5. Não passar o site a produção com os links de teste (S1). **Decidido em 2026-11-02:** `main` publica-se com `STRIPE_LINK_DIRECT`, `STRIPE_LINK_RETURN` e `STRIPE_PORTAL_LINK` vazios em `config.js` (Subscribe desativado) até ao modo real; os links de teste ficam em `config.local.js` (no `.gitignore`), carregado por `config.js` só quando a página é servida em `localhost`. Apagar os subscritores de teste (`docs/TESTE.md §5`).
 6. Google Sheets: confirmar que a folha pública `1o-qSJ…` tem só 3 separadores, em modo Leitor e distinta da folha privada. Rever o texto de `info!nota`.
 7. Depois de correr o setup, confirmar `select valor <> 'MUDAR-ESTE-VALOR' from config where chave='cron_secret'` (S10).
 8. Se alguma vez um `sk_`, `whsec_` ou `re_` passar por linha de comando/gravação de ecrã: rodar em Stripe → Chaves de API → Reverter, Webhooks → Reverter segredo, e Resend → apagar a chave (S8).
@@ -68,7 +68,7 @@ O estado de cada achado depois das correções está na secção **Estado dos ac
 
 | ID | Estado | Onde / como |
 |---|---|---|
-| S1 | ✅ corrigido | `stripe-webhook`: eventos do modo errado recebem 200 vazio + aviso (`STRIPE_ACCEPT_TEST`, definido pelo `setup-supabase.ps1` a partir do prefixo da chave). Continua a ser preciso **não** publicar `main` com links de teste (decisão do Afonso). |
+| S1 | ✅ corrigido | `stripe-webhook`: eventos do modo errado recebem 200 vazio + aviso (`STRIPE_ACCEPT_TEST`, definido pelo `setup-supabase.ps1` a partir do prefixo da chave). Site: `config.js` com os três links do Stripe **vazios** em `main` (Subscribe desativado) até ao modo real; links de teste só em `config.local.js` (`.gitignore`), carregado apenas em `localhost` (decisão de 2026-11-02). |
 | S2 | ⏳ Afonso | Drive → Restrito; pedido ao GitHub; `git reflog expire` + `gc` neste PC. Nada que o código possa fazer. |
 | S3 | ✅ corrigido | Tabela `subscricoes` + `recalcular_subscritor`: um evento click nunca retira acesso a uma direto. |
 | S4 | ⏳ Afonso | Authentication → desligar "Allow new users to sign up"; Redirect URLs só `app.html`. |

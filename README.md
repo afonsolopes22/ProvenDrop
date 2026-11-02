@@ -17,17 +17,18 @@ O research, a Metodologia v7, o bot da Click, as folhas Google e a rotina diári
 
 ## Configuração: um só sítio
 
-Todos os valores **públicos** estão em [`config.js`](config.js), lido pelas quatro páginas: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STRIPE_LINK_DIRECT`, `STRIPE_PORTAL_LINK`, `DAILY_TIME`, `PRICE_MONTHLY`, `PRICE_JOINING`, `CONTACT_EMAIL` e `CTR`. Com valores vazios o site não inventa nada: o botão Subscribe fica desativado ("Subscriptions are not open on this page yet"), o bloco CTR fica escondido e a hora mostra `[HOUR]`.
+Todos os valores **públicos** estão em [`config.js`](config.js), lido pelas quatro páginas: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STRIPE_LINK_DIRECT`, `STRIPE_LINK_RETURN`, `STRIPE_PORTAL_LINK`, `DAILY_TIME`, `PRICE_MONTHLY`, `PRICE_JOINING`, `CONTACT_EMAIL` e `CTR`. Com valores vazios o site não inventa nada: o botão Subscribe fica desativado ("Subscriptions are not open on this page yet"), os botões "Manage subscription" ficam escondidos, o bloco CTR fica escondido e a hora mostra `[HOUR]`.
 
 Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `supabase secrets set` através de [`scripts/setup-supabase.ps1`](scripts/setup-supabase.ps1). O `.gitignore` exclui `.env`, `supabase/.env` e `*.key`.
 
-Os links do Stripe em `config.js` são os de **modo de teste**: o botão Subscribe abre o Checkout de teste até à passagem a modo real (aprovação explícita). Domínio previsto `provendrop.com`: ver `docs/DOMINIO.md`; o ficheiro `CNAME` só se cria quando o domínio estiver comprado.
+**Links do Stripe (decisão S1, 2026-11-02):** em `main` os três links (`STRIPE_LINK_DIRECT`, `STRIPE_LINK_RETURN`, `STRIPE_PORTAL_LINK`) ficam **vazios** até ao modo real, por isso o site publicado tem o Subscribe desativado e nunca abre um Checkout de teste. Para os testes locais existe [`config.local.js`](config.local.example.js) (no `.gitignore`; copiar de `config.local.example.js`), que `config.js` só carrega quando a página é servida em `localhost`/`127.0.0.1` e que sobrepõe os links de **teste**. Em qualquer outro host o ficheiro nem é pedido. Domínio previsto `provendrop.com`: ver `docs/DOMINIO.md`; o ficheiro `CNAME` só se cria quando o domínio estiver comprado.
 
 ## Ficheiros
 
 | Ficheiro | Função |
 |---|---|
-| `config.js` | Configuração pública (ver acima). |
+| `config.js` | Configuração pública (ver acima). Links do Stripe vazios em `main` (S1). |
+| `config.local.example.js` | Modelo do `config.local.js` (links de **teste** do Stripe, só carregado em `localhost`; o próprio `config.local.js` está no `.gitignore`). |
 | `index.html` | Página pública (inglês). Montra com números da folha pública (nomes em barras), secções de produto, preço e FAQ. Dias de anúncio contados a partir de `data_inicio` quando a folha a tiver; senão "at analysis". |
 | `bem-vindo.html` | Pós-pagamento da subscrição direta. |
 | `bem-vindo-click.html` | Pós-pagamento dos clientes Click (WhatsApp). |

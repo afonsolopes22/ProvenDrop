@@ -63,6 +63,7 @@ $configTeste = ($cfg -match 'buy\.stripe\.com/test_') -or ($cfg -match 'billing\
 $configLive  = ($cfg -match 'buy\.stripe\.com/(?!test_)[A-Za-z0-9]') -or ($cfg -match 'billing\.stripe\.com/p/login/(?!test_)[A-Za-z0-9]')
 Write-Host ("config.js: links Stripe " + $(if ($configTeste -and -not $configLive) { "de TESTE" } elseif ($configLive -and -not $configTeste) { "REAIS" } elseif ($configTeste -and $configLive) { "MISTURADOS (teste e real)" } else { "vazios" }))
 if ($configTeste -and $configLive) { Falhar "config.js mistura links de teste e reais: corrige antes de continuar" }
+if (-not $configTeste -and -not $configLive) { Write-Host "  (S1: em main os links ficam vazios e o Subscribe do site publicado está desativado; os links de TESTE ficam em config.local.js, só em localhost)" }
 
 # ── 1. link ──────────────────────────────────────────────────────────────
 Passo "supabase link --project-ref $ProjectRef"

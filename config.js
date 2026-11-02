@@ -16,18 +16,23 @@ window.PROVENDROP_CONFIG = {
 
   /* Stripe Payment Link of the direct subscription (https://buy.stripe.com/…).
      Redirects to bem-vindo.html after payment. Empty = button disabled.
-     TEST MODE link (plink_1UX9UkJMAlqVy4dKAXTumtyZ): replace by the live link
-     only with explicit approval (docs/STRIPE.md, "Modo real"). */
-  STRIPE_LINK_DIRECT: "https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00",
+     Decision S1 (2026-11-02): EMPTY on main until live mode, so the published
+     site never opens a test Checkout. The TEST links live in config.local.js
+     (git-ignored, loaded only on localhost; copy config.local.example.js).
+     The live link goes here only with explicit approval (docs/STRIPE.md,
+     "Modo real"). */
+  STRIPE_LINK_DIRECT: "",
 
   /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee).
      Created by scripts/stripe-teste.ps1; shown in the member area to former members.
-     Empty = the normal link is shown instead. */
+     Empty = the normal link is shown instead (nothing, when that one is empty too).
+     Empty on main until live mode (S1); test URL in config.local.js. */
   STRIPE_LINK_RETURN: "",
 
   /* Stripe customer portal login link (https://billing.stripe.com/p/login/…).
-     Empty = "Manage subscription" buttons hidden. TEST MODE link. */
-  STRIPE_PORTAL_LINK: "https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00",
+     Empty = "Manage subscription" buttons hidden (bem-vindo-click.html falls back
+     to WhatsApp). Empty on main until live mode (S1); test URL in config.local.js. */
+  STRIPE_PORTAL_LINK: "",
 
   /* Time the daily collections are delivered, Europe/Lisbon, "HH:MM".
      Must match the HORA_ENVIO secret of the email-diario function
@@ -46,3 +51,18 @@ window.PROVENDROP_CONFIG = {
      fields come from documented campaign data (see README). */
   CTR: { valor: "", tipo_campanha: "", periodo: "", impressoes: "" }
 };
+
+/* S1: local tests only. When the page is served from localhost / 127.0.0.1 /
+   [::1] (or *.localhost), config.local.js is loaded right after this file and
+   overrides the Stripe TEST links (file git-ignored; copy
+   config.local.example.js). Any other host (GitHub Pages, provendrop.com) never
+   requests it, so the published site keeps Subscribe disabled until the live
+   links are written above. document.write is used on purpose: the load stays
+   synchronous, so the pages' inline scripts and the deferred app.js all see the
+   overrides. */
+(function(){
+  var h = location.hostname;
+  if (h === "localhost" || h === "127.0.0.1" || h === "[::1]" || /\.localhost$/.test(h)) {
+    document.write('<script src="config.local.js"><\/script>');
+  }
+})();

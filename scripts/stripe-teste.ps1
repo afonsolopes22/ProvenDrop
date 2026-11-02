@@ -3,7 +3,7 @@
   Ajustes no Stripe em MODO DE TESTE pela API (o Claude Code não tem a chave):
     1. cria o Payment Link Direct "regresso" (só a mensalidade, sem adesão; metadata
        origem=direto; redireciona para bem-vindo.html) e imprime o URL para
-       config.js → STRIPE_LINK_RETURN;
+       config.local.js → STRIPE_LINK_RETURN (S1: em config.js só os links reais);
     2. acrescenta ao endpoint de webhook os eventos charge.dispute.created e
        charge.refunded (A4), mantendo os seis já existentes.
   Pede a chave sk_test_ sem eco; recusa sk_live_. Não cria produtos nem preços.
@@ -52,7 +52,7 @@ if ($ja) {
   $link = Stripe POST "payment_links" $corpo
   Write-Host "Criado: $($link.id)"
 }
-Write-Host "URL (colar em config.js → STRIPE_LINK_RETURN):" -ForegroundColor Green
+Write-Host "URL (colar em config.local.js → STRIPE_LINK_RETURN; nunca em config.js, S1):" -ForegroundColor Green
 Write-Host "  $($link.url)"
 
 Write-Host "`n== 2. Eventos do webhook $Webhook" -ForegroundColor Cyan
@@ -71,4 +71,4 @@ else {
 Write-Host "Eventos agora: $($we.enabled_events -join ', ')"
 Write-Host "URL: $($we.url)   API: $($we.api_version)"
 $chave = $null; $auth = $null
-Write-Host "`nFeito. Próximo passo: colar o URL em config.js e registar o plink_ na nota do vault." -ForegroundColor Green
+Write-Host "`nFeito. Próximo passo: colar o URL em config.local.js e registar o plink_ na nota do vault." -ForegroundColor Green
