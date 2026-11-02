@@ -5,8 +5,10 @@ As duas funções (`stripe-webhook` e `email-diario`) enviam pela API do Resend 
 | E-mail | Quem envia | Para quem | Conteúdo |
 |---|---|---|---|
 | Boas-vindas ("Welcome to ProvenDrop: your access") | `stripe-webhook`, uma vez por subscritor | só `origem = direto` | magic link para `app.html`, hora do e-mail diário |
-| Diário ("ProvenDrop · dd/mm: N collections") | `email-diario`, chamada pelo pg_cron de hora a hora | só `origem = direto` **e** `estado = ativo` | uma linha por coleção: nome da coleção, mercado, anúncios, dias, alcance, "kit ready"; botão **Open today's collections**. **Sem** nomes de lojas, links de coleções nem zips: esses só na área, com sessão iniciada. |
-| Link de entrada pedido na página de login | Supabase Auth (SMTP) | quem tem conta | `{{ .ConfirmationURL }}` |
+| Diário ("ProvenDrop · dd/mm: N collections") | `email-diario`, chamada pelo pg_cron de hora a hora | só quem tem acesso: `direto`, não bloqueado, `ativo` ou `em_atraso` há < 7 dias | uma linha por coleção: nome da coleção, mercado, anúncios, dias, alcance, "kit ready"; botão **Open today's collections**. **Sem** nomes de lojas, links de coleções nem zips: esses só na área, com sessão iniciada. |
+| Link de entrada pedido na página de login | Supabase Auth (SMTP) | quem tem conta | link por `token_hash` (§5) |
+| Regresso ("Welcome back to ProvenDrop") | `stripe-webhook`, quando cancelado → ativo | só `direto` | magic link; nichos/países mantidos |
+| Alertas operacionais | `stripe-webhook`, `reconciliar` | `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`) | duas subscrições no mesmo e-mail, disputa (com prazo), reembolso, boas-vindas falhadas 5×, divergências Stripe ↔ base |
 
 ## Quando sai o e-mail diário
 
@@ -55,6 +57,8 @@ O magic link de boas-vindas vai pelo Resend (API), mas o link que o cliente pede
 1. Supabase → **Authentication** → **Emails** → **SMTP Settings** → **Enable Custom SMTP**.
 2. **Sender email**: o mesmo endereço de `EMAIL_FROM` (`noreply@provendrop.com`; em teste, `onboarding@resend.dev`); **Sender name**: `ProvenDrop`.
 3. **Host**: `smtp.resend.com`; **Port**: `465`; **Username**: `resend`; **Password**: a API key do Resend (podes criar uma segunda chave só para isto).
-4. **Authentication** → **Emails** → **Templates** → **Magic Link**: assunto `Your ProvenDrop sign-in link`, corpo em inglês com `{{ .ConfirmationURL }}`.
+4. **Authentication** → **Emails** → **Templates** → **Magic Link**: assunto `Your ProvenDrop sign-in link`, corpo em inglês com o link **por token_hash** (S12: não é consumido por scanners de e-mail; a área corre `verifyOtp` quando a página abre):
+   `<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=magiclink">Sign in to ProvenDrop</a>`
+   (`{{ .RedirectTo }}` é o `app.html` pedido pela página de login.) O e-mail de boas-vindas e o de regresso já usam este formato, enviados pelo Resend a partir do webhook.
 5. **Authentication** → **URL Configuration**: **Site URL** `https://afonsolopes22.github.io/ProvenDrop/` e, em **Redirect URLs**, `https://afonsolopes22.github.io/ProvenDrop/app.html`.
 6. A validade do link está em **Authentication → Settings → Email OTP expiration** (3600 s por defeito) e tem de ser igual a `MAGIC_LINK_MINUTOS` (60).

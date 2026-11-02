@@ -27,7 +27,7 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 |---|---|---|---|
 | 1.1 | Abrir o site → **Subscribe** | Checkout de teste do Stripe com "ProvenDrop Direct · 15,00 €/mês" + "Joining fee 25,00 €" (total 40 €) | ✅ 2026-11-02 (site local, modo de teste) |
 | 1.2 | Pagar com o cartão de teste `4242 4242 4242 4242`, validade futura, CVC qualquer, e-mail **teu** | Redireciona para `bem-vindo.html` ("Payment received. Welcome.") com `09:00` no passo 3 | ✅ 2026-11-02 (site local, modo de teste) |
-| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; a resposta traz `boas_vindas: "enviadas"` num deles e `"ja_enviadas"` no outro; sem erros | ❌ 2026-11-02 (1.ª tentativa): `customer.subscription.created` falhou no Resend → 500, e o `checkout.session.completed` seguinte passou **sem e-mail** porque o `user_id` já estava gravado. **Corrigido** (migração 0003 + webhook, deploy 2026-11-02): as boas-vindas só contam como enviadas quando `boas_vindas_em` é gravado, depois de o Resend aceitar; uma falha do Resend regista `console.error`, devolve 200 e volta a tentar no evento seguinte. ⏳ confirmar: no Stripe → Webhooks → endpoint → o `customer.subscription.created` falhado → **Reenviar**; esperado 200 com `boas_vindas: "enviadas"` (ou `"ja_enviadas"` se o reenvio manual já tiver corrido) e o `evt_…` a aparecer em `stripe_eventos` |
+| 1.3 | Supabase → Edge Functions → `stripe-webhook` → **Logs** | `checkout.session.completed` e `customer.subscription.created` com 200; a resposta traz `acesso:true` e `boas_vindas:"enviadas"` num deles; sem erros | ❌ 2026-11-02 (1.ª tentativa): o Resend falhou no `created` e o checkout passou sem e-mail (bug corrigido em fdcca13 e refeito em 0004/A3). **Não reenviar eventos antigos pelo Stripe** (PAGAMENTOS.md C1/A2: a fotografia antiga sobreporia o estado; hoje o webhook relê o Stripe, mas o teste limpo é um pagamento novo). ⏳ repetir com um **pagamento novo** |
 | 1.4 | SQL Editor: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o teu e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido | ✅ 2026-11-02 (site local, modo de teste) |
 | 1.4b | Se `boas_vindas_em` estiver null (Resend falhou): `curl -X POST "https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook?reenviar_boas_vindas=<o-teu-email>" -H "x-cron-secret: <CRON_SECRET>"` | `{ok:true, boas_vindas:"enviadas"}`; e-mail novo com magic link novo; `boas_vindas_em` passa a preenchido. Sem o cabeçalho → 401; e-mail de um subscritor click → 409 | ⏳ |
 | 1.5 | SQL Editor: `select * from public.stripe_eventos order by recebido_em` | um `evt_…` por evento, sem repetidos | ✅ 2026-11-02 (site local, modo de teste) |
@@ -70,11 +70,46 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
 | 4.1 | Ver código-fonte de `index.html`, `bem-vindo.html`, `bem-vindo-click.html`, `app.html` (sem sessão) e `config.js` publicados | Nenhuma loja, link de coleção, zip, `data.json`, chave `sk_`/`whsec_`/`re_`, nem o ID da folha Google privada (a que não é a "dados públicos do site") | ✅ local (2026-11-02) · ⏳ no site publicado |
-| 4.2 | `app.html` sem sessão, com o DevTools → Network | Só pedidos a `config.js`, fontes e `supabase.min.js`; nenhum dado de `feed_dia`/`verdes` (RLS) | ⏳ |
-| 4.3 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/rest/v1/feed_dia?select=*" -H "apikey: <anon>"` | `[]` ou erro de permissão; nunca linhas | ⏳ |
-| 4.4 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/storage/v1/object/kits/<caminho>" -H "apikey: <anon>"` | 400/403; o bucket é privado | ⏳ |
+| 4.2 | `app.html` sem sessão, com o DevTools → Network | Só pedidos a `config.js`, `app.js`, fontes e `supabase.min.js` (com SRI); nenhum dado de `feed_dia`/`verdes` (RLS) | ✅ 2026-11-02 (revisão de segurança, ao vivo) |
+| 4.3 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/rest/v1/feed_dia?select=*" -H "apikey: <anon>"` | `[]` ou erro de permissão; nunca linhas | ✅ 2026-11-02: 401 permission denied em `feed_dia`, `verdes`, `subscritores`, `config`, `stripe_eventos`, `envios_diarios` |
+| 4.4 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/storage/v1/object/kits/<caminho>" -H "apikey: <anon>"` | 400/403; o bucket é privado | ✅ 2026-11-02: listagem do bucket devolve `[]` |
+
+## 6. Cenários de pagamento (PAGAMENTOS.md), depois das correções de 2026-11-02
+
+Pré-requisito: `scripts\stripe-teste.ps1` corrido (link de regresso criado e eventos `charge.dispute.created`/`charge.refunded` no endpoint), `setup-supabase.ps1` corrido de novo (função com `STRIPE_ACCEPT_TEST=1`, `ALERT_EMAIL`), migração 0004 aplicada (feita em 2026-11-02). Em cada cenário, confirmar em SQL: `select * from public.subscricoes order by atualizado_em desc;` e `select email, origem, estado, em_atraso_desde, acesso_fim, bloqueado_em, boas_vindas_em, regresso_em from public.subscritores;`.
+
+Cartões de teste do Stripe (qualquer validade futura e CVC):
+
+| Cartão | Efeito |
+|---|---|
+| `4242 4242 4242 4242` | paga sempre |
+| `4000 0000 0000 0002` | recusado (`card_declined`) |
+| `4000 0027 6000 3184` | pede 3D Secure: completar ou abandonar (cenário 6.4) |
+| `4000 0000 0000 0341` | o checkout passa, a fatura seguinte falha (`past_due`) |
+| `4000 0000 0000 0259` | paga e abre uma disputa logo a seguir (cenário 6.23) |
+
+| # | Cenário | Como provocar | Esperado | Resultado |
+|---|---|---|---|---|
+| 6.3 | checkout e created em paralelo | Pagamento novo com `4242…` (os dois eventos chegam juntos) | **1** e-mail de boas-vindas (reserva atómica); `boas_vindas_tentativas = 1`; o link do e-mail entra (token_hash) | ⏳ |
+| 6.4 | created(incomplete) → updated(active) | Pagar com `4000 0027 6000 3184`, fechar o 3DS sem concluir; depois concluir o pagamento | Enquanto `incomplete`: `subscricoes.estado = incompleto`, `subscritores.estado = incompleto`, **sem** utilizador Auth nem e-mail; `app.html` diz "Payment not completed". Depois de pagar: `ativo` + boas-vindas | ⏳ |
+| 6.5 / 6.9 / 6.11 | Evento atrasado/reenviado com fotografia antiga | Depois de cancelar (6.13), **Reenviar** no Stripe um `customer.subscription.updated (active)` antigo | Estado continua `cancelado`: o webhook relê o Stripe (resposta `estado:"cancelado"`); `stripe_eventos` fica com `processado_em` e `tentativas` | ⏳ |
+| 6.8 | Evento repetido já concluído | Reenviar qualquer evento já processado | 200 `{"ok":true,"repetido":true}`; nada muda | ⏳ |
+| 6.12 | Falha de pagamento e depois pago | Pagar com `4000 0000 0000 0341`; no Stripe, criar e cobrar a fatura seguinte (ou usar um relógio de teste) | `invoice.payment_failed` → `em_atraso` com `em_atraso_desde`; a área continua a abrir com "You keep access for N more days"; `invoice.paid` → `ativo`, `em_atraso_desde` null | ⏳ |
+| 6.12b | Tolerância esgotada | SQL (só em teste): `update public.subscritores set em_atraso_desde = now() - interval '8 days' where email = '…'` | `app.html` → "Payment overdue … grace period is over"; `select count(*) from feed_dia` com a sessão → 0 (RLS); e-mail diário já não inclui o e-mail | ⏳ |
+| 6.13 | Cancelar no portal | **Manage subscription → Cancel** | `estado` continua `ativo`, `acesso_fim` = fim do período; a área mostra "Active until <data> (cancelled)" (B4); no fim do período → `cancelado` | ⏳ |
+| 6.14 | Direct → Click, mesmo e-mail | Com o Direct ativo, pagar o link da Click com o **mesmo** e-mail | `subscricoes`: 2 linhas (direto ativo, click ativo); `subscritores.origem` continua `direto`, acesso mantido; **alerta** "Mesmo e-mail com duas subscrições" em `ALERT_EMAIL` | ⏳ |
+| 6.15 | Click → Direct, mesmo e-mail | Pagar primeiro o link Click, depois o Direct | `subscricoes`: click + direto; `subscritores.origem = direto` com acesso; a linha click continua (comissão) | ⏳ |
+| 6.16 | Direct duas vezes | Pagar o link Direct duas vezes com o mesmo e-mail | 2 linhas direto em `subscricoes`; alerta de duplicados; cancelar uma no Stripe → acesso mantém-se pela outra | ⏳ |
+| 6.19 | Link Click para tentar obter acesso Direct | Pagar só o link Click | `subscritores.origem = click`, sem login, sem acesso (RLS) | ⏳ |
+| 6.22 | Regresso após cancelar | Com uma linha `cancelado` e `boas_vindas_em` preenchido, abrir `app.html` → "Subscribe again (monthly fee only)" e pagar | Checkout **sem** adesão (15 €); `subscricoes` nova linha direto ativo; `subscritores.estado = ativo`; e-mail **"Welcome back to ProvenDrop"** (`regresso_em` preenchido); nichos/países mantidos | ⏳ |
+| 6.23 | Disputa | Pagar com `4000 0000 0000 0259` | `charge.dispute.created` → `subscritores.bloqueado_em` preenchido (motivo `disputa dp_…`); `app.html` → "Access suspended"; RLS devolve 0 linhas; **alerta** com o prazo (`evidence_details.due_by`) | ⏳ |
+| 6.24 | Reembolso total | Stripe → Pagamentos → o pagamento → **Reembolsar** | `charge.refunded` → **alerta** "Reembolso total"; acesso **não** é cortado automaticamente (procedimento: cancelar a subscrição no Stripe → `deleted` → `cancelado`) | ⏳ |
+| 6.25 | Modo errado (S1/M11) | Com `STRIPE_ACCEPT_TEST=1`, um evento **real** (ou vice-versa) | 200 `{"ok":true,"ignorado":"…"}` e aviso no log; nada escrito | ⏳ (só verificável quando existir o endpoint real) |
+| 6.26 | Varrimento das boas-vindas | SQL: `update public.subscritores set boas_vindas_em = null where email = '…'`; esperar ≤ 15 min (ou `POST …/stripe-webhook?varrer_boas_vindas=1` com `x-cron-secret`) | Resposta `{candidatos:1, enviadas:1}`; e-mail novo; `boas_vindas_em` preenchido | ⏳ |
+| 6.27 | Reconciliação | `POST …/reconciliar` com `x-cron-secret` | JSON `{ok:true, stripe:N, base:N, divergencias:0}`; com uma divergência forçada (ex.: `update subscricoes set estado='cancelado' …`) → alerta por e-mail; nada é alterado | ⏳ |
+| 6.28 | Sem segredo | `POST …/reconciliar`, `…?varrer_boas_vindas=1`, `…?reenviar_boas_vindas=x` sem `x-cron-secret`; webhook sem assinatura | 401 `{"erro":"não autorizado"}`; 400 `{"erro":"assinatura inválida"}` | ✅ 2026-11-02 (curl, funções publicadas) |
 
 ## 5. Depois do teste
 
-- Apagar os subscritores de teste (`delete from public.subscritores where email in (...)`, e o utilizador em **Authentication → Users**) ou deixá-los: os de teste do Stripe não existem em modo real.
+- **Apagar sempre** os dados de teste antes de passar a modo real (A7: a base é a mesma em teste e em real; uma linha de teste `ativo` manteria acesso e e-mail diário sem pagar): `delete from public.subscricoes where email in (...)`, `delete from public.subscritores where email in (...)`, `delete from public.stripe_eventos`, `delete from public.envios_diarios`, e os utilizadores em **Authentication → Users**. Só depois é que o teste real prova as boas-vindas.
 - Só então: commit, PR, revisão, merge em `main` com aprovação, e a passagem a modo real (STRIPE.md, última secção).

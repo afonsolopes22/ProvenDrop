@@ -35,11 +35,17 @@ Os links do Stripe em `config.js` são os de **modo de teste**: o botão Subscri
 | `supabase/migrations/0001_plataforma.sql` | Tabelas, RLS, bucket privado `kits`, job pg_cron (já aplicada). |
 | `supabase/migrations/0002_kits_datas.sql` | `data_inicio` em `feed_dia`/`verdes`; `feed_dia` em `envios_diarios` (aplicada pelo setup-supabase.ps1). |
 | `supabase/migrations/0003_boas_vindas.sql` | `subscritores.boas_vindas_em`: as boas-vindas só contam como enviadas quando o Resend aceita (aplicada 2026-11-02). |
-| `supabase/functions/stripe-webhook` | Webhook do Stripe: regista subscritores (origem por metadata → price_id → payment link), boas-vindas com magic link, repetidas até o Resend aceitar; reenvio manual `?reenviar_boas_vindas=<email>` com `x-cron-secret`. |
-| `supabase/functions/email-diario` | E-mail diário aos subscritores diretos ativos, à hora `HORA_ENVIO`, com a lista mais recente (sem lojas, links nem zips). |
-| `supabase/functions/_shared/email.ts` | Envio pelo Resend e molde HTML. |
+| `supabase/migrations/0004_subscricoes.sql` | Tabela `subscricoes` (uma linha por subscrição Stripe, direto e click), `subscritores` derivado, acesso com tolerância de 7 dias em atraso, bloqueio por disputa, reserva atómica das boas-vindas, `stripe_eventos.processado_em`, `cron_secret` aleatório, varrimentos pg_cron (boas-vindas 15 min, reconciliação diária). Aplicada 2026-11-02. |
+| `supabase/functions/stripe-webhook` | Webhook do Stripe: relê sempre o estado no Stripe, escreve `subscricoes` e deriva `subscritores`; só aceita eventos do modo configurado (`STRIPE_ACCEPT_TEST`); boas-vindas e "welcome back" por magic link (token_hash); disputas bloqueiam o acesso e alertam; `?reenviar_boas_vindas=<email>` e `?varrer_boas_vindas=1` com `x-cron-secret`. |
+| `supabase/functions/email-diario` | E-mail diário a quem tem acesso (direto, ativo ou em atraso < 7 dias), à hora `HORA_ENVIO`, com a lista mais recente (sem lojas, links nem zips). |
+| `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
+| `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
-| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos (sem eco), funções, migração 0002, `public.config`. |
+| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). |
+| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0004, `public.config`. Enter = não alterar; recusa misturas teste/real. |
+| `scripts/stripe-teste.ps1` | Uma vez, em modo de teste: cria o Payment Link de regresso e acrescenta os eventos de disputa/reembolso ao webhook (pela API, com a tua chave sem eco). |
+| `.gitleaks.toml`, `.pre-commit-config.yaml`, `.github/workflows/secret-scan.yml` | Gate de segredos local (`pip install pre-commit && pre-commit install`) e em CI (histórico completo). |
+| `docs/SEGURANCA.md`, `docs/PAGAMENTOS.md` | Revisões de 2026-11-02 e o estado de cada achado. |
 | `docs/SETUP.md` | Ordem completa de configuração. |
 | `docs/STRIPE.md` | O que já existe no Stripe em modo de teste (ids e links), como confirmar e como repetir no modo real. |
 | `docs/EMAIL.md` | Resend: conta, domínio, chave, SMTP do Supabase Auth. |
@@ -54,17 +60,24 @@ Segue [`docs/SETUP.md`](docs/SETUP.md): Supabase CLI → Stripe ([`docs/STRIPE.m
 
 ### Rotina diária (vault)
 
-Guardar a service role key num ficheiro fora do vault e do repo, por exemplo `%USERPROFILE%\.provendrop\supabase_service_key.txt`, e correr, depois de `publicar_feed.py` e de `fazer_zip.py`, **a partir da raiz do vault "Product Research"** (os caminhos `zip:` das notas são relativos a essa raiz):
+Guardar a service role key num ficheiro de texto **fora do vault e do repo** (o caminho fica só na rotina, não aqui — S14) e correr, depois de `publicar_feed.py` e de `fazer_zip.py`, **a partir da raiz do vault "Product Research"** (os caminhos `zip:` das notas são relativos a essa raiz):
 
 ```bash
-python3 "_dados/publicar_plataforma.py" --feed "_dados/feed_bot.json" --url https://maljrfgnnhtrjunnwlre.supabase.co --key-file "%USERPROFILE%\.provendrop\supabase_service_key.txt" --zips-dir "."
+python3 "_dados/publicar_plataforma.py" --feed "_dados/feed_bot.json" --url https://maljrfgnnhtrjunnwlre.supabase.co --key-file "<ficheiro da service role key>" --zips-dir "."
 ```
 
 Códigos de saída: 0 ok · 3 rede bloqueada · 4 credenciais. Os zips encontrados em disco vão para o bucket privado `kits`; se o zip não existir, fica o `zip_url` externo. Quando a rotina passar a escrever `data_inicio:` no frontmatter das notas, a área e o site passam a contar os dias de anúncio até hoje.
 
+## Acesso, pagamentos falhados e regresso
+
+- Acesso (`public.tem_acesso`): subscrição **direto**, não bloqueada, `ativo` ou `em_atraso` há menos de **7 dias** (decisão de 2026-11-02). Depois a área fecha e o e-mail diário pára; `invoice.paid` repõe.
+- Quem cancela e volta **não paga a adesão outra vez**: a área mostra o link de regresso (`STRIPE_LINK_RETURN`, só mensalidade) a ex-membros. O site diz que a adesão é cobrada na primeira subscrição.
+- Não há promessa de vagas por nicho/país nem de reembolso (A9): o nicho e os países servem para ordenar as coleções.
+- Disputa → acesso suspenso + alerta; reembolso → só alerta. Alertas vão para `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`).
+
 ## E-mail diário
 
-Sai às `DAILY_TIME` (Europe/Lisbon; `09:00`) do dia seguinte à rotina, com a lista mais recente de `feed_dia`, só para `origem = direto` e `estado = ativo`. A mesma lista nunca sai duas vezes. Conteúdo: nome da coleção, mercado, anúncios, dias, alcance, "kit ready" e um botão para a área; **sem** lojas, links nem zips.
+Sai às `DAILY_TIME` (Europe/Lisbon; `09:00`) do dia seguinte à rotina, com a lista mais recente de `feed_dia`, só para quem tem acesso. A mesma lista nunca sai duas vezes. Conteúdo: nome da coleção, mercado, anúncios, dias, alcance, "kit ready" e um botão para a área; **sem** lojas, links nem zips.
 
 ## Indicador de CTR
 
