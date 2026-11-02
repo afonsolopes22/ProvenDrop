@@ -58,7 +58,7 @@ export function molde(titulo: string, corpoHtml: string, botao?: { texto: string
   const b = botao
     ? `<p style="margin:28px 0"><a href="${esc(botao.url)}" style="display:inline-block;background:#78C995;color:#101310;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:6px">${esc(botao.texto)}</a></p>`
     : "";
-  return `<!doctype html><html lang="pt-PT"><body style="margin:0;background:#F7F8F6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#171A18">
+  return `<!doctype html><html lang="en"><body style="margin:0;background:#F7F8F6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#171A18">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px">
   <p style="font-weight:700;font-size:18px;margin:0 0 24px">ProvenDrop</p>
   <h1 style="font-size:24px;line-height:1.25;margin:0 0 16px;font-weight:600">${esc(titulo)}</h1>
