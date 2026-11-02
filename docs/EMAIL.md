@@ -25,7 +25,7 @@ As duas funções (`stripe-webhook` e `email-diario`) enviam pela API do Resend 
 Sem domínio verificado o Resend só envia para o e-mail da própria conta (modo de teste, ver secção 4).
 
 1. Menu **Domains** → **Add Domain**.
-2. Escreve o domínio. Recomendação do Resend: um **subdomínio** só para envios, por exemplo `mail.provendrop.pt` (isola a reputação do domínio principal). Região: **EU (Ireland)** para ficar perto do Supabase.
+2. Escreve `provendrop.com` (o domínio previsto; ver [DOMINIO.md](DOMINIO.md) para a compra e os DNS do site). Região: **EU (Ireland)** para ficar perto do Supabase. O Resend recomenda um subdomínio só para envios (`mail.provendrop.com`); a decisão tomada foi enviar da raiz, `noreply@provendrop.com`, o que é igualmente válido.
 3. O Resend mostra os registos DNS a criar no painel do registrador do domínio (onde o domínio está alojado):
    - **DKIM**: registo `TXT` em `resend._domainkey.<domínio>` com o valor longo `p=MIG…`.
    - **SPF / Return-Path**: registo `MX` em `send.<domínio>` (prioridade 10, valor `feedback-smtp.<região>.amazonses.com`) e registo `TXT` em `send.<domínio>` com `v=spf1 include:amazonses.com ~all`.
@@ -41,19 +41,19 @@ Sem domínio verificado o Resend só envia para o e-mail da própria conta (modo
 
 ## 4. `EMAIL_FROM` e `EMAIL_REPLY_TO`
 
-- `EMAIL_FROM`: um endereço **do domínio verificado**, com nome: `ProvenDrop <noreply@mail.provendrop.pt>`. O Resend rejeita remetentes de domínios não verificados.
+- `EMAIL_FROM`: um endereço **do domínio verificado**, com nome: `ProvenDrop <noreply@provendrop.com>` (valor proposto pelo `setup-supabase.ps1`). O Resend rejeita remetentes de domínios não verificados.
 - `EMAIL_REPLY_TO` (opcional): o endereço onde queres receber as respostas dos clientes, por exemplo `afonso@…`. Os dois e-mails dizem "reply to this e-mail".
 
 ### Ainda sem domínio próprio: modo de teste do Resend
 
-Sem domínio verificado podes usar o remetente de teste `onboarding@resend.dev` como `EMAIL_FROM`. Limite: **só entrega ao e-mail com que criaste a conta Resend**; para qualquer outro destinatário a API devolve erro 403 e a função regista a falha. Serve para o teste completo (`docs/TESTE.md`) feito com o teu próprio e-mail; **não serve para clientes**. Quando o domínio estiver verificado, volta a correr o `setup-supabase.ps1` só para mudar `EMAIL_FROM` (podes deixar os outros valores em branco: o script só define o que preencheres).
+Enquanto `provendrop.com` não estiver comprado e verificado, responde `onboarding@resend.dev` quando o `setup-supabase.ps1` pedir `EMAIL_FROM`. Limite: **só entrega ao e-mail com que criaste a conta Resend**; para qualquer outro destinatário a API devolve erro 403 e a função regista a falha. Serve para o teste completo (`docs/TESTE.md`) feito com o teu próprio e-mail; **não serve para clientes**. Quando o domínio estiver verificado, volta a correr o `setup-supabase.ps1` e aceita o valor proposto `ProvenDrop <noreply@provendrop.com>` (Enter nos segredos deixa-os como estão).
 
 ## 5. Link de entrada da página de login (SMTP do Supabase)
 
 O magic link de boas-vindas vai pelo Resend (API), mas o link que o cliente pede na página de login (`app.html` → "Send sign-in link") é enviado pelo **Supabase Auth**, que por defeito usa um SMTP limitado a 2–4 e-mails por hora. Para não falhar:
 
 1. Supabase → **Authentication** → **Emails** → **SMTP Settings** → **Enable Custom SMTP**.
-2. **Sender email**: o mesmo endereço de `EMAIL_FROM`; **Sender name**: `ProvenDrop`.
+2. **Sender email**: o mesmo endereço de `EMAIL_FROM` (`noreply@provendrop.com`; em teste, `onboarding@resend.dev`); **Sender name**: `ProvenDrop`.
 3. **Host**: `smtp.resend.com`; **Port**: `465`; **Username**: `resend`; **Password**: a API key do Resend (podes criar uma segunda chave só para isto).
 4. **Authentication** → **Emails** → **Templates** → **Magic Link**: assunto `Your ProvenDrop sign-in link`, corpo em inglês com `{{ .ConfirmationURL }}`.
 5. **Authentication** → **URL Configuration**: **Site URL** `https://afonsolopes22.github.io/ProvenDrop/` e, em **Redirect URLs**, `https://afonsolopes22.github.io/ProvenDrop/app.html`.

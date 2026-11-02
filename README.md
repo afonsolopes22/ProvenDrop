@@ -21,6 +21,8 @@ Todos os valores **públicos** estão em [`config.js`](config.js), lido pelas qu
 
 Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `supabase secrets set` através de [`scripts/setup-supabase.ps1`](scripts/setup-supabase.ps1). O `.gitignore` exclui `.env`, `supabase/.env` e `*.key`.
 
+Os links do Stripe em `config.js` são os de **modo de teste**: o botão Subscribe abre o Checkout de teste até à passagem a modo real (aprovação explícita). Domínio previsto `provendrop.com`: ver `docs/DOMINIO.md`; o ficheiro `CNAME` só se cria quando o domínio estiver comprado.
+
 ## Ficheiros
 
 | Ficheiro | Função |
@@ -38,8 +40,9 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
 | `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos (sem eco), funções, migração 0002, `public.config`. |
 | `docs/SETUP.md` | Ordem completa de configuração. |
-| `docs/STRIPE.md` | Produtos, Payment Links, portal e webhook, passo a passo (modo de teste). |
+| `docs/STRIPE.md` | O que já existe no Stripe em modo de teste (ids e links), como confirmar e como repetir no modo real. |
 | `docs/EMAIL.md` | Resend: conta, domínio, chave, SMTP do Supabase Auth. |
+| `docs/DOMINIO.md` | provendrop.com: DNS do GitHub Pages e do Resend, `CNAME` (só quando o domínio existir), URLs a mudar. |
 | `docs/TESTE.md` | Plano de teste com resultados. |
 | vault `_dados/publicar_feed.py` | Gera `feed_bot.json` (bot da Click) e, só para a plataforma, `zip_path` e `data_inicio` em cada item. |
 | vault `_dados/publicar_plataforma.py` | Publica o feed em `feed_dia`/`verdes` e envia os zips para o Storage. |

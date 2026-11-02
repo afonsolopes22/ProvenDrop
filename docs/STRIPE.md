@@ -1,97 +1,79 @@
-# Stripe: produtos, Payment Links, portal e webhook (modo de teste)
+# Stripe: o que já existe em modo de teste, como confirmar, e como repetir no modo real
 
-Tudo o que está aqui faz-se **em modo de teste** até haver aprovação explícita para passar a real. Os nomes dos menus são os do Dashboard do Stripe em novembro de 2026 (idioma inglês); se o teu Dashboard estiver em português, os rótulos são a tradução directa. Onde o rótulo pode variar com a versão do Dashboard está assinalado.
+Conta Stripe `acct_1UQscOJMAlqVy4dK`, **modo de teste**. Tudo o que está nesta página já foi criado (2026-11-02) e **não deve ser criado outra vez**: produtos, links e webhook novos só no modo real, com aprovação explícita. Os identificadores abaixo são públicos; as chaves `sk_` e `whsec_` nunca entram em ficheiros, commits ou mensagens.
 
-Resultado final (o que fica onde):
+Rótulos dos menus: o Dashboard do Stripe em português (Europa). Entre parênteses, o rótulo em inglês quando ajuda.
 
-| Valor | Onde se cola | Secreto? |
+## O que existe
+
+| O quê | Identificador | Onde se usa |
 |---|---|---|
-| URL do Payment Link Direct (`https://buy.stripe.com/…`) | `config.js` → `STRIPE_LINK_DIRECT` | não |
-| Link de login do portal de cliente (`https://billing.stripe.com/p/login/…`) | `config.js` → `STRIPE_PORTAL_LINK` | não |
-| `price_…` do preço mensal Direct | segredo `STRIPE_PRICE_DIRETO` (setup-supabase.ps1) | não é secreto, mas vive nos segredos |
-| `price_…` do preço mensal do produto da Click | segredo `STRIPE_PRICE_CLICK` | idem |
-| `plink_…` do Payment Link Direct (opcional) | segredo `STRIPE_PAYMENT_LINK_DIRETO` | idem |
-| Secret key `sk_test_…` | segredo `STRIPE_SECRET_KEY` | **sim** |
-| Signing secret `whsec_…` do webhook | segredo `STRIPE_WEBHOOK_SECRET` | **sim** |
+| Produto **ProvenDrop Direct**, 15 €/mês | `prod_VYFz5Sh2acJSKc` · `price_1UX9ThJMAlqVy4dKYnrmwGb3` | segredo `STRIPE_PRICE_DIRETO` |
+| Produto **ProvenDrop via Click**, 15 €/mês | `prod_VYG0mJkH0A457H` · `price_1UX9UYJMAlqVy4dK2FZi3k9w` | segredo `STRIPE_PRICE_CLICK` |
+| Produto **Adesão ProvenDrop**, 25 € uma vez (nos dois links) | `prod_VYG0gDziJ4fFAJ` · `price_1UX9UOJMAlqVy4dKxdL2r2wj` | só no Stripe |
+| Payment Link **Direct** | `plink_1UX9UkJMAlqVy4dKAXTumtyZ` · `https://buy.stripe.com/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.js` → `STRIPE_LINK_DIRECT`; segredo `STRIPE_PAYMENT_LINK_DIRETO` |
+| Payment Link **via Click** (o que a Click envia aos clientes dela) | `plink_1UX9UxJMAlqVy4dKAbyhkQk7` · `https://buy.stripe.com/test_9B64gA2oygWv0yu7mhfbq01` | só a Click o usa |
+| Portal de cliente | configuração `bpc_1UX9V9JMAlqVy4dKReL66kNG` · `https://billing.stripe.com/p/login/test_cNidRaaV4gWv1Cy7mhfbq00` | `config.js` → `STRIPE_PORTAL_LINK` |
+| Webhook | `we_1UX9VNJMAlqVy4dKeelqzvJL` → `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook` | segredo `STRIPE_WEBHOOK_SECRET` (o `whsec_` deste endpoint) |
 
-Nunca colar chaves `sk_` nem `whsec_` em `config.js`, no README, em commits ou em mensagens.
+`config.js` e `scripts/setup-supabase.ps1` já trazem estes valores (o script propõe-nos e Enter aceita). Faltam só os dois segredos, que copias tu (secção e).
 
-## 0. Entrar em modo de teste
+## a) Produto "ProvenDrop Direct" e o seu Payment Link: confirmar
 
-No canto superior direito do Dashboard, activa **Test mode** (interruptor laranja). Em contas mais recentes o modo de teste chama-se **Sandbox**: escolhe-o no selector de conta, em cima à esquerda. Confirma que a faixa "Test mode"/"Sandbox" está visível antes de criar seja o que for. As chaves de teste começam por `sk_test_` e `pk_test_`; os links de teste contêm `/test_`.
+**Catálogo de produtos** (Product catalog) → **ProvenDrop Direct**:
+- Preço **15,00 € / mês**, recorrente (Recurring, Monthly). O **ID da API** (`price_1UX9Th…`) aparece ao lado do preço, com o ícone de copiar.
+- Produto **Adesão ProvenDrop**: preço único **25,00 €** (`price_1UX9UO…`).
 
-## a) Produto "ProvenDrop Direct" e o seu Payment Link
+**Links de pagamento** (Payment Links) → abre o link `test_cNidRa…`:
+- **Produtos**: ProvenDrop Direct 15,00 €/mês **+** Adesão ProvenDrop 25,00 € (o Stripe junta um preço único a uma subscrição: no 1.º pagamento cobra 40 €, depois 15 €/mês).
+- **Opções**: recolhe o e-mail (sempre); códigos promocionais permitidos; sem telefone.
+- **Metadados** (Metadata): `origem` = `direto`. (Se um dia o campo não aparecer no editor, o webhook reconhece na mesma pelo `price_` de `STRIPE_PRICE_DIRETO`.)
+- **Depois do pagamento** (After the payment) → **Não mostrar a página de confirmação** → redirecionar para `https://afonsolopes22.github.io/ProvenDrop/bem-vindo.html`.
+- O URL do link está em `config.js` → `STRIPE_LINK_DIRECT`; o id `plink_…` fica em `STRIPE_PAYMENT_LINK_DIRETO`.
 
-### Produto e preços
+## b) Payment Link da Click: confirmar
 
-1. Menu lateral → **Product catalog** → botão **+ Add product** (nalgumas versões **Create product**).
-2. **Name**: `ProvenDrop Direct`. Descrição (opcional): `Daily validated collections and Launch Kits`.
-3. Secção de preço (**Pricing**):
-   - **Recurring**, montante `15,00`, moeda **EUR**, **Billing period: Monthly**. Guarda.
-4. No produto criado, **+ Add another price**: **One-off**, `25,00` EUR. Descrição do preço: `Joining fee`. Guarda.
-   (Se preferires, a adesão pode ser um segundo produto "ProvenDrop joining fee" com preço único de 25 €; o resultado no link é o mesmo.)
-5. Abre o preço mensal e copia o **API ID** que começa por `price_…` → é o valor de `STRIPE_PRICE_DIRETO`. Fica à vista na página do produto, ao lado de cada preço (ícone de copiar).
+**Links de pagamento** → link `test_9B64gA…`:
+- **Produtos**: ProvenDrop via Click 15,00 €/mês + Adesão 25,00 €.
+- **Opções**: e-mail e **telefone** (para a Click juntar ao grupo).
+- **Metadados**: `origem` = `click`.
+- **Depois do pagamento** → redirecionar para `https://afonsolopes22.github.io/ProvenDrop/bem-vindo-click.html` (a página só existe online depois do merge do PR #1; até lá o redirecionamento dá 404 — é esperado).
 
-### Payment Link
+Quem paga por este link fica em `subscritores` com `origem = click` e o estado da subscrição (para a comissão), **sem login e sem acesso** à área (RLS).
 
-1. Menu lateral → **Payment Links** → **+ New** (ou **Create payment link**).
-2. **Select product**: escolhe `ProvenDrop Direct`, preço **15,00 €/month**. Clica em **Add another product** e junta o preço único **25,00 €** (Joining fee). O Stripe permite juntar um preço único a uma subscrição: no primeiro pagamento cobra 40 €, depois 15 €/mês.
-3. Painel de opções (**Options**, à direita):
-   - **Collect customer addresses**: *Billing addresses only* (opcional). O e-mail é sempre recolhido pelo Checkout, não precisa de opção.
-   - **Require customers to provide a phone number**: desligado.
-   - Opcional: **Add custom fields** → **Dropdown** com rótulo `Niche` e as opções `Women's jewellery`, `Home decoration`, `Women's fashion`, `Men's fashion`. (Aparece no pagamento no Dashboard; não é lido pelo webhook.)
-   - Se o editor mostrar **Metadata** (normalmente em **Advanced options**): chave `origem`, valor `direto`. **Se o campo não existir no editor, não faz mal**: o webhook reconhece a origem pelo `price_…` (`STRIPE_PRICE_DIRETO`).
-4. Separador **After the payment**:
-   - Em **Confirmation page**, escolhe a opção de **redirecionar para o teu site** em vez da página de confirmação do Stripe (o rótulo é "Don't show confirmation page" / "Redirect customers to your website", conforme a versão).
-   - URL: `https://afonsolopes22.github.io/ProvenDrop/bem-vindo.html`
-5. **Create link**. Copia o URL `https://buy.stripe.com/test_…` → `config.js` → `STRIPE_LINK_DIRECT`.
-6. Na página do link, o **ID** `plink_…` aparece nos detalhes (ou no URL do Dashboard). Opcional: guarda-o para `STRIPE_PAYMENT_LINK_DIRETO`.
+## c) Portal de cliente: confirmar
 
-Enquanto o link estiver em modo de teste, o botão **Subscribe** do site abre o Checkout de teste: só serve para o teste da secção 6 de `docs/TESTE.md`. Antes de publicar para clientes reais, substitui-se pelo link real (aprovação explícita).
+**Definições** (engrenagem) → **Faturação** (Billing) → **Portal do cliente** (Customer portal):
+- Link de entrada activo: `https://billing.stripe.com/p/login/test_cNidRa…` → `config.js` → `STRIPE_PORTAL_LINK`.
+- Funcionalidades: **cancelar subscrição** (no fim do período), **actualizar método de pagamento**, **histórico de faturas**, actualizar e-mail e morada. Sem mudança de plano. Regressa a `app.html`.
 
-## b) O Payment Link actual da Click
+O cliente entra no portal com o e-mail com que pagou; o Stripe envia-lhe um link de acesso. Cancelar no portal → `customer.subscription.updated` com `cancel_at_period_end = true` (continua `ativo` até ao fim do mês pago) e, no fim, `customer.subscription.deleted` → `cancelado`.
 
-O link que a Click envia aos clientes dela **não muda de produto nem de preço**. Só precisa de dois ajustes para o webhook o reconhecer e para o cliente não cair na página errada:
+## d) Webhook: confirmar
 
-1. **Payment Links** → abre o link da Click → menu **⋯** → **Edit**.
-2. Se existir **Metadata**: `origem` = `click`. Se não existir, copia o `price_…` do preço mensal do produto desse link (Product catalog → produto → API ID) → `STRIPE_PRICE_CLICK`. Um dos dois chega; os dois é melhor.
-3. **After the payment** → redirecionar para `https://afonsolopes22.github.io/ProvenDrop/bem-vindo-click.html` (e **não** para `bem-vindo.html`).
-4. Guarda.
+**Programadores** (Developers) → **Webhooks** → endpoint `we_1UX9VN…`:
+- **URL**: `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook`
+- **Eventos** (6): `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
+- Formato: **Snapshot** (objectos completos; a função não lê eventos *thin*).
+- Até a função ter deploy (`scripts/setup-supabase.ps1`), as entregas aparecem como falhadas em **Tentativas de entrega**; o Stripe volta a tentar durante 3 dias em modo real e algumas horas em teste. Depois do deploy, **Reenviar** (Resend) os eventos falhados, ou simplesmente fazer um pagamento de teste novo.
 
-Os clientes da Click ficam registados em `subscritores` com `origem = click` e `estado`, para efeitos de comissão, mas **sem login e sem acesso** à área pessoal (RLS). Se o produto da Click vive noutra conta Stripe, o webhook desta conta nunca o vê: nesse caso a Click fica fora do registo e não há nada a configurar aqui.
+## e) Os dois segredos: copiar para o setup-supabase.ps1
 
-## c) Portal de cliente (cancelar, mudar de cartão)
+1. **STRIPE_SECRET_KEY**: **Programadores** → **Chaves de API** (API keys) → **Chave secreta** (Secret key) → **Revelar chave de teste** → `sk_test_…`.
+2. **STRIPE_WEBHOOK_SECRET**: **Programadores** → **Webhooks** → endpoint `we_1UX9VN…` → **Segredo de assinatura** (Signing secret) → **Revelar** → `whsec_…`.
 
-1. **Settings** (engrenagem) → **Billing** → **Customer portal** (URL directo: `dashboard.stripe.com/settings/billing/portal`).
-2. Em **Ways to get started**, clica em **Activate link**. Aparece o link `https://billing.stripe.com/p/login/test_…` → copia para `config.js` → `STRIPE_PORTAL_LINK`.
-3. Nas opções do portal, confirma:
-   - **Cancel subscriptions**: ligado (cancelar no fim do período é o mais simples).
-   - **Update payment methods**: ligado.
-   - **Invoice history**: ligado.
-   - **Update subscriptions** (mudar de plano): desligado.
-4. Guarda. O cliente entra no portal com o e-mail com que pagou; o Stripe envia-lhe um link de acesso.
+Cola-os só quando o `scripts\setup-supabase.ps1` os pedir (sem eco). Se um deles for exposto: **Chaves de API → Reverter** (Roll key) e **Webhooks → ⋯ → Reverter segredo** (Roll secret), e correr o script outra vez.
 
-## d) Webhook (endpoint, eventos, signing secret)
+## Onde fica cada valor
 
-1. Menu lateral → **Developers** → **Webhooks** (abre o separador Webhooks do **Workbench**; URL directo `dashboard.stripe.com/test/webhooks` em modo de teste).
-2. **Create an event destination** (nalgumas contas ainda **+ Add endpoint**).
-3. **Your account** → formato de payload **Snapshot** (a função usa os objectos completos; **não** escolher *Thin*). Versão da API: a predefinida da conta.
-4. Em **Select events**, marca exactamente estes seis:
-   - `checkout.session.completed`
-   - `customer.subscription.created`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.paid`
-   - `invoice.payment_failed`
-5. **Continue** → tipo de destino **Webhook endpoint** → **Continue**.
-6. **Endpoint URL**: `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook`. Descrição: `ProvenDrop Supabase`. **Create destination**.
-7. Na página do endpoint, em **Signing secret**, clica em **Reveal** (ou **Click to reveal**) e copia o valor `whsec_…` → é `STRIPE_WEBHOOK_SECRET`, pedido pelo `scripts/setup-supabase.ps1`. Não o guardes em mais lado nenhum.
-
-O endpoint só responde a POST com assinatura válida; sem `STRIPE_WEBHOOK_SECRET` configurado devolve 500 a tudo. Cada `evt_…` é processado uma vez (tabela `stripe_eventos`); se a função falhar, liberta o id e o Stripe volta a tentar.
-
-## e) Secret key
-
-**Developers** → **API keys** → em **Standard keys**, **Secret key** → **Reveal test key** → `sk_test_…` → é `STRIPE_SECRET_KEY` (pedido pelo setup-supabase.ps1). A **Publishable key** não é usada.
+| Valor | `config.js` (público) | `supabase secrets` |
+|---|---|---|
+| URL do Payment Link Direct | `STRIPE_LINK_DIRECT` | — |
+| URL do portal | `STRIPE_PORTAL_LINK` | — |
+| `price_` Direct / Click | — | `STRIPE_PRICE_DIRETO` / `STRIPE_PRICE_CLICK` |
+| `plink_` Direct | — | `STRIPE_PAYMENT_LINK_DIRETO` |
+| `sk_test_` | **nunca** | `STRIPE_SECRET_KEY` |
+| `whsec_` | **nunca** | `STRIPE_WEBHOOK_SECRET` |
 
 ## O que o webhook faz com cada evento
 
@@ -104,6 +86,19 @@ O endpoint só responde a POST com assinatura válida; sem `STRIPE_WEBHOOK_SECRE
 | `invoice.paid` | Quem estava `em_atraso` volta a `ativo`. |
 | `invoice.payment_failed` | `ativo` → `em_atraso` (a área pede para actualizar o cartão). |
 
-## Passar a modo real (só com aprovação)
+Cada `evt_…` é processado uma vez (tabela `stripe_eventos`); se a função falhar, liberta o id e o Stripe volta a tentar. Sem `STRIPE_WEBHOOK_SECRET` configurado a função devolve 500 a tudo; com assinatura inválida, 400.
 
-Repetir a), c), d) e e) com **Test mode desligado**: produtos e preços reais, novo Payment Link real, novo link do portal, novo endpoint de webhook com novo `whsec_`, chave `sk_live_`. Voltar a correr `scripts/setup-supabase.ps1` com os valores reais e substituir `STRIPE_LINK_DIRECT` e `STRIPE_PORTAL_LINK` em `config.js`. Os dados de teste (clientes `cus_…` de teste) não passam para o modo real.
+## Modo real (só com aprovação explícita)
+
+Com o interruptor **Modo de teste** desligado, repetir exactamente a estrutura de teste:
+
+1. **Catálogo de produtos → + Adicionar produto**: `ProvenDrop Direct` (15,00 € / mês, recorrente), `ProvenDrop via Click` (15,00 € / mês) e `Adesão ProvenDrop` (25,00 €, único). Anotar os três `price_…` reais.
+2. **Links de pagamento → + Novo**: link Direct (Direct + Adesão; e-mail; metadados `origem=direto`; depois do pagamento → `https://provendrop.com/bem-vindo.html` quando o domínio estiver activo, senão o URL do GitHub Pages) e link via Click (via Click + Adesão; e-mail + telefone; `origem=click`; → `bem-vindo-click.html`). Entregar o link via Click à Click.
+3. **Definições → Faturação → Portal do cliente**: mesmas opções; **Activar link**; copiar o link real.
+4. **Programadores → Webhooks → + Adicionar destino/endpoint**: mesmo URL da função, os mesmos 6 eventos, formato Snapshot; revelar o novo `whsec_`.
+5. **Programadores → Chaves de API**: `sk_live_…`.
+6. Correr `scripts\setup-supabase.ps1` com os valores reais (o script recusa `sk_live_` combinado com os `price_` de teste, e pede confirmação "SIM").
+7. `config.js`: `STRIPE_LINK_DIRECT` e `STRIPE_PORTAL_LINK` reais; commit; publicar.
+8. Guardar os ids reais numa nota do vault igual à de teste (sem chaves).
+
+Os clientes e subscrições de teste não passam para o modo real.
