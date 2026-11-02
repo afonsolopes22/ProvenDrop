@@ -115,10 +115,13 @@ main{padding-block:32px 72px}
 
 /* first-visit guide */
 .guia{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(16,19,16,.55)}
-.guia .card{max-width:620px;width:100%}
+.guia .card{position:relative;max-width:620px;width:100%;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;padding-right:clamp(44px,5vw,56px)}
+.guia .fechar{position:absolute;top:10px;right:10px;width:36px;height:36px;border:1px solid var(--line-2);border-radius:50%;background:var(--white);color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.guia .fechar:hover{border-color:var(--ink)}
 .guia ol{margin-top:18px;display:grid;gap:12px;counter-reset:g}
-.guia li{counter-increment:g;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start}
-.guia li::before{content:counter(g);width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);display:grid;place-items:center}
+.guia li{counter-increment:g;display:grid;grid-template-columns:32px minmax(0,1fr);gap:0 12px;align-items:start}
+.guia li::before{content:counter(g);grid-row:1 / span 2;width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);display:grid;place-items:center}
+.guia li>b,.guia li>span{grid-column:2}
 .guia b{display:block;font-weight:600}
 .guia span{color:var(--ink-2);font-size:15px}
 
@@ -253,6 +256,7 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
 <!-- first-visit guide -->
 <div class="guia" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
   <div class="card">
+    <button class="fechar" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>
     <h2 id="guiaTitulo">Welcome. One minute to get started.</h2>
     <ol>
       <li><b>Open a collection</b><span>“Today” has the day’s collections with the proof for each one: ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
@@ -486,6 +490,7 @@ footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px 
   }
   $("#guiaOk").addEventListener("click", () => fecharGuia("prefs"));
   $("#guiaSaltar").addEventListener("click", () => fecharGuia("hoje"));
+  $("#guiaFechar").addEventListener("click", () => fecharGuia("hoje"));
   $("#btnGuia").addEventListener("click", abrirGuia);
   addEventListener("keydown", e => { if(e.key === "Escape" && !$("#guia").hidden) fecharGuia("hoje"); });
 })();
