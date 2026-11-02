@@ -57,18 +57,9 @@ footer{margin-top:40px;padding-top:24px;border-top:1px solid var(--line-2);color
 footer p+p{margin-top:8px}
 :focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
 </style>
-<script>
-/* ── AFTER-PAYMENT PAGE (direct subscription) ─────────────────────
-   The Stripe Payment Link of the ProvenDrop subscription redirects
-   here. Click Dynamics customers never land on this page: their link
-   goes to bem-vindo-click.html. */
-
-/* Delivery time (Europe/Lisbon), e.g. "9:00". Replaces every [HOUR]. Keep in sync with index.html. */
-window.PROVENDROP_DAILY_TIME = "";
-
-/* Optional public contact e-mail. Empty = no contact line. */
-window.PROVENDROP_CONTACT_EMAIL = "";
-</script>
+<!-- After-payment page of the direct subscription. The Stripe Payment Link redirects here;
+     Click Dynamics customers land on bem-vindo-click.html instead. Values come from config.js. -->
+<script src="config.js"></script>
 </head>
 <body>
 <main class="wrap">
@@ -125,9 +116,10 @@ window.PROVENDROP_CONTACT_EMAIL = "";
 </main>
 <script>
 (function(){
-  var hour=String(window.PROVENDROP_DAILY_TIME||"").trim();
+  var C=window.PROVENDROP_CONFIG||{};
+  var hour=String(C.DAILY_TIME||"").trim();
   if(hour){ document.querySelectorAll('[data-fill="hour"]').forEach(function(e){ e.textContent=hour; }); }
-  var mail=String(window.PROVENDROP_CONTACT_EMAIL||"").trim();
+  var mail=String(C.CONTACT_EMAIL||"").trim();
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
     var c=document.getElementById("contactLine");
     c.innerHTML='Questions? Write to <a href="mailto:'+mail+'">'+mail+'</a>.'; c.hidden=false;

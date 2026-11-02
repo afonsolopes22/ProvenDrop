@@ -1,7 +1,13 @@
-# segredos e ficheiros locais do Supabase CLI
+# segredos: nunca no repositório
+.env
+.env.*
+!.env.example
 supabase/.env
 supabase/.env.*
 !supabase/.env.example
+*.key
+*.pem
+# ficheiros locais do Supabase CLI
 supabase/.temp/
 supabase/.branches/
 

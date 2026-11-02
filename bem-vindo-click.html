@@ -65,10 +65,8 @@ code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px soli
 .note{margin-top:16px;color:var(--muted);font-size:14px}
 footer{margin-top:36px;color:var(--muted);font-size:14px}
 </style>
-<script>
-/* Stripe customer portal link (manage or cancel the subscription). Empty = the button opens WhatsApp. */
-window.PROVENDROP_PORTAL_LINK = "";
-</script>
+<!-- Stripe customer portal link comes from config.js (STRIPE_PORTAL_LINK). Empty = the button opens WhatsApp. -->
+<script src="config.js"></script>
 </head>
 <body>
 <main class="wrap">
@@ -131,7 +129,7 @@ window.PROVENDROP_PORTAL_LINK = "";
 (function(){
   var t="Hi! I have just subscribed to ProvenDrop.\nPayment email: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ";
   document.getElementById("btnEntrar").href="https://wa.me/351920117648?text="+encodeURIComponent(t);
-  var p=window.PROVENDROP_PORTAL_LINK; if(p){var g=document.getElementById("btnGerir");g.href=p;}
+  var p=String((window.PROVENDROP_CONFIG||{}).STRIPE_PORTAL_LINK||"").trim(); if(/^https:\/\//.test(p)){var g=document.getElementById("btnGerir");g.href=p;}
 })();
 </script>
 </body>

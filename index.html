@@ -96,6 +96,8 @@ h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
 .facts div{min-width:0}
 .facts dt{font-size:13px;line-height:1.3;color:var(--on-dark-2)}
 .facts dd{margin:4px 0 0;font-size:21px;font-weight:500;letter-spacing:-.01em}
+.facts dd .at{display:block;font-size:12px;font-weight:400;letter-spacing:0;color:var(--ink-2)}
+.dark .facts dd .at{color:var(--on-dark-2)}
 .status{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;white-space:nowrap}
 .status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .status.go{color:var(--green)}
@@ -428,29 +430,8 @@ section[hidden]{display:none}
   .foot{grid-template-columns:minmax(0,1fr)}
 }
 </style>
-<script>
-/* ── SITE CONFIGURATION ───────────────────────────────────────────
-   Fill these before publishing. Nothing is invented when they are empty:
-   the Subscribe button stays disabled and every "[HOUR]" placeholder
-   stays visible so it cannot be missed. */
-
-/* Stripe Payment Link of the ProvenDrop subscription (direct membership).
-   Must redirect to bem-vindo.html after payment. Empty = button disabled. */
-window.PROVENDROP_STRIPE_LINK = "";
-
-/* Time the daily collections are delivered (Europe/Lisbon), e.g. "9:00".
-   Replaces every [HOUR] on the page. Empty = placeholders stay visible. */
-window.PROVENDROP_DAILY_TIME = "";
-
-/* Optional public contact e-mail. Empty = not shown. */
-window.PROVENDROP_CONTACT_EMAIL = "";
-
-/* Observed Google Ads CTR of the kit prompts (section right after the hero).
-   Shown ONLY when all five fields come from documented campaign data:
-   value in percent, campaign type, first and last month, impressions.
-   Empty = the whole section stays hidden. */
-window.PROVENDROP_CTR = { value: "", campaign_type: "", from: "", to: "", impressions: "" };
-</script>
+<!-- Every public value (Stripe link, delivery time, price, contact, CTR) lives in config.js. Nothing is invented when a value is empty. -->
+<script src="config.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -509,7 +490,7 @@ window.PROVENDROP_CTR = { value: "", campaign_type: "", from: "", to: "", impres
     </div>
   </div>
 
-  <!-- A3: observed-CTR highlight. Hidden until window.PROVENDROP_CTR is fully documented (configuration in <head>). -->
+  <!-- A3: observed-CTR highlight. Hidden until PROVENDROP_CONFIG.CTR (config.js) is fully documented. -->
   <section class="dark creatives" id="creatives" hidden>
     <div class="wrap">
       <div class="ctr">
@@ -848,8 +829,8 @@ observing<span class="time" data-fill="hour">[HOUR]</span></div>
         <article class="plan direct" aria-labelledby="planName">
           <p class="plan-tag">ProvenDrop</p>
           <h3 id="planName">Daily collections and Launch Kits</h3>
-          <!-- Price: the only membership price published so far (€15/month + €25 joining fee). Confirm in Stripe before publishing. -->
-          <div class="plan-price"><span class="amt">€15</span><small>/ month</small><span class="fee">€25 joining fee, once</span></div>
+          <!-- Price: filled from config.js (PRICE_MONTHLY / PRICE_JOINING). Must match the Stripe prices. -->
+          <div class="plan-price"><span class="amt">€<span data-fill="price-monthly">15</span></span><small>/ month</small><span class="fee" id="feeLine">€<span data-fill="price-joining">25</span> joining fee, once</span></div>
           <ul>
             <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Validated collections every day</li>
             <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Creative and Google Ads kit on approved collections</li>
@@ -888,7 +869,7 @@ observing<span class="time" data-fill="hour">[HOUR]</span></div>
           <details><summary>What is included in the Launch Kit?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A one-page guide, reference photographs, prompts for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete opportunity analysis. The photographs are references only and must not be published in ads.</p></details>
           <details><summary>Do you run my campaigns or produce my creatives?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. The Launch Kit gives you the prompts, references and Google Ads material; you generate the images and videos with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
           <details><summary>Can I cancel?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Yes, whenever you want, in your member area (“Manage subscription”). There is no minimum term.</p></details>
-          <details><summary>How much does it cost?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>€15 a month, plus a €25 joining fee charged once with the first payment.</p></details>
+          <details><summary>How much does it cost?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p id="faqPrice">€<span data-fill="price-monthly">15</span> a month<span data-if-joining>, plus a €<span data-fill="price-joining">25</span> joining fee charged once with the first payment</span>.</p></details>
           <details><summary>Why are memberships limited?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
         </div>
       </div>
@@ -933,19 +914,31 @@ observing<span class="time" data-fill="hour">[HOUR]</span></div>
 document.documentElement.classList.add("js");
 setTimeout(function(){ document.documentElement.classList.add("settled"); }, 1500);
 (function(){
+  /* All public values come from config.js. */
+  var C=window.PROVENDROP_CONFIG||{}, s=function(k){ return String(C[k]==null?"":C[k]).trim(); };
+
   /* Subscribe button: enabled only when the Stripe Payment Link is configured. */
-  var b=document.getElementById("btnSubscribe"), n=document.getElementById("noteSubscribe"), link=String(window.PROVENDROP_STRIPE_LINK||"").trim();
+  var b=document.getElementById("btnSubscribe"), n=document.getElementById("noteSubscribe"), link=s("STRIPE_LINK_DIRECT");
   if(b && /^https:\/\//.test(link)){
     b.href=link; b.removeAttribute("aria-disabled");
     if(n) n.textContent="Secure card payment by Stripe. Your access e-mail arrives right after you pay.";
   }
 
   /* Delivery time: replaces every [HOUR] placeholder. */
-  var hour=String(window.PROVENDROP_DAILY_TIME||"").trim();
+  var hour=s("DAILY_TIME");
   if(hour){ document.querySelectorAll('[data-fill="hour"]').forEach(function(e){ e.textContent=hour; }); }
 
+  /* Price: digits only; empty keeps the text already on the page. */
+  var pm=s("PRICE_MONTHLY").replace(/[^\d.,]/g,""), pj=s("PRICE_JOINING").replace(/[^\d.,]/g,"");
+  if(pm){ document.querySelectorAll('[data-fill="price-monthly"]').forEach(function(e){ e.textContent=pm; }); }
+  if(pj && Number(pj.replace(",","."))>0){ document.querySelectorAll('[data-fill="price-joining"]').forEach(function(e){ e.textContent=pj; }); }
+  if(/^0+([.,]0+)?$/.test(pj)){ /* PRICE_JOINING "0" = no joining fee: hide it everywhere */
+    var fl=document.getElementById("feeLine"); if(fl) fl.hidden=true;
+    document.querySelectorAll("[data-if-joining]").forEach(function(e){ e.remove(); });
+  }
+
   /* Optional public contact. */
-  var mail=String(window.PROVENDROP_CONTACT_EMAIL||"").trim();
+  var mail=s("CONTACT_EMAIL");
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
     var f=document.getElementById("footContact"), c=document.getElementById("noteContact");
     if(f){ f.innerHTML='<a href="mailto:'+mail+'">'+mail+'</a>'; f.hidden=false; }
@@ -953,10 +946,10 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
   }
 
   /* Observed CTR: the section appears only when every field is documented. */
-  var k=window.PROVENDROP_CTR||{}, v=String(k.value||"").trim().replace("%","");
-  if(v && k.campaign_type && k.from && k.to && k.impressions){
+  var k=C.CTR||{}, v=String(k.valor||"").trim().replace("%","");
+  if(v && k.tipo_campanha && k.periodo && k.impressoes){
     document.getElementById("ctrValue").textContent=v+"%";
-    document.getElementById("ctrWhat").textContent="The creative prompts in the kit are the same ones we use in our own Google Ads campaigns: "+v+"% CTR in "+k.campaign_type+" campaigns, between "+k.from+" and "+k.to+", across "+k.impressions+" impressions.";
+    document.getElementById("ctrWhat").textContent="The creative prompts in the kit are the same ones we use in our own Google Ads campaigns: "+v+"% CTR in "+k.tipo_campanha+" campaigns, "+k.periodo+", across "+k.impressoes+" impressions.";
     document.getElementById("creatives").hidden=false;
   }
 })();
@@ -1038,9 +1031,12 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
 
   const strip = mk => `<ul class="strip" aria-hidden="true">${MARKETS.map(c => `<li${c===mk?' class="ok"':''}>${c}</li>`).join("")}</ul>`;
   const badge = st => st==="go" ? `<span class="status go">Approved</span>` : `<span class="status watch">Observing</span>`;
+  /* Days advertising: counted up to today when the sheet gives data_inicio (first day of the oldest active ad); otherwise the value measured at analysis. */
+  const daysNow = r => { const d = r.data_inicio ? date(r.data_inicio) : null; if (!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
+  const days = r => { const n = daysNow(r); return n != null ? `${fmt(n)}` : `${fmt(num(r.dias_ativo))}<small class="at">at analysis</small>`; };
   const facts = r => `<dl class="facts">
             <div><dt>Active ads</dt><dd>${fmt(num(r.anuncios_ativos))}</dd></div>
-            <div><dt>Days advertising</dt><dd>${fmt(num(r.dias_ativo))}</dd></div>
+            <div><dt>Days advertising</dt><dd>${days(r)}</dd></div>
             <div><dt>EU reach</dt><dd>${fmt(num(r.alcance_eu))}</dd></div>
           </dl>`;
   const redact = w => `<span class="redact" style="width:${w}" aria-hidden="true"></span>`;
@@ -1075,7 +1071,7 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
     $("#cardsHoje").innerHTML = rows.map(row).join("");
     const u = ago(upd); $("#listUpd").textContent = u ? u + (day ? ", list for "+day : "") : (day ? "List for "+day : "");
     const wa = $("#waMsg"); if (wa) {
-      const hour = String(window.PROVENDROP_DAILY_TIME||"").trim() || "[HOUR]";
+      const hour = String((window.PROVENDROP_CONFIG||{}).DAILY_TIME||"").trim() || "[HOUR]";
       const k = n => n == null ? "No data" : n >= 1000 ? Math.round(n/1000).toLocaleString("en-GB")+"k" : String(Math.round(n));
       wa.innerHTML = esc(day ? "Collections for "+day : "Today’s collections") + "\n\n" + rows.map(r => {
         const st = status(r), mk = market(r.mercado_destaque);
