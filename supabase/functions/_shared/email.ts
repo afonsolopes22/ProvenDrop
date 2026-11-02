@@ -33,7 +33,7 @@ async function verificar(r: Response, contexto: string) {
 /** Envia uma mensagem. */
 export async function enviarEmail(m: Mensagem): Promise<void> {
   const r = await fetch(API, { method: "POST", headers: cabecalhos(), body: JSON.stringify(corpo(m)) });
-  await verificar(r, `e-mail para ${m.to}`);
+  await verificar(r, "e-mail"); // B5: sem o endereço do destinatário na mensagem de erro
 }
 
 /** Envia várias mensagens, em lotes de 100 (limite do endpoint /emails/batch). Devolve quantas foram aceites. */
