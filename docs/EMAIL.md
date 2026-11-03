@@ -5,7 +5,7 @@ As duas funções (`stripe-webhook` e `email-diario`) enviam pela API do Resend 
 | E-mail | Quem envia | Para quem | Conteúdo |
 |---|---|---|---|
 | Boas-vindas ("Welcome to ProvenDrop: your access") | `stripe-webhook`, uma vez por subscritor | só `origem = direto` | magic link para `app.html`, hora do e-mail diário |
-| Diário ("ProvenDrop · dd/mm: N collections") | `email-diario`, chamada pelo pg_cron de hora a hora | só quem tem acesso: `direto`, não bloqueado, `ativo` ou `em_atraso` há < 7 dias | uma linha por coleção: nome da coleção, mercado, anúncios, dias, alcance, "kit ready"; botão **Open today's collections**. **Sem** nomes de lojas, links de coleções nem zips: esses só na área, com sessão iniciada. |
+| Diário ("ProvenDrop · dd/mm: N collections") | `email-diario`, chamada pelo pg_cron de hora a hora | só quem tem acesso: `direto`, não bloqueado, `ativo` ou `em_atraso` há < 7 dias | uma linha por coleção: estado (🟢/🟡 "under observation"), nome da coleção, nicho, mercado, "N Meta + N Google ads", dias, alcance, "kit ready" em todas as que têm kit; botão **Open today's collections**. **Sem** nomes de lojas, links de coleções nem zips: esses só na área, com sessão iniciada. |
 | Link de entrada pedido na página de login | Supabase Auth (SMTP) | quem tem conta | link por `token_hash` (§5) |
 | Regresso ("Welcome back to ProvenDrop") | `stripe-webhook`, quando cancelado → ativo | só `direto` | magic link; nichos/países mantidos |
 | Alertas operacionais | `stripe-webhook`, `reconciliar` | `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`) | duas subscrições no mesmo e-mail, disputa (com prazo), reembolso, boas-vindas falhadas 5×, divergências Stripe ↔ base |

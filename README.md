@@ -37,13 +37,14 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/migrations/0002_kits_datas.sql` | `data_inicio` em `feed_dia`/`verdes`; `feed_dia` em `envios_diarios` (aplicada pelo setup-supabase.ps1). |
 | `supabase/migrations/0003_boas_vindas.sql` | `subscritores.boas_vindas_em`: as boas-vindas só contam como enviadas quando o Resend aceita (aplicada 2026-11-02). |
 | `supabase/migrations/0004_subscricoes.sql` | Tabela `subscricoes` (uma linha por subscrição Stripe, direto e click), `subscritores` derivado, acesso com tolerância de 7 dias em atraso, bloqueio por disputa, reserva atómica das boas-vindas, `stripe_eventos.processado_em`, `cron_secret` aleatório, varrimentos pg_cron (boas-vindas 15 min, reconciliação diária). Aplicada 2026-11-02. |
+| `supabase/migrations/0005_google_e_kits.sql` | `feed_dia.anuncios_meta`, `anuncios_google`, `plataformas`, `anunciante_google` (só área privada), `kit_pronto`; `verdes.anuncios_google`, `plataformas`. Kit em todas as coleções da lista (aprovadas e a observar). **Por aplicar** (setup-supabase.ps1 ou SQL Editor). |
 | `supabase/functions/stripe-webhook` | Webhook do Stripe: relê sempre o estado no Stripe, escreve `subscricoes` e deriva `subscritores`; só aceita eventos do modo configurado (`STRIPE_ACCEPT_TEST`); boas-vindas e "welcome back" por magic link (token_hash); disputas bloqueiam o acesso e alertam; `?reenviar_boas_vindas=<email>` e `?varrer_boas_vindas=1` com `x-cron-secret`. |
-| `supabase/functions/email-diario` | E-mail diário a quem tem acesso (direto, ativo ou em atraso < 7 dias), à hora `HORA_ENVIO`, com a lista mais recente (sem lojas, links nem zips). |
+| `supabase/functions/email-diario` | E-mail diário a quem tem acesso (direto, ativo ou em atraso < 7 dias), à hora `HORA_ENVIO`, com a lista mais recente: estado, coleção, nicho, mercado, "N Meta + N Google ads", dias, alcance, "kit ready" em todas as que têm kit (sem lojas, links, anunciantes nem zips). |
 | `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
 | `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
 | `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). |
-| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0004, `public.config`. Enter = não alterar; recusa misturas teste/real. |
+| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0005, `public.config`. Enter = não alterar; recusa misturas teste/real. |
 | `scripts/stripe-teste.ps1` | Uma vez, em modo de teste: cria o Payment Link de regresso e acrescenta os eventos de disputa/reembolso ao webhook (pela API, com a tua chave sem eco). |
 | `.gitleaks.toml`, `.pre-commit-config.yaml`, `.github/workflows/secret-scan.yml` | Gate de segredos local (`pip install pre-commit && pre-commit install`) e em CI (histórico completo). |
 | `docs/SEGURANCA.md`, `docs/PAGAMENTOS.md` | Revisões de 2026-11-02 e o estado de cada achado. |
@@ -53,7 +54,7 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `docs/DOMINIO.md` | provendrop.com: DNS do GitHub Pages e do Resend, `CNAME` (só quando o domínio existir), URLs a mudar. |
 | `docs/TESTE.md` | Plano de teste com resultados. |
 | vault `_dados/publicar_feed.py` | Gera `feed_bot.json` (bot da Click) e, só para a plataforma, `zip_path` e `data_inicio` em cada item. |
-| vault `_dados/publicar_plataforma.py` | Publica o feed em `feed_dia`/`verdes` e envia os zips para o Storage. |
+| vault `_dados/publicar_plataforma.py` | Publica o feed em `feed_dia`/`verdes` e envia os zips para o Storage. Desde 2026-11-02 passa `anuncios_meta`/`anuncios_google`/`plataformas`/`anunciante_google` (valores por omissão em feeds antigos) e `kit_pronto` = há zip, aprovada ou a observar. |
 
 ## Pôr a funcionar
 
