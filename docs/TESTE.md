@@ -75,11 +75,11 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 4.1 | Ver código-fonte de `index.html`, `bem-vindo.html`, `bem-vindo-click.html`, `app.html` (sem sessão) e `config.js` publicados | Nenhuma loja, link de coleção, zip, `data.json`, chave `sk_`/`whsec_`/`re_`, nem o ID da folha Google privada (a que não é a "dados públicos do site") | ✅ local (2026-11-02) · ⏳ no site publicado |
+| 4.1 | Ver código-fonte de `index.html`, `bem-vindo.html`, `bem-vindo-click.html`, `app.html` (sem sessão) e `config.js` publicados | Nenhuma loja, link de coleção, zip, `data.json`, chave `sk_`/`whsec_`/`re_`, nem o ID da folha Google privada (a que não é a "dados públicos do site") | ✅ local (2026-11-02) · ✅ site publicado 2026-11-03 (após merge do PR #1: `config.js` com links vazios, `config.local.js` e `data.json` → 404) |
 | 4.2 | `app.html` sem sessão, com o DevTools → Network | Só pedidos a `config.js`, `app.js`, fontes e `supabase.min.js` (com SRI); nenhum dado de `feed_dia`/`verdes` (RLS) | ✅ 2026-11-02 (revisão de segurança, ao vivo) |
 | 4.3 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/rest/v1/feed_dia?select=*" -H "apikey: <anon>"` | `[]` ou erro de permissão; nunca linhas | ✅ 2026-11-02: 401 permission denied em `feed_dia`, `verdes`, `subscritores`, `config`, `stripe_eventos`, `envios_diarios` |
 | 4.4 | Com a anon key, `curl "https://maljrfgnnhtrjunnwlre.supabase.co/storage/v1/object/kits/<caminho>" -H "apikey: <anon>"` | 400/403; o bucket é privado | ✅ 2026-11-02: listagem do bucket devolve `[]` |
-| 4.5 | Site **publicado** (GitHub Pages ou domínio): `index.html`, `bem-vindo-click.html`, `app.html` com DevTools → Network | S1: Subscribe desativado ("Subscriptions are not open on this page yet"); "Manage subscription" abre o WhatsApp / está escondido; **nenhum pedido** a `config.local.js` | ⏳ no site publicado (simulado em local, ver §0) |
+| 4.5 | Site **publicado** (GitHub Pages ou domínio): `index.html`, `bem-vindo-click.html`, `app.html` com DevTools → Network | S1: Subscribe desativado ("Subscriptions are not open on this page yet"); "Manage subscription" abre o WhatsApp / está escondido; **nenhum pedido** a `config.local.js` | ✅ 2026-11-03 no site publicado (Playwright em `afonsolopes22.github.io`: `aria-disabled`, "Subscriptions are not open on this page yet", 0 pedidos a `config.local.js`, WhatsApp, `app.html` em login, 0 erros de consola) |
 
 ## 6. Cenários de pagamento (PAGAMENTOS.md), depois das correções de 2026-11-02
 
