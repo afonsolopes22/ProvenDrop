@@ -6,7 +6,10 @@
 // RECENTE de feed_dia (a rotina publica ao fim da tarde; às 09:00 do dia
 // seguinte sai a lista de ontem) e nunca envia a mesma lista duas vezes
 // (envios_diarios.feed_dia). O e-mail NÃO leva links das lojas nem dos zips:
-// só o resumo e um botão para a área.
+// só o resumo e um botão para a área. Cada linha: estado, coleção, nicho,
+// mercado, "N Meta + N Google ads", dias, alcance e "kit ready" em todas as
+// que têm kit (aprovadas e a observar, desde 2026-11-02). Nunca o nome da
+// loja nem o anunciante Google.
 //
 // Deploy:  supabase functions deploy email-diario --no-verify-jwt
 // Segredos: CRON_SECRET (igual ao valor em public.config), RESEND_API_KEY,
@@ -32,9 +35,17 @@ const json = (b: unknown, status = 200) =>
 interface Item {
   ordem: number; nicho: string | null; colecao: string | null; mercado_destaque: string | null;
   paises_ads: string[] | null; estado: string | null; alcance_eu: number | null;
-  anuncios_ativos: number | null; dias_ativo: number | null; data_inicio: string | null;
-  zip_url: string | null; zip_path: string | null;
+  anuncios_ativos: number | null; anuncios_meta: number | null; anuncios_google: number | null;
+  dias_ativo: number | null; data_inicio: string | null;
+  zip_url: string | null; zip_path: string | null; kit_pronto: boolean | null;
 }
+
+/** Os nichos são guardados com os rótulos portugueses da rotina; o e-mail é em inglês. */
+const NICHO: Record<string, string> = {
+  "joalharia": "Women's jewellery", "house decor": "Home decoration",
+  "roupa feminina": "Women's fashion", "roupa masculina": "Men's fashion",
+};
+const nicho = (i: Item) => NICHO[(i.nicho ?? "").trim().toLowerCase()] ?? (i.nicho ?? "").trim();
 
 /** Dia (AAAA-MM-DD) e hora inteira atuais em Europe/Lisbon. */
 function agoraLisboa(d = new Date()) {
@@ -45,7 +56,7 @@ function agoraLisboa(d = new Date()) {
   return { dia: `${p.year}-${p.month}-${p.day}`, hora: Number.parseInt(p.hour, 10), ddmm: `${p.day}/${p.month}` };
 }
 
-const k = (n: number | null) => n == null ? "" : n >= 1000 ? `${Math.round(n / 1000)}k people` : `${Math.round(n)} people`;
+const k = (n: number | null) => n == null || n <= 0 ? "" : n >= 1000 ? `${Math.round(n / 1000)}k people` : `${Math.round(n)} people`;
 const aprovada = (i: Item) => /aprov/i.test(i.estado ?? "");
 const mercado = (i: Item) => i.mercado_destaque || (i.paises_ads?.[0] ?? "");
 /** Dias contados até hoje quando há data_inicio; senão o valor da análise. */
@@ -57,16 +68,26 @@ function dias(i: Item): string {
   return i.dias_ativo != null ? `${i.dias_ativo} days at analysis` : "";
 }
 
+/** "12 Meta + 5 Google ads". Linhas antigas (sem anuncios_meta/google): anuncios_ativos eram Meta. */
+function anuncios(i: Item): string {
+  const meta = i.anuncios_meta ?? i.anuncios_ativos;
+  const google = i.anuncios_google ?? 0;
+  if (meta == null && !google) return "";
+  return `${meta ?? 0} Meta + ${google} Google ads`;
+}
+const temKit = (i: Item) => i.kit_pronto === true || !!(i.zip_path || i.zip_url);
+
 function linhaTexto(i: Item): string {
-  const cab = `${i.colecao ?? "Collection"} · ${mercado(i)}`.replace(/ · $/, "");
-  if (!aprovada(i)) return `🟡 ${cab} — observing`;
+  const ok = aprovada(i);
+  const cab = [i.colecao ?? "Collection", nicho(i), mercado(i)].filter(Boolean).join(" · ");
   const partes = [
-    i.anuncios_ativos != null ? `${i.anuncios_ativos} ads` : "",
+    ok ? "" : "under observation",
+    anuncios(i),
     dias(i),
     k(i.alcance_eu),
-    (i.zip_path || i.zip_url) ? "kit ready" : "",
+    temKit(i) ? "kit ready" : "",
   ].filter(Boolean);
-  return `🟢 ${cab} — ${partes.join(" · ")}`;
+  return `${ok ? "🟢" : "🟡"} ${cab} — ${partes.join(" · ")}`;
 }
 
 function linhaHtml(i: Item): string {
@@ -98,7 +119,7 @@ Deno.serve(async (req) => {
   if ((repetido.data?.length ?? 0) > 0 && !forcar) return json({ ok: true, saltado: "lista já enviada", feed_dia: feedDia });
 
   const feed = await admin.from("feed_dia")
-    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,dias_ativo,data_inicio,zip_url,zip_path")
+    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto")
     .eq("dia", feedDia).order("ordem");
   if (feed.error) return json({ erro: semSegredos(feed.error.message) }, 500);
   const itens = (feed.data ?? []) as Item[];
@@ -114,7 +135,7 @@ Deno.serve(async (req) => {
 
   const n = itens.length;
   const subject = `ProvenDrop · ${ddmm}: ${n} ${n === 1 ? "collection" : "collections"} today`;
-  const rodape = "Store links and Launch Kits are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.";
+  const rodape = "Store links and Launch Kits (approved and under observation) are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.";
   const text = itens.map(linhaTexto).join("\n") + `\n\nOpen today's collections: ${APP_URL}\n\n${rodape}`;
   const html = molde(
     `${n} ${n === 1 ? "collection" : "collections"} today`,
