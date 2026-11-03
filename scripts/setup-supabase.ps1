@@ -14,7 +14,7 @@
     3. recusa misturas de teste e real: chave sk_live_ com links/ids de teste em
        config.js ou nos valores escritos, e vice-versa (A6);
     4. faz deploy das funções stripe-webhook, email-diario e reconciliar (--no-verify-jwt);
-    5. aplica as migrações 0002–0004 e actualiza public.config (email_diario_url,
+    5. aplica as migrações 0002–0005 e actualiza public.config (email_diario_url,
        stripe_webhook_url, reconciliar_url, cron_secret) com `supabase db query --linked`.
 
   Nada é escrito em ficheiros do repositório.
@@ -162,11 +162,11 @@ if (-not $SemDeploy) {
   }
 }
 
-# ── 4. SQL: migrações 0002–0004 + public.config ─────────────────────────
-Passo "Migrações 0002, 0003, 0004 e public.config"
+# ── 4. SQL: migrações 0002–0005 + public.config ─────────────────────────
+Passo "Migrações 0002, 0003, 0004, 0005 e public.config"
 $base = "https://$ProjectRef.supabase.co/functions/v1"
 $sql = ""
-foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
+foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql","0005_google_e_kits.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
 $sql += "update public.config set valor = '$base/email-diario'   where chave = 'email_diario_url';`n"
 $sql += "update public.config set valor = '$base/stripe-webhook' where chave = 'stripe_webhook_url';`n"
 $sql += "update public.config set valor = '$base/reconciliar'    where chave = 'reconciliar_url';`n"
