@@ -93,6 +93,8 @@ h1{font-size:clamp(46px,6.6vw,96px);line-height:.99}
 .score-big{font-family:var(--display);font-size:clamp(56px,5.4vw,76px);line-height:.9;letter-spacing:-.03em}
 .score-big small{font-family:var(--body);font-size:15px;letter-spacing:0;color:var(--on-dark-2);margin-left:3px}
 .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0;padding-block:16px;border-block:1px solid var(--dark-line)}
+.facts.four{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.facts.four dd{font-size:18px;white-space:nowrap}
 .facts div{min-width:0}
 .facts dt{font-size:13px;line-height:1.3;color:var(--on-dark-2)}
 .facts dd{margin:4px 0 0;font-size:21px;font-weight:500;letter-spacing:-.01em}
@@ -405,6 +407,7 @@ section[hidden]{display:none}
   body{font-size:16px}
   .cta .btn{flex:1 1 100%}
   .row{grid-template-columns:minmax(0,1fr)}
+  .facts.four{grid-template-columns:repeat(2,minmax(0,1fr))}
   .timeline{grid-template-columns:minmax(0,1fr);border-left:2px solid var(--ink);margin-left:5px}
   .timeline li{border-top:0;padding:0 0 26px 22px}
   .timeline li:last-child{padding-bottom:0}
@@ -529,7 +532,7 @@ section[hidden]{display:none}
           <ul>
             <li>Prompts for advertising images</li>
             <li>Prompts for UGC videos</li>
-            <li>Visual references for every approved collection</li>
+            <li>Visual references for every collection in the daily list</li>
           </ul>
         </li>
         <li>
@@ -560,7 +563,7 @@ section[hidden]{display:none}
       </div>
       <ol class="flow three">
         <li><b>Subscribe</b><span>Pay on this website and receive an e-mail right away to enter your member area. No password.</span></li>
-        <li><b>Every day at <i data-fill="hour">[HOUR]</i></b><span>The day’s collections arrive: competitor stores with ads running in Europe, demand validated on Google, confirmed the next day.</span></li>
+        <li><b>Every day at <i data-fill="hour">[HOUR]</i></b><span>The day’s collections arrive: competitor stores with active ads on Meta and Google, demand validated on Google Search, confirmed the next day.</span></li>
         <li><b>Download the kit and launch</b><span>Images, creative prompts, UGC videos and a Google Ads plan, ready to use. One collection live in 1–2 days.</span></li>
       </ol>
     </div>
@@ -570,7 +573,7 @@ section[hidden]{display:none}
     <div class="wrap">
       <div class="head">
         <h2>The evidence behind every collection</h2>
-        <p class="lede">Each entry shows how long a competitor has been advertising the collection, how many people the ads reached and where demand holds up. Names, stores and links are reserved for members.<span class="upd" id="listUpd" style="display:block"></span></p>
+        <p class="lede">Each entry shows how long a competitor has been advertising the collection on Meta and Google, how many people the ads reached and where demand holds up. Names, stores and links are reserved for members.<span class="upd" id="listUpd" style="display:block"></span></p>
       </div>
       <div class="legend" style="margin-bottom:18px" aria-label="Market strip legend">
         <span><i class="l-ok"></i>Strongest market</span>
@@ -587,16 +590,16 @@ section[hidden]{display:none}
           <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Comes with the collection link and its Launch Kit.</p></div>
         </article>
         <article class="row" aria-label="Example of an observing entry. Details are reserved for members.">
-          <div class="row-name"><span class="status watch">Observing</span><h3><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
+          <div class="row-name"><span class="status watch">Under observation</span><h3><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop">Niche, store and strongest market</p></div>
           <div><dl class="facts">
             <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
             <div><dt>EU reach</dt><dd><span class="redact" style="width:5ch" aria-hidden="true"></span></dd></div>
           </dl><div class="row-mk"><p class="cap">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li class="ok">ES</li><li>FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
-          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Promising but not approved yet, so it has no kit.</p></div>
+          <div class="row-score"><div class="score-big"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small>/ 10</small></div><p class="row-note">Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget.</p></div>
         </article>
       </div>
-      <p class="members-note">Approved collections and their Launch Kits reach members in the member area and by daily e-mail. Click Dynamics customers receive them in the Click WhatsApp group.</p>
+      <p class="members-note">Every collection in the daily list, with its Launch Kit, reaches members in the member area and by daily e-mail. A collection is sent once: never the same one twice. Click Dynamics customers receive them in the Click WhatsApp group.</p>
 
       <div class="archive" id="archive" hidden>
         <div class="archive-head">
@@ -614,12 +617,12 @@ section[hidden]{display:none}
     <div class="wrap">
       <div class="head">
         <h2>What you receive every day</h2>
-        <p class="lede">The collections, the proof behind each one, the kit for the approved ones and the archive. Nothing to research on your side.</p>
+        <p class="lede">The collections, the proof behind each one, the Launch Kit with every one of them and the archive. Nothing to research on your side.</p>
       </div>
       <ul class="pillars four">
         <li><span class="k">01</span><h3>The day’s collections</h3><p>One per niche whenever possible: jewellery, home decoration, women’s fashion and men’s fashion.</p></li>
-        <li><span class="k">02</span><h3>The proof for each one</h3><p>How many ads are active, for how many days, how many people they reached and in which countries Google demand is rising.</p></li>
-        <li><span class="k">03</span><h3>The complete kit on approved collections</h3><p>Reference photographs, 20 creatives to generate in ChatGPT, 4 UGC videos, keywords, Shopping titles and landing-page copy.</p></li>
+        <li><span class="k">02</span><h3>The proof for each one</h3><p>How many Meta and Google ads are active, for how many days, how many people they reached and in which countries Google demand is rising.</p></li>
+        <li><span class="k">03</span><h3>The complete kit with every collection</h3><p>Launch Kit with every collection in the daily list — approved and under observation (clearly labelled): reference photographs, 20 creatives to generate in ChatGPT, 4 UGC videos, keywords, Shopping titles and landing-page copy.</p></li>
         <li><span class="k">04</span><h3>The archive</h3><p>Every approved collection, and whether it is still being advertised.</p></li>
       </ul>
     </div>
@@ -629,7 +632,7 @@ section[hidden]{display:none}
     <div class="wrap">
       <div class="head">
         <h2>How a collection earns its place</h2>
-        <p class="lede">Candidates are scored on 13 metrics across four weighted categories. Brands, intellectual-property risks and non-compliant offers are removed.</p>
+        <p class="lede">Candidates are scored on 13 metrics across four weighted categories. Every store is checked on the day it is scored: only generic stores make the list. Brands, manufacturers, intellectual-property risks and non-compliant offers are removed.</p>
       </div>
       <div class="weights" role="img" aria-label="Current weighting: advertising evidence 42 percent, search demand 33 percent, store and collection quality 17 percent, risk assessment 8 percent">
         <div class="w1">42%</div><div class="w2">33%</div><div class="w3">17%</div><div class="w4">8%</div>
@@ -638,7 +641,7 @@ section[hidden]{display:none}
         <div>
           <h3><span class="pct">42%</span>Advertising evidence</h3>
           <p>Are competitors paying to advertise this collection, and for how long?</p>
-          <ul><li>EU audience reach</li><li>Advertising duration</li><li>Active ads and variations</li><li>Creative diversity</li><li>Other stores on the same theme</li></ul>
+          <ul><li>EU audience reach</li><li>Advertising duration</li><li>Active ads and variations, on Meta and Google</li><li>Creative diversity</li><li>Other stores on the same theme</li></ul>
         </div>
         <div>
           <h3><span class="pct">33%</span>Search demand</h3>
@@ -685,6 +688,7 @@ section[hidden]{display:none}
         <li data-mk="US"><span class="country">United States</span><span class="lang">Searches in English</span><span class="state"></span></li>
       </ul>
       <p class="mk-note">EU reach comes from Meta’s EU ad transparency data, which does not cover the UK or the US.</p>
+      <p class="mk-note" style="margin-top:8px">Also tracked: Netherlands, Austria, Switzerland, Hungary.</p>
     </div>
   </section>
 
@@ -718,8 +722,8 @@ section[hidden]{display:none}
   <section class="dark" id="kit">
     <div class="wrap">
       <div class="head">
-        <h2>Every approved collection ships as a Launch Kit</h2>
-        <p class="lede">Research tells you what to launch. The Launch Kit gives you what you need to launch it: creative prompts, visual references and the Google Ads material, prepared for the collection’s strongest market.</p>
+        <h2>Every collection in the daily list ships as a Launch Kit</h2>
+        <p class="lede">Research tells you what to launch. The Launch Kit gives you what you need to launch it: creative prompts, visual references and the Google Ads material, prepared for the collection’s strongest market. Approved and under observation alike, each one clearly labelled.</p>
       </div>
       <ul class="tiles" aria-label="What a Launch Kit contains">
         <li class="tile creative"><span class="tag">Creative production</span><span class="big">20</span><b>Advertising image prompts</b><span class="d">Ready to paste into your image model, one per creative angle.</span></li>
@@ -734,7 +738,7 @@ section[hidden]{display:none}
 
       <div class="kit-foot">
         <div class="window">
-          <div class="window-bar"><span>Approved collection.zip</span><span>Real kit structure</span></div>
+          <div class="window-bar"><span>Collection.zip</span><span>Real kit structure</span></div>
           <ul class="tree">
             <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b>LEIA-ME.txt</b><span>One page: the collection, where to sell it, pricing and the first three steps.</span></li>
             <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b>1 - Imagens</b><span>Reference photographs and the instructions for generating 20 advertising images.</span></li>
@@ -768,7 +772,7 @@ section[hidden]{display:none}
 <span class="redact" style="width:1.5em" aria-hidden="true"></span> ads · <span class="redact" style="width:1.5em" aria-hidden="true"></span> days · <span class="redact" style="width:3em" aria-hidden="true"></span> people · kit ready
 
 <span class="dot watch"></span><span class="redact" style="width:7em" aria-hidden="true"></span> · FR
-observing<span class="time" data-fill="hour">[HOUR]</span></div>
+under observation · <span class="redact" style="width:1.5em" aria-hidden="true"></span> ads · kit ready<span class="time" data-fill="hour">[HOUR]</span></div>
               <div class="bubble bot"><span class="mailbtn">Open today’s collections</span><span class="time" data-fill="hour">[HOUR]</span></div>
             </div>
           </div>
@@ -832,7 +836,7 @@ observing<span class="time" data-fill="hour">[HOUR]</span></div>
           <div class="plan-price"><span class="amt">€<span data-fill="price-monthly">15</span></span><small>/ month</small><span class="fee" id="feeLine">€<span data-fill="price-joining">25</span> joining fee with your first subscription</span></div>
           <ul>
             <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Validated collections every day</li>
-            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Creative and Google Ads kit on approved collections</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Launch Kit with every collection in the daily list — approved and under observation (clearly labelled)</li>
             <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Complete archive and the status of each collection</li>
             <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Cancel whenever you want</li>
           </ul>
@@ -857,12 +861,14 @@ observing<span class="time" data-fill="hour">[HOUR]</span></div>
       <div class="faq-grid">
         <h2>Questions</h2>
         <div class="faq">
-          <details><summary>What exactly is ProvenDrop?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>An ecommerce market intelligence service with three components: product research and market validation, AI-powered creative production, and advertising campaign preparation. We discover collections from stores already advertising in international markets, validate them, and deliver each approved one as a Launch Kit. It is not a store, a product catalogue or an advertising agency.</p></details>
+          <details><summary>What exactly is ProvenDrop?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>An ecommerce market intelligence service with three components: product research and market validation, AI-powered creative production, and advertising campaign preparation. We discover collections from generic stores already advertising on Meta and Google in international markets, validate them, and deliver each one as a Launch Kit. It is not a store, a product catalogue or an advertising agency.</p></details>
           <details><summary>Do I receive it on WhatsApp?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. A subscription on this website is individual: you receive everything in your member area and by e-mail. WhatsApp is only for Click Dynamics customers.</p></details>
           <details><summary>What time do the collections arrive?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Every day at <span data-fill="hour">[HOUR]</span>, weekends included.</p></details>
-          <details><summary>What if there is no approved collection one day?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>You receive the best collections still “observing”, always labelled as such. We never show a collection as approved before it has passed the next-day confirmation.</p></details>
-          <details><summary>Are the collections from brands?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. Only stores selling generic products. Brands with their own designs are left out.</p></details>
-          <details><summary>How are collections validated?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Each candidate is scored on 13 metrics across advertising evidence, search demand, store and collection quality, and risk. Brands are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
+          <details><summary>What if there is no approved collection one day?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>You receive the best collections still under observation, always labelled as such, and each one comes with its Launch Kit so you can test it with a small budget. We never show a collection as approved before it has passed the next-day confirmation.</p></details>
+          <details><summary>Do you ever send brands or manufacturers?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. Every store is checked on the day it is scored: only generic (dropshipping) stores make the list. If a store shows any sign of being a brand or a manufacturer, it is excluded.</p></details>
+          <details><summary>Will I get the same collection twice?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>No. A collection is sent once. The only exception: a collection under observation that later passes the check is sent once more as approved.</p></details>
+          <details><summary>Why Google as well as Meta?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Many of the collections that are selling right now advertise only on Google Shopping and YouTube. We track both, so you don’t miss them.</p></details>
+          <details><summary>How are collections validated?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Each candidate is scored on 13 metrics across advertising evidence (Meta and Google), search demand, store and collection quality, and risk. Brands and manufacturers are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
           <details><summary>How many collections do I receive?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Normally 1 to 4 a day, one per niche whenever possible. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
           <details><summary>Which countries and niches are covered?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>Italy, Spain, France, Germany, the United Kingdom and the United States. Four niches: women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
           <details><summary>What is included in the Launch Kit?<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p>A one-page guide, reference photographs, prompts for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete opportunity analysis. The photographs are references only and must not be published in ads.</p></details>
@@ -1029,25 +1035,29 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
   }
 
   const strip = mk => `<ul class="strip" aria-hidden="true">${MARKETS.map(c => `<li${c===mk?' class="ok"':''}>${c}</li>`).join("")}</ul>`;
-  const badge = st => st==="go" ? `<span class="status go">Approved</span>` : `<span class="status watch">Observing</span>`;
+  const badge = st => st==="go" ? `<span class="status go">Approved</span>` : `<span class="status watch">Under observation</span>`;
   /* Days advertising: counted up to today when the sheet gives data_inicio (first day of the oldest active ad); otherwise the value measured at analysis. */
   const daysNow = r => { const d = r.data_inicio ? date(r.data_inicio) : null; if (!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
   const days = r => { const n = daysNow(r); return n != null ? `${fmt(n)}` : `${fmt(num(r.dias_ativo))}<small class="at">at analysis</small>`; };
-  const facts = r => `<dl class="facts">
-            <div><dt>Active ads</dt><dd>${fmt(num(r.anuncios_ativos))}</dd></div>
+  /* Google ads: shown only when the sheet has the column (anuncios_google) with a value for the row; otherwise nothing changes. */
+  const gAds = r => num(r.anuncios_google);
+  const metaAds = r => num(r.anuncios_meta) != null ? num(r.anuncios_meta) : num(r.anuncios_ativos);
+  const facts = r => { const g = gAds(r); return `<dl class="facts${g != null ? " four" : ""}">
+            <div><dt>${g != null ? "Meta ads" : "Active ads"}</dt><dd>${fmt(g != null ? metaAds(r) : num(r.anuncios_ativos))}</dd></div>${g != null ? `
+            <div><dt>Google ads</dt><dd>${fmt(g)}</dd></div>` : ""}
             <div><dt>Days advertising</dt><dd>${days(r)}</dd></div>
             <div><dt>EU reach</dt><dd>${fmt(num(r.alcance_eu))}</dd></div>
-          </dl>`;
+          </dl>`; };
   const redact = w => `<span class="redact" style="width:${w}" aria-hidden="true"></span>`;
   const where = r => { const mk = market(r.mercado_destaque); return mk ? `, strongest in ${COUNTRY[mk]}` : ""; };
   const validated = r => { const n = num(r.trends_validados); return n == null ? "Search demand: no data" : `Search demand validated in ${Math.round(n)} of 6 markets`; };
 
   function row(r){
     const st = status(r), mk = market(r.mercado_destaque);
-    return `<article class="row" aria-label="${st==="go"?"Approved":"Observing"} collection. Name, store and link are reserved for members.">
+    return `<article class="row" aria-label="${st==="go"?"Approved":"Under observation"} collection. Name, store and link are reserved for members.">
       <div class="row-name">${badge(st)}<h3>${redact(st==="go"?"78%":"64%")}</h3><p class="shop"><b>${niche(r.nicho)}</b>${where(r)}</p></div>
       <div>${facts(r)}<div class="row-mk"><p class="cap">${validated(r)}</p>${strip(mk)}</div></div>
-      <div class="row-score"><div class="score-big">${score(num(r.score))}<small>/ 10</small></div><p class="row-note">${st==="go"?"Comes with the collection link and its Launch Kit.":"Promising but not approved yet, so it has no kit."}</p></div>
+      <div class="row-score"><div class="score-big">${score(num(r.score))}<small>/ 10</small></div><p class="row-note">${st==="go"?"Comes with the collection link and its Launch Kit.":"Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget."}</p></div>
     </article>`;
   }
 
@@ -1073,9 +1083,10 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
       const hour = String((window.PROVENDROP_CONFIG||{}).DAILY_TIME||"").trim() || "[HOUR]";
       const k = n => n == null ? "No data" : n >= 1000 ? Math.round(n/1000).toLocaleString("en-GB")+"k" : String(Math.round(n));
       wa.innerHTML = esc(day ? "Collections for "+day : "Today’s collections") + "\n\n" + rows.map(r => {
-        const st = status(r), mk = market(r.mercado_destaque);
+        const st = status(r), mk = market(r.mercado_destaque), g = gAds(r);
+        const ads = g != null ? `${fmt(metaAds(r))} Meta + ${fmt(g)} Google ads` : `${fmt(num(r.anuncios_ativos))} ads`;
         return `<span class="dot ${st}"></span>${redact(st==="go"?"9em":"7em")}${mk ? " · "+mk : ""}\n` +
-          (st==="go" ? `${fmt(num(r.anuncios_ativos))} ads · ${fmt(num(r.dias_ativo))} days · ${k(num(r.alcance_eu))} people · kit ready` : "observing");
+          (st==="go" ? "" : "under observation · ") + `${ads} · ${fmt(num(r.dias_ativo))} days · ${k(num(r.alcance_eu))} people · kit ready`;
       }).join("\n\n") + `<span class="time">${esc(hour)}</span>`;
     }
     return true;
@@ -1085,13 +1096,15 @@ setTimeout(function(){ document.documentElement.classList.add("settled"); }, 150
     rows = rows.filter(r => market(r.mercado_destaque) || r.nicho);
     if (!rows.length) return;
     const box = $("#arqBox");
-    box.innerHTML = `<table class="dt"><thead><tr><th scope="col">Approved</th><th scope="col">Niche</th><th scope="col">Market</th><th scope="col">Score</th><th scope="col">Ads at approval</th><th scope="col">Days advertising</th><th scope="col">EU reach</th><th scope="col">Still advertising</th></tr></thead><tbody>${
+    const hasG = rows.some(r => gAds(r) != null);   /* "Google ads" column only when the sheet publishes it */
+    box.innerHTML = `<table class="dt"><thead><tr><th scope="col">Approved</th><th scope="col">Niche</th><th scope="col">Market</th><th scope="col">Score</th><th scope="col">Ads at approval</th>${hasG ? '<th scope="col">Google ads</th>' : ""}<th scope="col">Days advertising</th><th scope="col">EU reach</th><th scope="col">Still advertising</th></tr></thead><tbody>${
       rows.slice().reverse().map(r => { const mk = market(r.mercado_destaque); const chk = dayText(r.ultima_verificacao); return `<tr>
         <td data-l="Approved"><span>${esc(dayText(r.data_aprovacao)||"No date")}</span></td>
         <td data-l="Niche"><span>${niche(r.nicho)}</span></td>
         <td data-l="Market"><span>${mk ? COUNTRY[mk] : "No data"}</span></td>
         <td class="n" data-l="Score"><span>${score(num(r.score))}</span></td>
-        <td class="n" data-l="Ads at approval"><span>${fmt(num(r.anuncios_na_aprovacao))}</span></td>
+        <td class="n" data-l="Ads at approval"><span>${fmt(num(r.anuncios_na_aprovacao))}</span></td>${hasG ? `
+        <td class="n" data-l="Google ads"><span>${fmt(gAds(r))}</span></td>` : ""}
         <td class="n" data-l="Days advertising"><span>${fmt(num(r.dias_ativo_na_aprovacao))}</span></td>
         <td class="n" data-l="EU reach"><span>${fmt(num(r.alcance_eu))}</span></td>
         <td data-l="Still advertising"><span>${yes(r.ainda_a_anunciar) ? "Yes" : "No"}${num(r.anuncios_ultima_verificacao)!=null ? `<span class="sub">${fmt(num(r.anuncios_ultima_verificacao))} ads${chk ? ", checked "+esc(chk) : ""}</span>` : ""}</span></td>
