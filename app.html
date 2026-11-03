@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Member area · ProvenDrop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Same tokens as index.html (Hybrid Premium). */
+:root{
+  --light:#F7F8F6; --white:#FFFFFF; --ink:#171A18; --ink-2:#5C645E; --line:#E6E9E5; --line-2:#CFD4CE;
+  --dark:#101310; --dark-card:#191E1A; --dark-line:#2A312C; --on-dark:#F2F4F1; --on-dark-2:#A3ACA5;
+  --green:#78C995; --green-soft:#DFF3E5; --green-ink:#1D6E42;
+  --watch:#E2BC74; --watch-ink:#7A5610; --watch-soft:#F7EDD8;
+  --red-soft:#F8E1DE; --red-ink:#8A2E24;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--light);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+a{color:inherit}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+h1,h2{font-family:var(--display);letter-spacing:-.02em}
+h1{font-size:clamp(32px,4vw,46px);line-height:1.05}
+h2{font-size:clamp(24px,2.6vw,32px);line-height:1.1}
+h3{font-size:17px;font-weight:600;line-height:1.3}
+[hidden]{display:none !important}
+:focus-visible{outline:2px solid var(--green-ink);outline-offset:3px;border-radius:3px}
+.wrap{width:100%;max-width:1100px;margin-inline:auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:var(--light);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:60px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.01em;text-decoration:none}
+.brand svg{display:block}
+.tabs{display:flex;gap:2px}
+.tabs button{padding:8px 12px;border:0;background:none;font:inherit;font-size:15px;color:var(--ink-2);border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:600;box-shadow:inset 0 0 0 1px var(--line-2)}
+.who{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink-2);min-width:0}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:28ch}
+
+/* buttons and forms */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn-go{background:var(--green);color:#101310}
+.btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn-sm{min-height:36px;padding:6px 12px;font-size:14px}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed;pointer-events:none}
+@media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+input[type=email],select{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line-2);border-radius:6px;background:var(--white);font:inherit;font-size:16px;color:var(--ink)}
+input[type=email]:focus,select:focus{border-color:var(--ink);outline:none}
+.check{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line-2);border-radius:8px;background:var(--white);font-size:15px;font-weight:500;cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--green-ink)}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.msg{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:15px;background:var(--green-soft);color:var(--green-ink)}
+.msg.erro{background:var(--red-soft);color:var(--red-ink)}
+.msg.aviso{background:var(--watch-soft);color:var(--watch-ink)}
+
+/* views */
+main{padding-block:32px 72px}
+.view{display:grid;gap:24px}
+.card{background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:clamp(18px,2.4vw,28px)}
+.narrow{max-width:520px;margin:clamp(24px,6vw,72px) auto 0}
+.narrow .lede{margin-top:12px}
+.lede{color:var(--ink-2);font-size:17px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+.head p{color:var(--ink-2)}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-2);border:1px dashed var(--line-2);border-radius:14px}
+
+/* feed cards */
+.feed{display:grid;gap:14px}
+.col{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr) minmax(0,3fr);gap:18px clamp(20px,3vw,40px);align-items:start}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;white-space:nowrap}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.status.go{color:var(--green-ink)}
+.status.watch{color:var(--watch-ink)}
+.status.watch::before{background:transparent;border:1.5px solid currentColor}
+.col h3{font-family:var(--display);font-size:clamp(24px,2.4vw,30px);font-weight:400;line-height:1.1;letter-spacing:-.015em;margin-top:8px}
+.col .shop{margin-top:6px;font-size:15px;color:var(--ink-2)}
+.col .shop a{text-underline-offset:3px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.facts.four{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.facts.four dd{font-size:17px;white-space:nowrap}
+.plats{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.plat{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border:1px solid var(--line-2);border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--white)}
+.plat svg{flex-shrink:0}
+.plat.meta{color:#1D4ED8;border-color:#BFD2FA}
+.plat.google{color:#B45309;border-color:#F3D7A6}
+.dt .plats{margin-top:0}
+.obs{display:inline-block;margin:8px 0 0;padding:4px 9px;border-radius:6px;background:var(--watch-soft);color:var(--watch-ink);font-size:13.5px;font-weight:600}
+.cap.adv{margin:10px 0 0;color:var(--ink)}
+.facts div{min-width:0}
+.facts dt{font-size:13px;line-height:1.3;color:var(--ink-2)}
+.facts dd{margin:3px 0 0;font-size:19px;font-weight:500;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.facts dd .at{display:block;font-size:12px;font-weight:400;color:var(--ink-2)}
+.cap{margin:14px 0 8px;font-size:13px;color:var(--ink-2)}
+.strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.strip li{display:grid;place-items:center;height:30px;border-radius:3px;border:1px solid var(--line-2);color:var(--ink-2);font-size:12.5px;font-weight:600}
+.strip .ok{background:var(--green);border-color:var(--green);color:#101310}
+.side{display:grid;gap:12px;justify-items:start}
+.score{font-family:var(--display);font-size:clamp(44px,4.4vw,60px);line-height:.9;letter-spacing:-.03em}
+.score small{font-family:var(--body);font-size:14px;letter-spacing:0;color:var(--ink-2);margin-left:3px}
+.nota{font-size:14.5px;color:var(--ink-2)}
+.pref-first{border-color:var(--green-ink)}
+
+/* archive */
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end;margin-bottom:18px}
+.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th{padding:10px 14px 10px 0;text-align:left;font-size:13px;font-weight:500;color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+.dt td{padding:14px 14px 14px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.dt .n{font-variant-numeric:tabular-nums}
+.dt .sub{display:block;font-size:13.5px;color:var(--ink-2)}
+.dt a{text-underline-offset:3px}
+
+/* first-visit guide */
+.guia{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(16,19,16,.55)}
+.guia .card{position:relative;max-width:620px;width:100%;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;padding-right:clamp(44px,5vw,56px)}
+.guia .fechar{position:absolute;top:10px;right:10px;width:36px;height:36px;border:1px solid var(--line-2);border-radius:50%;background:var(--white);color:var(--ink);font:inherit;font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.guia .fechar:hover{border-color:var(--ink)}
+.guia ol{margin-top:18px;display:grid;gap:12px;counter-reset:g}
+.guia li{counter-increment:g;display:grid;grid-template-columns:32px minmax(0,1fr);gap:0 12px;align-items:start}
+.guia li::before{content:counter(g);grid-row:1 / span 2;width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);display:grid;place-items:center}
+.guia li>b,.guia li>span{grid-column:2}
+.guia b{display:block;font-weight:600}
+.guia span{color:var(--ink-2);font-size:15px}
+
+footer{color:var(--ink-2);font-size:14px;padding-block:20px 40px;border-top:1px solid var(--line)}
+
+@media (max-width:860px){
+  .col{grid-template-columns:minmax(0,1fr)}
+  .side{grid-template-columns:auto 1fr;align-items:center}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-left,0px)) max(8px,env(safe-area-inset-bottom,0px));background:var(--white);border-top:1px solid var(--line-2)}
+  .tabs button{font-size:14px;padding:10px 8px}
+  main{padding-bottom:110px}
+  .who span{display:none}
+}
+@media (max-width:640px){
+  .facts.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dt thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .dt,.dt tbody,.dt tr,.dt td{display:block;width:100%}
+  .dt tr{padding-block:12px;border-bottom:1px solid var(--line-2)}
+  .dt td{padding:3px 0;border:0;display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px}
+  .dt td::before{content:attr(data-l);font-size:13.5px;color:var(--ink-2)}
+}
+</style>
+<!-- S6: strict CSP (no inline scripts: the logic lives in app.js) and SRI on the pinned supabase-js.
+     connect-src must match SUPABASE_URL in config.js. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src https://maljrfgnnhtrjunnwlre.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'self'; object-src 'none'">
+<!-- Supabase URL, anon key, portal link and delivery time come from config.js (public values only;
+     access to data is decided by the RLS policies on the server). -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" translate="no" href="./">
+      <svg width="24" height="24" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="#101310"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#78C995" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      ProvenDrop
+    </a>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Sections" hidden>
+      <button role="tab" data-tab="hoje" aria-selected="true">Today</button>
+      <button role="tab" data-tab="arquivo" aria-selected="false">Archive</button>
+      <button role="tab" data-tab="prefs" aria-selected="false">Preferences</button>
+      <button role="tab" data-tab="conta" aria-selected="false">Subscription</button>
+    </nav>
+    <div class="who" id="who" hidden><span id="whoEmail"></span><button class="btn btn-line btn-sm" id="btnSair" type="button">Sign out</button></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 0. not configured -->
+  <section class="view" id="vConfig" hidden>
+    <div class="card narrow">
+      <h1>The member area is not active yet</h1>
+      <p class="lede">This page starts working once the connection to the server is configured. Until then there is nothing to see here.</p>
+      <p style="margin-top:18px"><a class="btn btn-line" href="./">Back to the site</a></p>
+    </div>
+  </section>
+
+  <!-- 1. sign in -->
+  <section class="view" id="vLogin" hidden>
+    <form class="card narrow" id="formLogin" novalidate>
+      <h1>Sign in to your area</h1>
+      <p class="lede">Enter the e-mail you paid with. We send you a sign-in link: no password.</p>
+      <div style="margin-top:22px">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
+      </div>
+      <button class="btn btn-go" id="btnLogin" type="submit" style="margin-top:14px;width:100%">Send sign-in link</button>
+      <div class="msg" id="msgLogin" hidden></div>
+      <p class="nota" style="margin-top:18px">Not a member yet? <a href="./#join">Subscribe on the site</a>. Click customer? Your access is through the Click WhatsApp group.</p>
+    </form>
+  </section>
+
+  <!-- 2. signed in but no active subscription -->
+  <section class="view" id="vSemAcesso" hidden>
+    <div class="card narrow">
+      <h1 id="semTitulo">No active subscription</h1>
+      <p class="lede" id="semTexto"></p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+        <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
+        <a class="btn btn-go" id="semRegresso" href="#" target="_blank" rel="noopener" hidden>Subscribe again (monthly fee only)</a>
+        <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. member area -->
+  <section class="view" id="vApp" hidden>
+    <div id="tHoje" role="tabpanel">
+      <div class="head">
+        <div><h1 id="hojeTitulo">Today’s collections</h1><p id="hojeSub"></p></div>
+        <p class="nota" id="hojeHora"></p>
+      </div>
+      <div class="msg aviso" id="aviso" hidden></div>
+      <div class="msg aviso" id="hojePrefs" hidden>You have not chosen your niche and your countries yet. <a href="#" data-go="prefs">Choose now</a>: what matters to you comes first.</div>
+      <div class="feed" id="feed" style="margin-top:20px"></div>
+    </div>
+
+    <div id="tArquivo" role="tabpanel" hidden>
+      <div class="head"><div><h1>Archive of approved collections</h1><p>Every approved collection, where it advertises (Meta, Google or both), and whether the store is still advertising it.</p></div></div>
+      <div class="filters" style="margin-top:20px">
+        <div><label for="fNicho">Niche</label><select id="fNicho"><option value="">All</option></select></div>
+        <div><label for="fPais">Strongest market</label><select id="fPais"><option value="">All</option></select></div>
+        <div><label for="fPlat">Platform</label><select id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
+        <label class="check" style="margin-bottom:0"><input type="checkbox" id="fAtivas"> Only still advertising</label>
+      </div>
+      <div class="card" id="arqBox" style="padding-top:6px"></div>
+    </div>
+
+    <div id="tPrefs" role="tabpanel" hidden>
+      <div class="head"><div><h1>Preferences</h1><p>Your niche and your countries. The collections that matter to you come first; the others stay visible.</p></div></div>
+      <form class="card" id="formPrefs" style="margin-top:20px">
+        <h3>Niches</h3>
+        <div class="checks" id="prefNichos" style="margin-top:10px"></div>
+        <h3 style="margin-top:22px">Countries you sell in</h3>
+        <div class="checks" id="prefPaises" style="margin-top:10px"></div>
+        <button class="btn btn-go" type="submit" style="margin-top:22px">Save preferences</button>
+        <div class="msg" id="msgPrefs" hidden></div>
+      </form>
+    </div>
+
+    <div id="tConta" role="tabpanel" hidden>
+      <div class="head"><div><h1>Subscription</h1><p>No minimum term: cancel whenever you want.</p></div></div>
+      <div class="card" style="margin-top:20px;display:grid;gap:14px">
+        <div><div class="cap" style="margin:0 0 4px">E-mail</div><div id="contaEmail" style="font-weight:500"></div></div>
+        <div><div class="cap" style="margin:0 0 4px">Status</div><div id="contaEstado" style="font-weight:500"></div></div>
+        <div><div class="cap" style="margin:0 0 4px">Member since</div><div id="contaDesde" style="font-weight:500"></div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+          <a class="btn btn-go" id="contaPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
+          <button class="btn btn-line" type="button" id="btnGuia">See the 1-minute guide</button>
+        </div>
+        <p class="nota" id="contaNota"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">The photographs in the kits belong to competitor stores and are for reference only: never publish them in your ads. No fake discounts, countdowns or health claims. Kit documents are currently written in Portuguese.</div></footer>
+
+<!-- first-visit guide -->
+<div class="guia" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
+  <div class="card">
+    <button class="fechar" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>
+    <h2 id="guiaTitulo">Welcome. One minute to get started.</h2>
+    <ol>
+      <li><b>Open a collection</b><span>“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
+      <li><b>Download the Launch Kit</b><span>Every collection in the list comes with a kit: reference photographs, 20 creative prompts, 4 UGC videos and the Google Ads material. Collections under observation are labelled: test them with a small budget. Read LEIA-ME first.</span></li>
+      <li><b>Paste the prompts into ChatGPT</b><span>With the reference photographs attached, you generate the 20 images ready to advertise. Never publish the original photographs.</span></li>
+      <li><b>Launch Google Ads</b><span>Keywords, negative keywords, Shopping titles and landing-page copy are in the file 3 - Google Ads. Start with the strongest market.</span></li>
+    </ol>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+      <button class="btn btn-go" type="button" id="guiaOk">Choose my niche and countries</button>
+      <button class="btn btn-line" type="button" id="guiaSaltar">See today’s collections</button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -1,49 +1,94 @@
 # ProvenDrop
 
-Site estático (GitHub Pages): `index.html` (página principal) e `bem-vindo.html` (página depois do pagamento **Direct**).
+Site estático (GitHub Pages) + plataforma de membros para a subscrição direta.
 
-**Este repo e o site são públicos: não colocar aqui `data.json`, coleções, lojas nem links de ZIP.** As coleções só são entregues a quem subscreve, pelo canal de cada adesão.
+**Este repo e o site são públicos: não colocar aqui `data.json`, coleções, lojas, links de ZIP nem segredos.** As coleções só são entregues a quem subscreve: na área pessoal (com sessão iniciada) e, para clientes da Click, no grupo de WhatsApp da Click.
 
-## Posicionamento
+## Duas portas, o mesmo produto
 
-"Discover. Validate. Create. Launch." — três componentes: (1) Product Research & Market Validation, (2) AI-Powered Creative Production, (3) Advertising Campaign Preparation. Cada coleção aprovada é apresentada como um **Launch Kit** (20 prompts de imagem, 4 prompts de vídeo UGC, referências visuais, keywords, negativas, Shopping titles, landing copy, análise).
-
-## Duas adesões, dois produtos Stripe
-
-| | ProvenDrop via Click | ProvenDrop Direct |
+| | Via Click | Direto |
 |---|---|---|
-| Para quem | Clientes que aderem através da Click Dynamics | Clientes que aderem de forma independente |
-| Produto Stripe | Produto da parceria Click | Produto Direct (Payment Link) |
-| Entrega | Canal WhatsApp gerido pela Click (bot + comunidade) | Diretamente pelo ProvenDrop; plataforma privada quando existir |
-| Página pós-pagamento | A que a Click/produto da parceria definir | `bem-vindo.html` |
-| Variável em `index.html` | `window.PROVENDROP_CLICK_STRIPE_LINK` | `window.PROVENDROP_DIRECT_STRIPE_LINK` |
+| Como paga | Payment Link que a Click envia aos clientes dela (fica como está) | Botão **Subscribe** do site → Payment Link "ProvenDrop Direct" |
+| Onde recebe | Grupo de WhatsApp da Click (bot `/pr`) | Área pessoal `app.html` + e-mail diário |
+| Depois de pagar | `bem-vindo-click.html` | `bem-vindo.html` → e-mail com magic link → `app.html` |
+| Registo | `subscritores.origem = 'click'` (sem login, sem e-mail; serve para a comissão) | `subscritores.origem = 'direto'` + utilizador Auth |
 
-Ambas usam o mesmo research; nenhuma coleção é exclusiva de um canal. **Enquanto uma variável estiver vazia, o botão dessa opção fica desativado** com a nota "not open on this page yet". Nunca colar URLs inventados ou de teste.
+O research, a Metodologia v7, o bot da Click, as folhas Google e a rotina diária não mudam. A única novidade na rotina é a chamada ao script `publicar_plataforma.py` (ver abaixo).
 
-### Configurar o produto Direct
-1. Stripe → **Catálogo de produtos** → produto "ProvenDrop Direct": preço recorrente (mensal) + adesão única, se aplicável.
-2. Stripe → **Payment Links** → novo link com esse produto. Recolher e-mail (e, opcionalmente, campo "Nicho").
-3. **Após o pagamento** → "Não mostrar página de confirmação" → redirecionar para `https://<domínio>/bem-vindo.html`.
-4. Colar o link em `index.html` em `window.PROVENDROP_DIRECT_STRIPE_LINK = "";`.
-5. Stripe → Definições → **Portal de cliente**: ativar "cancelar subscrição" e copiar o link para `bem-vindo.html` (`window.PROVENDROP_PORTAL_LINK`).
-6. Opcional: e-mail público de contacto para membros Direct em `window.PROVENDROP_CONTACT_EMAIL` (em `index.html` e `bem-vindo.html`). Vazio = botão/linha de contacto escondidos.
-7. Stripe → Definições → Notificações: e-mail a cada pagamento novo (o onboarding Direct é feito à mão por e-mail, no início).
+## Configuração: um só sítio
 
-### Configurar o produto Click
-Colar o link do produto Stripe da parceria em `window.PROVENDROP_CLICK_STRIPE_LINK = "";`. O pós-pagamento desse produto é o que estiver acordado com a Click (não é `bem-vindo.html`).
+Todos os valores **públicos** estão em [`config.js`](config.js), lido pelas quatro páginas: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STRIPE_LINK_DIRECT`, `STRIPE_LINK_RETURN`, `STRIPE_PORTAL_LINK`, `DAILY_TIME`, `PRICE_MONTHLY`, `PRICE_JOINING`, `CONTACT_EMAIL` e `CTR`. Com valores vazios o site não inventa nada: o botão Subscribe fica desativado ("Subscriptions are not open on this page yet"), os botões "Manage subscription" ficam escondidos, o bloco CTR fica escondido e a hora mostra `[HOUR]`.
 
-### Preço
-O único preço publicado até agora é **15 €/mês + 25 € de adesão única**, repetido nos dois cartões de adesão. Se os produtos Click e Direct tiverem preços diferentes, editar o cartão correspondente em `index.html` (comentários `<!-- Price: ... -->`).
+Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `supabase secrets set` através de [`scripts/setup-supabase.ps1`](scripts/setup-supabase.ps1). O `.gitignore` exclui `.env`, `supabase/.env` e `*.key`.
 
-## Indicador de CTR observado
+**Links do Stripe (decisão S1, 2026-11-02):** em `main` os três links (`STRIPE_LINK_DIRECT`, `STRIPE_LINK_RETURN`, `STRIPE_PORTAL_LINK`) ficam **vazios** até ao modo real, por isso o site publicado tem o Subscribe desativado e nunca abre um Checkout de teste. Para os testes locais existe [`config.local.js`](config.local.example.js) (no `.gitignore`; copiar de `config.local.example.js`), que `config.js` só carrega quando a página é servida em `localhost`/`127.0.0.1` e que sobrepõe os links de **teste**. Em qualquer outro host o ficheiro nem é pedido. Domínio previsto `provendrop.com`: ver `docs/DOMINIO.md`; o ficheiro `CNAME` só se cria quando o domínio estiver comprado.
 
-A secção Launch Kit tem um bloco `#ctrBox` escondido. Só aparece quando **os quatro campos** de `window.PROVENDROP_CTR` estiverem preenchidos a partir de dados de campanhas documentados:
+## Ficheiros
 
-```js
-window.PROVENDROP_CTR = { value: "14", campaigns: "N", period: "Mmm–Mmm AAAA", format: "Search" };
+| Ficheiro | Função |
+|---|---|
+| `config.js` | Configuração pública (ver acima). Links do Stripe vazios em `main` (S1). |
+| `config.local.example.js` | Modelo do `config.local.js` (links de **teste** do Stripe, só carregado em `localhost`; o próprio `config.local.js` está no `.gitignore`). |
+| `index.html` | Página pública (inglês). Montra com números da folha pública (nomes em barras), secções de produto, preço e FAQ. Dias de anúncio contados a partir de `data_inicio` quando a folha a tiver; senão "at analysis". |
+| `bem-vindo.html` | Pós-pagamento da subscrição direta. |
+| `bem-vindo-click.html` | Pós-pagamento dos clientes Click (WhatsApp). |
+| `app.html` | Área pessoal (inglês): login por magic link, Today, Archive, Preferences, Subscription, guia de 1 minuto. Só usa a chave *anon*; o acesso é decidido pelas políticas RLS. Kits por URL assinada (15 min) do bucket privado. |
+| `supabase/migrations/0001_plataforma.sql` | Tabelas, RLS, bucket privado `kits`, job pg_cron (já aplicada). |
+| `supabase/migrations/0002_kits_datas.sql` | `data_inicio` em `feed_dia`/`verdes`; `feed_dia` em `envios_diarios` (aplicada pelo setup-supabase.ps1). |
+| `supabase/migrations/0003_boas_vindas.sql` | `subscritores.boas_vindas_em`: as boas-vindas só contam como enviadas quando o Resend aceita (aplicada 2026-11-02). |
+| `supabase/migrations/0004_subscricoes.sql` | Tabela `subscricoes` (uma linha por subscrição Stripe, direto e click), `subscritores` derivado, acesso com tolerância de 7 dias em atraso, bloqueio por disputa, reserva atómica das boas-vindas, `stripe_eventos.processado_em`, `cron_secret` aleatório, varrimentos pg_cron (boas-vindas 15 min, reconciliação diária). Aplicada 2026-11-02. |
+| `supabase/migrations/0005_google_e_kits.sql` | `feed_dia.anuncios_meta`, `anuncios_google`, `plataformas`, `anunciante_google` (só área privada), `kit_pronto`; `verdes.anuncios_google`, `plataformas`. Kit em todas as coleções da lista (aprovadas e a observar). Aplicada 2026-11-03 com `supabase db query --linked`. |
+| `supabase/functions/stripe-webhook` | Webhook do Stripe: relê sempre o estado no Stripe, escreve `subscricoes` e deriva `subscritores`; só aceita eventos do modo configurado (`STRIPE_ACCEPT_TEST`); boas-vindas e "welcome back" por magic link (token_hash); disputas bloqueiam o acesso e alertam; `?reenviar_boas_vindas=<email>` e `?varrer_boas_vindas=1` com `x-cron-secret`. |
+| `supabase/functions/email-diario` | E-mail diário a quem tem acesso (direto, ativo ou em atraso < 7 dias), à hora `HORA_ENVIO`, com a lista mais recente: estado, coleção, nicho, mercado, "N Meta + N Google ads", dias, alcance, "kit ready" em todas as que têm kit (sem lojas, links, anunciantes nem zips). |
+| `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
+| `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
+| `supabase/.env.example` | Nomes das variáveis (sem valores). |
+| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). |
+| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0005, `public.config`. Enter = não alterar; recusa misturas teste/real. |
+| `scripts/stripe-teste.ps1` | Uma vez, em modo de teste: cria o Payment Link de regresso e acrescenta os eventos de disputa/reembolso ao webhook (pela API, com a tua chave sem eco). |
+| `.gitleaks.toml`, `.pre-commit-config.yaml`, `.github/workflows/secret-scan.yml` | Gate de segredos local (`pip install pre-commit && pre-commit install`) e em CI (histórico completo). |
+| `docs/SEGURANCA.md`, `docs/PAGAMENTOS.md` | Revisões de 2026-11-02 e o estado de cada achado. |
+| `docs/SETUP.md` | Ordem completa de configuração. |
+| `docs/STRIPE.md` | O que já existe no Stripe em modo de teste (ids e links), como confirmar e como repetir no modo real. |
+| `docs/EMAIL.md` | Resend: conta, domínio, chave, SMTP do Supabase Auth. |
+| `docs/DOMINIO.md` | provendrop.com: DNS do GitHub Pages e do Resend, `CNAME` (só quando o domínio existir), URLs a mudar. |
+| `docs/TESTE.md` | Plano de teste com resultados. |
+| vault `_dados/publicar_feed.py` | Gera `feed_bot.json` (bot da Click) e, só para a plataforma, `zip_path` e `data_inicio` em cada item. |
+| vault `_dados/publicar_plataforma.py` | Publica o feed em `feed_dia`/`verdes` e envia os zips para o Storage. Desde 2026-11-02 passa `anuncios_meta`/`anuncios_google`/`plataformas`/`anunciante_google` (valores por omissão em feeds antigos) e `kit_pronto` = há zip, aprovada ou a observar. |
+
+## Pôr a funcionar
+
+Segue [`docs/SETUP.md`](docs/SETUP.md): Supabase CLI → Stripe ([`docs/STRIPE.md`](docs/STRIPE.md)) → Resend ([`docs/EMAIL.md`](docs/EMAIL.md)) → `scripts\setup-supabase.ps1` → `config.js` → teste ([`docs/TESTE.md`](docs/TESTE.md)).
+
+### Rotina diária (vault)
+
+Guardar a service role key num ficheiro de texto **fora do vault e do repo** (o caminho fica só na rotina, não aqui — S14) e correr, depois de `publicar_feed.py` e de `fazer_zip.py`, **a partir da raiz do vault "Product Research"** (os caminhos `zip:` das notas são relativos a essa raiz):
+
+```bash
+python3 "_dados/publicar_plataforma.py" --feed "_dados/feed_bot.json" --url https://maljrfgnnhtrjunnwlre.supabase.co --key-file "<ficheiro da service role key>" --zips-dir "."
 ```
 
-À data de 2026-11-01 **não existe** no repo nem no vault nenhum registo de campanhas (número, período, formato, cálculo) que sustente o valor ~14 %; o indicador fica desligado até existir. O texto legal "Observed campaign results. Performance is not guaranteed and depends on multiple campaign factors." já está no bloco.
+Códigos de saída: 0 ok · 3 rede bloqueada · 4 credenciais. Os zips encontrados em disco vão para o bucket privado `kits`; se o zip não existir, fica o `zip_url` externo. Quando a rotina passar a escrever `data_inicio:` no frontmatter das notas, a área e o site passam a contar os dias de anúncio até hoje.
+
+## Acesso, pagamentos falhados e regresso
+
+- Acesso (`public.tem_acesso`): subscrição **direto**, não bloqueada, `ativo` ou `em_atraso` há menos de **7 dias** (decisão de 2026-11-02). Depois a área fecha e o e-mail diário pára; `invoice.paid` repõe.
+- Quem cancela e volta **não paga a adesão outra vez**: a área mostra o link de regresso (`STRIPE_LINK_RETURN`, só mensalidade) a ex-membros. O site diz que a adesão é cobrada na primeira subscrição.
+- Não há promessa de vagas por nicho/país nem de reembolso (A9): o nicho e os países servem para ordenar as coleções.
+- Disputa → acesso suspenso + alerta; reembolso → só alerta. Alertas vão para `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`).
+
+## E-mail diário
+
+Sai às `DAILY_TIME` (Europe/Lisbon; `09:00`) do dia seguinte à rotina, com a lista mais recente de `feed_dia`, só para quem tem acesso. A mesma lista nunca sai duas vezes. Conteúdo: nome da coleção, mercado, anúncios, dias, alcance, "kit ready" e um botão para a área; **sem** lojas, links nem zips.
+
+## Indicador de CTR
+
+A secção logo a seguir ao topo do `index.html` só aparece quando `CTR` em `config.js` tiver os quatro campos preenchidos com dados de campanhas documentados:
+```js
+CTR: { valor: "14", tipo_campanha: "Search", periodo: "Jun–Oct 2026", impressoes: "120,000" }
+```
+À data de 2026-11-02 não existe no repo nem no vault nenhum registo (campanhas, período, impressões, cálculo) que sustente o valor; fica escondido até existir.
 
 ## Publicar
-Settings → Pages → Deploy from branch → `main` / root. Domínio próprio: Settings → Pages → Custom domain.
+
+Settings → Pages → Deploy from branch → `main` / root. O ramo `plataforma-direto` só se funde em `main` depois do teste de `docs/TESTE.md` e da aprovação. Stripe fica em modo de teste até aprovação explícita.
