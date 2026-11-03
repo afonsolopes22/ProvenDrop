@@ -23,6 +23,22 @@
   const dia = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : ""; };
   const diaCurto = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}) : ""; };
   const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
+  /* Ads per platform (0005). Rows published before 2026-11-02 only have anuncios_ativos (Meta). */
+  const metaAds = r => r.anuncios_meta != null ? r.anuncios_meta : r.anuncios_ativos;
+  const googleAds = r => r.anuncios_google != null ? r.anuncios_google : 0;
+  const plats = r => {
+    const p = (Array.isArray(r.plataformas) ? r.plataformas : []).map(s => String(s).toLowerCase()).filter(s => s === "meta" || s === "google");
+    if(p.length) return [...new Set(p)];
+    const d = []; if(Number(metaAds(r)) > 0) d.push("meta"); if(Number(googleAds(r)) > 0) d.push("google");
+    return d.length ? d : ["meta"];
+  };
+  const ICON = {
+    meta: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 12c-1.8-3.6-3.3-5.5-5.5-5.5S3 9.5 3 12s1.3 5.5 3.5 5.5S10.2 15.6 12 12s3.3-5.5 5.5-5.5S21 9.5 21 12s-1.3 5.5-3.5 5.5S13.8 15.6 12 12z"/></svg>',
+    google: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20.5 12H12"/><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/></svg>',
+  };
+  const chips = r => `<ul class="plats" aria-label="Advertising platforms">${plats(r).map(p => `<li class="plat ${p}">${ICON[p]}${p === "meta" ? "Meta" : "Google"}</li>`).join("")}</ul>`;
+  /* S7: a kit is only offered through the private bucket (zip_path); external zip links are never shown. */
+  const temKit = r => !!r.zip_path;
   /* Days advertising: counted up to today when data_inicio exists; otherwise the value measured at analysis. */
   const diasAgora = r => { const d = parse(r.data_inicio); if(!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
   const dias = r => { const n = diasAgora(r); return n != null ? fmt(n) : `${fmt(r.dias_ativo)}<small class="at">at analysis</small>`; };
@@ -142,25 +158,29 @@
 
   function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
 
-  /* S7: kits only through the private bucket (zip_path); external zip links are never shown. */
+  /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02. */
   function cartao(r){
     const ok = aprovada(r), link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = ok ? (r.zip_path ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>`
-                    : `<span class="nota">Kit being prepared</span>`) : `<span class="nota">No kit: not approved yet</span>`;
+    const kit = temKit(r) ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
+                          : `<span class="nota">Kit being prepared</span>`;
+    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<p class="cap adv">Advertiser: ${esc(r.anunciante_google)}</p>` : "";
     return `<article class="card col${pref ? " pref-first" : ""}">
       <div>
-        <span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Observing"}</span>
+        <span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>
+        ${ok ? "" : `<p class="obs">Under observation — test with a small budget</p>`}
         <h3>${esc(r.colecao || "Collection")}</h3>
         <p class="shop"><b>${esc(nicho(r.nicho))}</b>${mk ? " · strongest in " + esc(PAIS[mk] || mk) : ""}<br>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>
         ${r.nota ? `<p class="nota" style="margin-top:10px">${esc(r.nota)}</p>` : ""}
       </div>
       <div>
-        <dl class="facts">
-          <div><dt>Active ads</dt><dd>${fmt(r.anuncios_ativos)}</dd></div>
+        <dl class="facts four">
+          <div><dt>Meta ads</dt><dd>${fmt(metaAds(r))}</dd></div>
+          <div><dt>Google ads</dt><dd>${fmt(googleAds(r))}</dd></div>
           <div><dt>Days advertising</dt><dd>${dias(r)}</dd></div>
-          <div><dt>EU reach</dt><dd>${fmt(r.alcance_eu)}</dd></div>
+          <div><dt>People reached</dt><dd>${fmt(r.alcance_eu)}</dd></div>
         </dl>
+        ${chips(r)}${adv}
         <p class="cap">${r.trends_validados != null ? `Search demand validated in ${esc(r.trends_validados)} of 6 markets` : "Search demand: no data"}</p>
         ${strip(mk, r.mercados_verdes)}
       </div>
@@ -192,21 +212,24 @@
     $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(PAIS[p] || p)}</option>`).join("");
     renderArquivo();
   }
-  ["#fNicho","#fPais","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  ["#fNicho","#fPais","#fPlat","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  /* Platform filter: "meta" / "google" = advertises there (alone or with the other); "both" = on both. */
+  const plataformaOk = (r, pl) => !pl || (pl === "both" ? plats(r).length === 2 : plats(r).includes(pl));
   function renderArquivo(){
-    const n = $("#fNicho").value, p = $("#fPais").value, so = $("#fAtivas").checked;
-    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && (!so || r.ainda_a_anunciar === true));
+    const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
+    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
     if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th>Score</th><th>Ads</th><th>Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th>Score</th><th>Ads</th><th>Platforms</th><th>Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
       const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
-      const kit = r.zip_path ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
+      const kit = temKit(r) ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
       return `<tr>
         <td data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
         <td data-l="Collection"><span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : esc(r.colecao)}<span class="sub">${esc(r.loja||"")}</span></span></td>
         <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
         <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
         <td class="n" data-l="Score"><span>${score(r.score)}</span></td>
-        <td class="n" data-l="Ads"><span>${fmt(r.anuncios_ativos)} at approval${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td class="n" data-l="Ads"><span>${fmt(r.anuncios_ativos)} at approval${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td data-l="Platforms"><span>${chips(r)}</span></td>
         <td class="n" data-l="Days advertising"><span>${dias(r)}</span></td>
         <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
         <td data-l="Kit"><span>${kit}</span></td>
