@@ -43,7 +43,10 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
 | `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
-| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). |
+| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). Desde 2026-11-05 o "Today" e o "Archive" são tabelas densas (uma linha por coleção; blocos chave/valor abaixo de 768 px). |
+| `src/tailwind.css` | Fonte do CSS (Tailwind v4): tema escuro/industrial (`#090D16`), Cormorant Garamond nos títulos, JetBrains Mono em dados, tabelas e botões, e as poucas classes de componente que o `app.js` usa por nome (`.msg`, `.status`, `.dt`, `.strip`, `.plat`, `.redact`). |
+| `tailwind.css` | CSS compilado e minificado, lido por `index.html` e `app.html` (fica no repo: o GitHub Pages não faz build). Regenerar com `npm run build:css` sempre que se mudarem classes nas páginas ou no `app.js`. |
+| `package.json` | Só o build do CSS (`@tailwindcss/cli`). `node_modules/` está no `.gitignore`. |
 | `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0005, `public.config`. Enter = não alterar; recusa misturas teste/real. |
 | `scripts/stripe-teste.ps1` | Uma vez, em modo de teste: cria o Payment Link de regresso e acrescenta os eventos de disputa/reembolso ao webhook (pela API, com a tua chave sem eco). |
 | `.gitleaks.toml`, `.pre-commit-config.yaml`, `.github/workflows/secret-scan.yml` | Gate de segredos local (`pip install pre-commit && pre-commit install`) e em CI (histórico completo). |
@@ -55,6 +58,20 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `docs/TESTE.md` | Plano de teste com resultados. |
 | vault `_dados/publicar_feed.py` | Gera `feed_bot.json` (bot da Click) e, só para a plataforma, `zip_path` e `data_inicio` em cada item. |
 | vault `_dados/publicar_plataforma.py` | Publica o feed em `feed_dia`/`verdes` e envia os zips para o Storage. Desde 2026-11-02 passa `anuncios_meta`/`anuncios_google`/`plataformas`/`anunciante_google` (valores por omissão em feeds antigos) e `kit_pronto` = há zip, aprovada ou a observar. |
+
+## Estilos (redesign de 2026-11-05)
+
+`index.html` e `app.html` usam Tailwind **compilado** (sem CDN em runtime, por causa da CSP estrita do `app.html`). Regras do tema: fundo `#090D16`, bordas finas de 1 px (`slate-800`), sem sombras, sem cantos arredondados, sem gradientes; títulos em Cormorant Garamond, dados/números/tabelas/botões em JetBrains Mono (Google Fonts, já permitidas na CSP). Texto secundário em `slate-400` (contraste ≥ 4,5:1 sobre o fundo). Depois de alterar classes:
+
+```bash
+npm install
+```
+
+```bash
+npm run build:css
+```
+
+e fazer commit do `tailwind.css` gerado. Nada muda na lógica: `app.js` e `config.js` mantêm as mesmas funções, ids e variáveis.
 
 ## Pôr a funcionar
 

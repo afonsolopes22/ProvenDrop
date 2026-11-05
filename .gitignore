@@ -25,6 +25,9 @@ feed_bot.json
 supabase/.temp/
 supabase/.branches/
 
+# build do CSS (npm run build:css gera tailwind.css, que fica no repo)
+node_modules/
+
 # ferramentas locais
 .claude/
 .claude-flow/

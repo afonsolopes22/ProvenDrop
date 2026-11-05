@@ -36,7 +36,7 @@
     meta: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 12c-1.8-3.6-3.3-5.5-5.5-5.5S3 9.5 3 12s1.3 5.5 3.5 5.5S10.2 15.6 12 12s3.3-5.5 5.5-5.5S21 9.5 21 12s-1.3 5.5-3.5 5.5S13.8 15.6 12 12z"/></svg>',
     google: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20.5 12H12"/><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/></svg>',
   };
-  const chips = r => `<ul class="plats" aria-label="Advertising platforms">${plats(r).map(p => `<li class="plat ${p}">${ICON[p]}${p === "meta" ? "Meta" : "Google"}</li>`).join("")}</ul>`;
+  const chips = (r, cls) => `<ul class="plats flex flex-wrap gap-1${cls ? " " + cls : ""}" aria-label="Advertising platforms">${plats(r).map(p => `<li class="plat ${p}">${ICON[p]}${p === "meta" ? "Meta" : "Google"}</li>`).join("")}</ul>`;
   /* S7: a kit is only offered through the private bucket (zip_path); external zip links are never shown. */
   const temKit = r => !!r.zip_path;
   /* Days advertising: counted up to today when data_inicio exists; otherwise the value measured at analysis. */
@@ -153,42 +153,32 @@
   function renderFeed(){
     const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
     const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
-    $("#feed").innerHTML = rows.length ? rows.map(cartao).join("") : '<div class="empty">No collections on this day.</div>';
+    /* Today is a high-density table (one row per collection); stacked key/value blocks under 768px (.dt). */
+    $("#feed").innerHTML = rows.length ? `<table class="dt"><thead><tr><th>Status</th><th>Collection</th><th>Niche · market</th><th class="text-right">Meta</th><th class="text-right">Google</th><th class="text-right">Days</th><th class="text-right">Reach</th><th>Markets</th><th class="text-right">Score</th><th>Kit</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
   }
 
   function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
 
-  /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02. */
+  /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02.
+     One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css). */
   function cartao(r){
     const ok = aprovada(r), link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = temKit(r) ? `<button class="btn btn-go" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
-                          : `<span class="nota">Kit being prepared</span>`;
-    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<p class="cap adv">Advertiser: ${esc(r.anunciante_google)}</p>` : "";
-    return `<article class="card col${pref ? " pref-first" : ""}">
-      <div>
-        <span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>
-        ${ok ? "" : `<p class="obs">Under observation — test with a small budget</p>`}
-        <h3>${esc(r.colecao || "Collection")}</h3>
-        <p class="shop"><b>${esc(nicho(r.nicho))}</b>${mk ? " · strongest in " + esc(PAIS[mk] || mk) : ""}<br>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>
-        ${r.nota ? `<p class="nota" style="margin-top:10px">${esc(r.nota)}</p>` : ""}
-      </div>
-      <div>
-        <dl class="facts four">
-          <div><dt>Meta ads</dt><dd>${fmt(metaAds(r))}</dd></div>
-          <div><dt>Google ads</dt><dd>${fmt(googleAds(r))}</dd></div>
-          <div><dt>Days advertising</dt><dd>${dias(r)}</dd></div>
-          <div><dt>People reached</dt><dd>${fmt(r.alcance_eu)}</dd></div>
-        </dl>
-        ${chips(r)}${adv}
-        <p class="cap">${r.trends_validados != null ? `Search demand validated in ${esc(r.trends_validados)} of 6 markets` : "Search demand: no data"}</p>
-        ${strip(mk, r.mercados_verdes)}
-      </div>
-      <div class="side">
-        <div class="score">${score(r.score)}<small>/ 10</small></div>
-        ${kit}
-      </div>
-    </article>`;
+    const kit = temKit(r) ? `<button class="btn btn-go btn-sm min-w-[128px] whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
+                          : `<span class="nota font-mono text-[11px] text-slate-400">Kit being prepared</span>`;
+    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 text-slate-300">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
+    return `<tr class="card${pref ? " pref-first" : ""}">
+      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[10px] leading-snug text-watch">Under observation — test with a small budget</span>`}${chips(r, "mt-2")}</td>
+      <td data-l="Collection"><h3 class="min-w-[14ch] font-display text-[22px] font-medium leading-[1.1] text-slate-100">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 text-[11px] text-slate-400">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>${r.nota ? `<p class="nota sub mt-1.5">${esc(r.nota)}</p>` : ""}</td>
+      <td data-l="Niche"><div class="min-w-[150px]"><b class="font-medium text-slate-200">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(PAIS[mk] || mk)}</span>` : ""}${adv}</div></td>
+      <td class="n md:text-right" data-l="Meta ads">${fmt(metaAds(r))}</td>
+      <td class="n md:text-right" data-l="Google ads">${fmt(googleAds(r))}</td>
+      <td class="n md:text-right" data-l="Days">${dias(r)}</td>
+      <td class="n md:text-right" data-l="Reach">${fmt(r.alcance_eu)}</td>
+      <td data-l="Markets"><div class="min-w-[156px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand validated in ${esc(r.trends_validados)} of 6` : "Demand: no data"}</span></div></td>
+      <td class="n md:text-right" data-l="Score"><span class="font-display text-[26px] font-medium leading-none text-slate-100">${score(r.score)}</span><span class="sub">/ 10</span></td>
+      <td data-l="Kit">${kit}</td>
+    </tr>`;
   }
 
   /* kits: short-lived signed URL from the private bucket; only works for members with access (RLS) */
@@ -219,18 +209,18 @@
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
     const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
     if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th>Score</th><th>Ads</th><th>Platforms</th><th>Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
       const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
       const kit = temKit(r) ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
       return `<tr>
-        <td data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
-        <td data-l="Collection"><span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : esc(r.colecao)}<span class="sub">${esc(r.loja||"")}</span></span></td>
+        <td class="n whitespace-nowrap" data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
+        <td data-l="Collection"><span class="block min-w-[14ch]">${link ? `<a class="font-display text-[18px] font-medium leading-tight text-slate-100 no-underline hover:underline" href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="font-display text-[18px] font-medium leading-tight text-slate-100">${esc(r.colecao)}</span>`}<span class="sub">${esc(r.loja||"")}</span></span></td>
         <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
         <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
-        <td class="n" data-l="Score"><span>${score(r.score)}</span></td>
-        <td class="n" data-l="Ads"><span>${fmt(r.anuncios_ativos)} at approval${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td class="n md:text-right" data-l="Score"><span>${score(r.score)}</span></td>
+        <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} at approval</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
         <td data-l="Platforms"><span>${chips(r)}</span></td>
-        <td class="n" data-l="Days advertising"><span>${dias(r)}</span></td>
+        <td class="n md:text-right" data-l="Days advertising"><span>${dias(r)}</span></td>
         <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
         <td data-l="Kit"><span>${kit}</span></td>
       </tr>`; }).join("")}</tbody></table>`;
