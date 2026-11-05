@@ -1,39 +1,39 @@
 <!doctype html>
-<html lang="en" class="bg-base">
+<html lang="en" class="bg-page">
 <head>
 <meta charset="utf-8">
 <meta name="description" content="Discover. Validate. Create. Launch. More than product research: market validation, AI-powered creative production and Google Ads campaign preparation for ecommerce, delivered as Launch Kits.">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090D16">
+<meta name="theme-color" content="#F4F7F6">
 <title>ProvenDrop</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' fill='%23090D16'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%23F1F5F9' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='8' fill='%230D9488'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Dark / industrial: Cormorant Garamond for titles, JetBrains Mono for data. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Clean SaaS theme: light page, white cards, teal brand, one dark panel for live data. -->
 <link rel="stylesheet" href="tailwind.css">
 <!-- Every public value (Stripe link, delivery time, price, contact, CTR) lives in config.js. Nothing is invented when a value is empty. -->
 <script src="config.js"></script>
 </head>
-<body class="bg-base text-slate-300">
-<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-slate-100 focus:px-3 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:text-base" href="#main">Skip to content</a>
+<body class="bg-page text-ink">
+<a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-ink focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-white" href="#main">Skip to content</a>
 
-<header class="sticky top-0 z-20 border-b border-slate-800 bg-base/90 backdrop-blur" id="top">
-  <div class="relative mx-auto flex min-h-16 w-full max-w-[1320px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-10">
-    <a class="inline-flex items-center gap-3 font-mono text-[13px] font-semibold uppercase tracking-[0.18em] text-slate-100 no-underline" translate="no" href="#main" aria-label="ProvenDrop, back to top">
-      <svg width="22" height="22" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" fill="#F1F5F9"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#090D16" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      ProvenDrop
+<header class="sticky top-0 z-20 border-b border-line bg-white/85 backdrop-blur" id="top">
+  <div class="relative mx-auto flex min-h-16 w-full max-w-[1280px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+    <a class="inline-flex items-center gap-2.5 text-[18px] font-extrabold tracking-tight text-ink no-underline" translate="no" href="#main" aria-label="ProvenDrop, back to top">
+      <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0D9488"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Proven<span class="text-brand">Drop</span></span>
     </a>
-    <button class="-mr-2 grid size-11 place-items-center text-slate-200 md:hidden" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg>
+    <button class="-mr-2 grid size-11 place-items-center rounded-xl text-ink md:hidden" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg>
     </button>
-    <nav class="hidden items-center gap-1 md:flex max-md:absolute max-md:inset-x-0 max-md:top-full max-md:flex-col max-md:items-stretch max-md:gap-0 max-md:border-b max-md:border-slate-800 max-md:bg-base max-md:px-4 max-md:pb-5 max-md:pt-2" id="nav" aria-label="Main">
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#overview">What it is</a>
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#intelligence">Intelligence</a>
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#kit">Launch Kit</a>
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#markets">Markets</a>
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#join">Subscribe</a>
-      <a class="px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 no-underline hover:text-slate-100 max-md:border-b max-md:border-slate-800 max-md:py-3.5 max-md:text-[12px] max-md:text-slate-200" href="#faq">FAQ</a>
+    <nav class="hidden items-center gap-1 md:flex max-md:absolute max-md:inset-x-0 max-md:top-full max-md:flex-col max-md:items-stretch max-md:gap-0 max-md:border-b max-md:border-line max-md:bg-white max-md:px-4 max-md:pb-5 max-md:pt-2" id="nav" aria-label="Main">
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#overview">What it is</a>
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#intelligence">Intelligence</a>
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#kit">Launch Kit</a>
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#markets">Markets</a>
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#join">Subscribe</a>
+      <a class="whitespace-nowrap rounded-lg px-3 py-2 text-[14px] font-semibold text-ink-2 no-underline hover:bg-page hover:text-ink max-md:rounded-none max-md:border-b max-md:border-line max-md:py-3.5 max-md:text-ink" href="#faq">FAQ</a>
       <a class="btn btn-line btn-sm md:ml-3 max-md:mt-4" href="app.html">Sign in</a>
       <a class="btn btn-go btn-sm md:ml-1 max-md:mt-2" href="#join">Subscribe</a>
     </nav>
@@ -42,351 +42,355 @@
 
 <main id="main">
   <!-- hero -->
-  <div class="mx-auto w-full max-w-[1320px] px-4 py-12 sm:px-6 md:py-20 lg:px-10">
+  <div class="mx-auto w-full max-w-[1280px] px-4 py-12 sm:px-6 md:py-20 lg:px-8">
     <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-      <div class="lg:col-span-7">
-        <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">Ecommerce market intelligence · daily</p>
-        <h1 class="mt-5 font-display text-[clamp(52px,8vw,118px)] font-medium leading-[0.95] tracking-[-0.015em] text-slate-100">Discover. Validate. Create. Launch.</h1>
-        <p class="mt-6 max-w-[56ch] font-display text-[22px] leading-[1.35] text-slate-400 md:text-[25px]">More than product research. Everything you need to turn ecommerce opportunities into advertising campaigns.</p>
+      <div class="lg:col-span-6">
+        <p class="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 text-[12px] font-bold text-brand-dark"><span class="size-1.5 rounded-full bg-brand"></span>Ecommerce market intelligence, every day</p>
+        <h1 class="mt-5 text-[clamp(42px,6.2vw,80px)] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink">Discover. Validate. Create. Launch.</h1>
+        <p class="mt-5 max-w-[52ch] text-[18px] leading-relaxed text-ink-2 md:text-[20px]">More than product research. Everything you need to turn ecommerce opportunities into advertising campaigns.</p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a class="btn btn-go max-sm:w-full" href="#join">Subscribe</a>
           <a class="btn btn-line max-sm:w-full" href="#overview">See how it works</a>
         </div>
+        <p class="mt-5 text-[13px] font-medium text-ink-3">Six markets · four niches · Launch Kit with every collection · cancel anytime</p>
       </div>
-      <aside class="border border-slate-800 bg-panel lg:col-span-5" id="heroPanel" aria-label="Latest daily entry. Collection names, stores and links are reserved for members.">
-        <div class="flex items-baseline justify-between gap-3 border-b border-slate-800 px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400"><span id="heroTop">Example of a daily entry</span><span id="heroUpd">Members only</span></div>
-        <div class="px-5 py-5">
+      <aside class="card-deep overflow-hidden lg:col-span-6" id="heroPanel" aria-label="Latest daily entry. Collection names, stores and links are reserved for members.">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4"><span class="inline-flex items-center gap-2 text-[14px] font-bold text-white"><span class="size-2 rounded-full bg-amber-400"></span><span id="heroTop">Example of a daily entry</span></span><span class="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white/70" id="heroUpd">Members only</span></div>
+        <div class="px-6 pt-5">
           <span class="status go">Approved</span>
-          <div class="mt-3 font-display text-[34px] font-medium leading-[1.05] text-slate-100"><span class="redact" style="width:86%" aria-hidden="true"></span><br><span class="redact" style="width:48%" aria-hidden="true"></span></div>
-          <p class="mt-3 font-mono text-[12px] text-slate-400">Niche, store and strongest market</p>
+          <div class="mt-3 text-[30px] font-extrabold leading-[1.1] text-white"><span class="redact" style="width:86%" aria-hidden="true"></span><br><span class="redact" style="width:48%" aria-hidden="true"></span></div>
+          <p class="mt-2 text-[13px] text-white/60">Niche, store and strongest market</p>
         </div>
-        <div class="flex items-end gap-4 border-t border-slate-800 px-5 py-4">
-          <div class="font-display text-[64px] font-medium leading-none text-slate-100"><span class="redact" style="width:1.5em" aria-hidden="true"></span></div>
-          <span class="pb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">/ 10 ProvenDrop score</span>
+        <div class="flex items-end gap-3 px-6 pt-5">
+          <div class="text-[56px] font-extrabold leading-none tracking-tight text-white"><span class="redact" style="width:1.5em" aria-hidden="true"></span></div>
+          <span class="pb-2 text-[13px] font-semibold text-white/60">/ 10 ProvenDrop score</span>
         </div>
-        <dl class="facts grid-cols-3 border-x-0">
+        <dl class="facts grid-cols-3 px-6 pt-5">
           <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
           <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
           <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
         </dl>
-        <div class="px-5 py-4"><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div>
-        <p class="border-t border-slate-800 px-5 py-3 font-mono text-[11px] leading-snug text-slate-400">Names, stores, links and Launch Kits are reserved for members.</p>
+        <div class="px-6 pt-4"><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div>
+        <p class="mt-5 border-t border-white/10 px-6 py-4 text-[13px] text-white/55">Names, stores, links and Launch Kits are reserved for members.</p>
       </aside>
     </div>
   </div>
 
   <!-- A3: observed-CTR highlight. Hidden until PROVENDROP_CONFIG.CTR (config.js) is fully documented. -->
-  <section class="border-t border-slate-800 py-14 md:py-20" id="creatives" hidden>
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="grid items-center gap-6 border border-slate-800 bg-panel p-6 md:grid-cols-[auto_minmax(0,1fr)] md:gap-14 md:p-9">
-        <div class="font-mono text-[clamp(56px,7vw,104px)] font-medium leading-none tabular-nums text-slate-100"><span id="ctrValue"></span><small class="mt-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">CTR on Google Ads</small></div>
+  <section class="py-10" id="creatives" hidden>
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="card-deep grid items-center gap-6 p-7 md:grid-cols-[auto_minmax(0,1fr)] md:gap-14 md:p-10">
+        <div class="text-[clamp(56px,7vw,104px)] font-extrabold leading-none tracking-tight tabular-nums text-white"><span id="ctrValue"></span><small class="mt-2 block text-[13px] font-semibold text-white/60">CTR on Google Ads</small></div>
         <div>
-          <h2 class="font-display text-[clamp(28px,3vw,40px)] font-medium leading-tight text-slate-100">With the prompts you will receive.</h2>
-          <p class="mt-3 text-slate-400" id="ctrWhat"></p>
-          <p class="mt-3 text-slate-400">Paste them into ChatGPT, attach the reference photographs, and you have 20 images ready to advertise, in minutes.</p>
-          <p class="mt-3 font-mono text-[12px] text-slate-400">Measured in our own campaigns. Performance is not guaranteed: your CTR depends on your product, your audience and your budget.</p>
+          <h2 class="text-[clamp(26px,3vw,38px)] font-extrabold leading-tight tracking-tight text-white">With the prompts you will receive.</h2>
+          <p class="mt-3 text-white/75" id="ctrWhat"></p>
+          <p class="mt-3 text-white/75">Paste them into ChatGPT, attach the reference photographs, and you have 20 images ready to advertise, in minutes.</p>
+          <p class="mt-3 text-[13px] text-white/50">Measured in our own campaigns. Performance is not guaranteed: your CTR depends on your product, your audience and your budget.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- overview -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="overview">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 01 · What it is</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Three components, one system</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">ProvenDrop is not only product research. It combines market validation, AI-powered creative production and advertising campaign preparation, so every opportunity arrives ready to work on.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="overview">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-10 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">What it is</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Three components, one system</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">ProvenDrop is not only product research. It combines market validation, AI-powered creative production and advertising campaign preparation, so every opportunity arrives ready to work on.</p>
       </div>
-      <ol class="grid gap-px border border-slate-800 bg-slate-800 md:grid-cols-3">
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6 md:p-8">
-          <span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">01</span>
-          <h3 class="font-display text-[28px] font-medium leading-[1.1] text-slate-100">Product Research &amp; Market Validation</h3>
-          <p class="text-slate-400">Collections discovered from stores already advertising, then validated on advertising evidence and search demand across six markets.</p>
-          <ul class="mt-2 grid gap-2 border-t border-slate-800 pt-4 font-mono text-[12.5px] leading-snug text-slate-300 marker:text-slate-600 list-disc pl-4">
+      <ol class="grid gap-4 md:grid-cols-3">
+        <li class="card grid min-w-0 content-start gap-3 p-6 md:p-7">
+          <span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">01</span>
+          <h3 class="text-[20px] font-bold leading-snug tracking-tight text-ink">Product Research &amp; Market Validation</h3>
+          <p class="text-ink-2">Collections discovered from stores already advertising, then validated on advertising evidence and search demand across six markets.</p>
+          <ul class="mt-1 grid gap-2 border-t border-line pt-4 text-[14px] font-medium text-ink marker:text-brand list-disc pl-4">
             <li>Discover collections and opportunities</li>
             <li>Analyse advertising evidence and market demand</li>
             <li>Validate opportunities across different markets</li>
           </ul>
         </li>
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6 md:p-8">
-          <span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">02</span>
-          <h3 class="font-display text-[28px] font-medium leading-[1.1] text-slate-100">AI-Powered Creative Production</h3>
-          <p class="text-slate-400">Ready-to-use prompts and visual references to produce your own advertising images and UGC videos with the AI tools you already use.</p>
-          <ul class="mt-2 grid gap-2 border-t border-slate-800 pt-4 font-mono text-[12.5px] leading-snug text-slate-300 marker:text-slate-600 list-disc pl-4">
+        <li class="card grid min-w-0 content-start gap-3 p-6 md:p-7">
+          <span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">02</span>
+          <h3 class="text-[20px] font-bold leading-snug tracking-tight text-ink">AI-Powered Creative Production</h3>
+          <p class="text-ink-2">Ready-to-use prompts and visual references to produce your own advertising images and UGC videos with the AI tools you already use.</p>
+          <ul class="mt-1 grid gap-2 border-t border-line pt-4 text-[14px] font-medium text-ink marker:text-brand list-disc pl-4">
             <li>Prompts for advertising images</li>
             <li>Prompts for UGC videos</li>
             <li>Visual references for every collection in the daily list</li>
           </ul>
         </li>
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6 md:p-8">
-          <span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">03</span>
-          <h3 class="font-display text-[28px] font-medium leading-[1.1] text-slate-100">Advertising Campaign Preparation</h3>
-          <p class="text-slate-400">The material a Google Ads campaign needs on day one, prepared for the market where the collection is performing.</p>
-          <ul class="mt-2 grid gap-2 border-t border-slate-800 pt-4 font-mono text-[12.5px] leading-snug text-slate-300 marker:text-slate-600 list-disc pl-4">
+        <li class="card grid min-w-0 content-start gap-3 p-6 md:p-7">
+          <span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">03</span>
+          <h3 class="text-[20px] font-bold leading-snug tracking-tight text-ink">Advertising Campaign Preparation</h3>
+          <p class="text-ink-2">The material a Google Ads campaign needs on day one, prepared for the market where the collection is performing.</p>
+          <ul class="mt-1 grid gap-2 border-t border-line pt-4 text-[14px] font-medium text-ink marker:text-brand list-disc pl-4">
             <li>Shopping titles, keywords and negative keywords</li>
             <li>Landing-page copy</li>
             <li>From discovery to a campaign ready to prepare</li>
           </ul>
         </li>
       </ol>
-      <ol class="mt-12 grid gap-px border-y border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4" aria-label="The ProvenDrop path, in four steps">
-        <li class="min-w-0 bg-base py-6 lg:pr-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">01</span><b class="mt-3 block font-display text-[34px] font-medium leading-[1.05] text-slate-100">Discover</b><span class="mt-2 block text-slate-400">Collections already backed by real advertising activity.</span></li>
-        <li class="min-w-0 bg-base py-6 sm:pl-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">02</span><b class="mt-3 block font-display text-[34px] font-medium leading-[1.05] text-slate-100">Validate</b><span class="mt-2 block text-slate-400">13 metrics, six markets, measured again 24 hours later.</span></li>
-        <li class="min-w-0 bg-base py-6 lg:pl-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">03</span><b class="mt-3 block font-display text-[34px] font-medium leading-[1.05] text-slate-100">Create</b><span class="mt-2 block text-slate-400">Image and UGC video prompts, with visual references.</span></li>
-        <li class="min-w-0 bg-base py-6 sm:pl-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">04</span><b class="mt-3 block font-display text-[34px] font-medium leading-[1.05] text-slate-100">Launch</b><span class="mt-2 block text-slate-400">Google Ads keywords, titles and landing copy, ready to use.</span></li>
+      <ol class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="The ProvenDrop path, in four steps">
+        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 1</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Discover</b><span class="mt-1.5 block text-[14px] text-ink-2">Collections already backed by real advertising activity.</span></li>
+        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 2</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Validate</b><span class="mt-1.5 block text-[14px] text-ink-2">13 metrics, six markets, measured again 24 hours later.</span></li>
+        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 3</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Create</b><span class="mt-1.5 block text-[14px] text-ink-2">Image and UGC video prompts, with visual references.</span></li>
+        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 4</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Launch</b><span class="mt-1.5 block text-[14px] text-ink-2">Google Ads keywords, titles and landing copy, ready to use.</span></li>
       </ol>
     </div>
   </section>
 
   <!-- steps -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="steps">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 02 · How it works for you</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Three steps. Zero research on your side.</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">You subscribe, the collections arrive every day, and you launch with the kit. The research is finished before it reaches you.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="steps">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-10 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">How it works for you</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Three steps. Zero research on your side.</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">You subscribe, the collections arrive every day, and you launch with the kit. The research is finished before it reaches you.</p>
       </div>
-      <ol class="grid gap-px border-y border-slate-800 bg-slate-800 md:grid-cols-3">
-        <li class="min-w-0 bg-base py-6 md:pr-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">01</span><b class="mt-3 block font-display text-[32px] font-medium leading-[1.05] text-slate-100">Subscribe</b><span class="mt-2 block text-slate-400">Pay on this website and receive an e-mail right away to enter your member area. No password.</span></li>
-        <li class="min-w-0 bg-base py-6 md:px-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">02</span><b class="mt-3 block font-display text-[32px] font-medium leading-[1.05] text-slate-100">Every day at <i class="font-mono text-[24px] not-italic tracking-tight" data-fill="hour">[HOUR]</i></b><span class="mt-2 block text-slate-400">The day’s collections arrive: competitor stores with active ads on Meta and Google, demand validated on Google Search, confirmed the next day.</span></li>
-        <li class="min-w-0 bg-base py-6 md:pl-6"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">03</span><b class="mt-3 block font-display text-[32px] font-medium leading-[1.05] text-slate-100">Download the kit and launch</b><span class="mt-2 block text-slate-400">Images, creative prompts, UGC videos and a Google Ads plan, ready to use. One collection live in 1–2 days.</span></li>
+      <ol class="grid gap-4 md:grid-cols-3">
+        <li class="card min-w-0 p-6 md:p-7"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">1</span><b class="mt-4 block text-[22px] font-extrabold tracking-tight text-ink">Subscribe</b><span class="mt-2 block text-ink-2">Pay on this website and receive an e-mail right away to enter your member area. No password.</span></li>
+        <li class="card min-w-0 p-6 md:p-7"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">2</span><b class="mt-4 block text-[22px] font-extrabold tracking-tight text-ink">Every day at <i class="not-italic text-brand-dark" data-fill="hour">[HOUR]</i></b><span class="mt-2 block text-ink-2">The day’s collections arrive: competitor stores with active ads on Meta and Google, demand validated on Google Search, confirmed the next day.</span></li>
+        <li class="card min-w-0 p-6 md:p-7"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">3</span><b class="mt-4 block text-[22px] font-extrabold tracking-tight text-ink">Download the kit and launch</b><span class="mt-2 block text-ink-2">Images, creative prompts, UGC videos and a Google Ads plan, ready to use. One collection live in 1–2 days.</span></li>
       </ol>
     </div>
   </section>
 
-  <!-- daily intelligence: the evidence file -->
-  <section class="scroll-mt-16 border-t border-slate-800 bg-panel py-16 md:py-24" id="intelligence">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 03 · Intelligence</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">The evidence behind every collection</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">Each entry shows how long a competitor has been advertising the collection on Meta and Google, how many people the ads reached and where demand holds up. Names, stores and links are reserved for members.<span class="mt-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400" id="listUpd"></span></p>
+  <!-- daily intelligence: the evidence panel -->
+  <section class="scroll-mt-16 py-14 md:py-20" id="intelligence">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Intelligence</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">The evidence behind every collection</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">Each entry shows how long a competitor has been advertising the collection on Meta and Google, how many people the ads reached and where demand holds up. Names, stores and links are reserved for members.<span class="mt-2 block text-[13px] font-semibold text-ink-3" id="listUpd"></span></p>
       </div>
-      <div class="mb-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400" aria-label="Market strip legend">
-        <span class="inline-flex items-center gap-2"><i class="size-3 bg-slate-100"></i>Strongest market</span>
-        <span class="inline-flex items-center gap-2"><i class="size-3 border border-slate-700"></i>Other markets</span>
-      </div>
-      <div class="hidden gap-px border-y border-slate-800 bg-slate-800 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400 md:grid md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)]" aria-hidden="true">
-        <span class="bg-panel py-2 pr-6">Collection</span><span class="bg-panel px-6 py-2">Evidence</span><span class="bg-panel py-2 pl-6">Score · kit</span>
-      </div>
-      <div class="border-b border-slate-800 max-md:border-t" id="cardsHoje">
-        <article class="row grid gap-px bg-slate-800 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)]" aria-label="Example of an approved entry. Details are reserved for members.">
-          <div class="row-name bg-panel py-6 md:pr-6"><span class="status go">Approved</span><h3 class="mt-3 font-display text-[30px] font-medium leading-[1.1] text-slate-100"><span class="redact" style="width:78%" aria-hidden="true"></span></h3><p class="shop mt-2 font-mono text-[12px] text-slate-400">Niche, store and strongest market</p></div>
-          <div class="bg-panel py-6 md:px-6"><dl class="facts grid-cols-3">
-            <div class="!bg-panel"><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
-            <div class="!bg-panel"><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
-            <div class="!bg-panel"><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
-          </dl><div class="mt-4"><p class="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Strongest market</p><ul class="strip [&>li:not(.ok)]:bg-panel" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
-          <div class="row-score grid content-start gap-3 bg-panel py-6 md:pl-6"><div class="font-display text-[56px] font-medium leading-none text-slate-100"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small class="ml-1 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">/ 10</small></div><p class="row-note max-w-[32ch] font-mono text-[12px] leading-snug text-slate-400">Comes with the collection link and its Launch Kit.</p></div>
-        </article>
-        <article class="row grid gap-px bg-slate-800 border-t border-slate-800 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)]" aria-label="Example of an observing entry. Details are reserved for members.">
-          <div class="row-name bg-panel py-6 md:pr-6"><span class="status watch">Under observation</span><h3 class="mt-3 font-display text-[30px] font-medium leading-[1.1] text-slate-100"><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop mt-2 font-mono text-[12px] text-slate-400">Niche, store and strongest market</p></div>
-          <div class="bg-panel py-6 md:px-6"><dl class="facts grid-cols-3">
-            <div class="!bg-panel"><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
-            <div class="!bg-panel"><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
-            <div class="!bg-panel"><dt>EU reach</dt><dd><span class="redact" style="width:5ch" aria-hidden="true"></span></dd></div>
-          </dl><div class="mt-4"><p class="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Strongest market</p><ul class="strip [&>li:not(.ok)]:bg-panel" aria-hidden="true"><li>IT</li><li class="ok">ES</li><li>FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
-          <div class="row-score grid content-start gap-3 bg-panel py-6 md:pl-6"><div class="font-display text-[56px] font-medium leading-none text-slate-100"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small class="ml-1 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">/ 10</small></div><p class="row-note max-w-[32ch] font-mono text-[12px] leading-snug text-slate-400">Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget.</p></div>
-        </article>
-      </div>
-      <p class="mt-6 max-w-[64ch] text-slate-400">Every collection in the daily list, with its Launch Kit, reaches members in the member area and by daily e-mail. A collection is sent once: never the same one twice. Click Dynamics customers receive them in the Click WhatsApp group.</p>
-
-      <div class="mt-16 md:mt-24" id="archive" hidden>
-        <div class="mb-5 flex flex-wrap items-end justify-between gap-x-5 gap-y-3 border-b border-slate-800 pb-5">
-          <div>
-            <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 03.1 · Archive</p>
-            <h3 class="mt-2 font-display text-[clamp(28px,3vw,40px)] font-medium leading-[1.1] text-slate-100">Approved archive</h3>
-            <p class="mt-2 max-w-[52ch] text-slate-400">Every approved collection so far, in numbers, and whether the competitor is still advertising it.</p>
+      <div class="card-deep p-5 md:p-8">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <span class="inline-flex items-center gap-2 text-[15px] font-bold text-white"><span class="size-2 rounded-full bg-amber-400"></span>Daily list</span>
+          <div class="flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-semibold text-white/60" aria-label="Market strip legend">
+            <span class="inline-flex items-center gap-2"><i class="size-3 rounded bg-brand"></i>Strongest market</span>
+            <span class="inline-flex items-center gap-2"><i class="size-3 rounded bg-white/10"></i>Other markets</span>
           </div>
         </div>
-        <div class="overflow-x-auto" id="arqBox"></div>
+        <div class="border-t border-white/10" id="cardsHoje">
+          <article class="row grid gap-6 border-b border-white/10 py-6 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] md:gap-8" aria-label="Example of an approved entry. Details are reserved for members.">
+            <div class="row-name"><span class="status go">Approved</span><h3 class="mt-3 text-[24px] font-extrabold leading-[1.1] text-white"><span class="redact" style="width:78%" aria-hidden="true"></span></h3><p class="shop mt-2 text-[13px] text-white/60">Niche, store and strongest market</p></div>
+            <div><dl class="facts grid-cols-3">
+              <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+              <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+              <div><dt>EU reach</dt><dd><span class="redact" style="width:6ch" aria-hidden="true"></span></dd></div>
+            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
+            <div class="row-score grid content-start gap-3"><div class="text-[48px] font-extrabold leading-none tracking-tight text-white"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small class="ml-1.5 text-[13px] font-semibold text-white/55">/ 10</small></div><p class="row-note max-w-[32ch] text-[13px] leading-snug text-white/60">Comes with the collection link and its Launch Kit.</p></div>
+          </article>
+          <article class="row grid gap-6 border-b border-white/10 py-6 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] md:gap-8" aria-label="Example of an observing entry. Details are reserved for members.">
+            <div class="row-name"><span class="status watch">Under observation</span><h3 class="mt-3 text-[24px] font-extrabold leading-[1.1] text-white"><span class="redact" style="width:64%" aria-hidden="true"></span></h3><p class="shop mt-2 text-[13px] text-white/60">Niche, store and strongest market</p></div>
+            <div><dl class="facts grid-cols-3">
+              <div><dt>Active ads</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+              <div><dt>Days advertising</dt><dd><span class="redact" style="width:2ch" aria-hidden="true"></span></dd></div>
+              <div><dt>EU reach</dt><dd><span class="redact" style="width:5ch" aria-hidden="true"></span></dd></div>
+            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip" aria-hidden="true"><li>IT</li><li class="ok">ES</li><li>FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
+            <div class="row-score grid content-start gap-3"><div class="text-[48px] font-extrabold leading-none tracking-tight text-white"><span class="redact" style="width:1.5em" aria-hidden="true"></span><small class="ml-1.5 text-[13px] font-semibold text-white/55">/ 10</small></div><p class="row-note max-w-[32ch] text-[13px] leading-snug text-white/60">Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget.</p></div>
+          </article>
+        </div>
+        <p class="mt-5 max-w-[70ch] text-[14px] text-white/60">Every collection in the daily list, with its Launch Kit, reaches members in the member area and by daily e-mail. A collection is sent once: never the same one twice. Click Dynamics customers receive them in the Click WhatsApp group.</p>
+      </div>
+
+      <div class="mt-6" id="archive" hidden>
+        <div class="card p-5 md:p-7">
+          <div class="mb-4 flex flex-wrap items-end justify-between gap-x-5 gap-y-2">
+            <div>
+              <h3 class="text-[22px] font-extrabold tracking-tight text-ink">Approved archive</h3>
+              <p class="mt-1 max-w-[52ch] text-[14px] text-ink-2">Every approved collection so far, in numbers, and whether the competitor is still advertising it.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto" id="arqBox"></div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- daily -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="daily">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 04 · Every day</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">What you receive every day</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">The collections, the proof behind each one, the Launch Kit with every one of them and the archive. Nothing to research on your side.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="daily">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-10 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Every day</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">What you receive every day</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">The collections, the proof behind each one, the Launch Kit with every one of them and the archive. Nothing to research on your side.</p>
       </div>
-      <ul class="grid gap-px border border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4">
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6"><span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">01</span><h3 class="font-display text-[26px] font-medium leading-[1.1] text-slate-100">The day’s collections</h3><p class="text-slate-400">One per niche whenever possible: jewellery, home decoration, women’s fashion and men’s fashion.</p></li>
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6"><span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">02</span><h3 class="font-display text-[26px] font-medium leading-[1.1] text-slate-100">The proof for each one</h3><p class="text-slate-400">How many Meta and Google ads are active, for how many days, how many people they reached and in which countries Google demand is rising.</p></li>
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6"><span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">03</span><h3 class="font-display text-[26px] font-medium leading-[1.1] text-slate-100">The complete kit with every collection</h3><p class="text-slate-400">Launch Kit with every collection in the daily list — approved and under observation (clearly labelled): reference photographs, 20 creatives to generate in ChatGPT, 4 UGC videos, keywords, Shopping titles and landing-page copy.</p></li>
-        <li class="grid min-w-0 content-start gap-3 bg-base p-6"><span class="font-mono text-[11px] tracking-[0.2em] text-slate-400">04</span><h3 class="font-display text-[26px] font-medium leading-[1.1] text-slate-100">The archive</h3><p class="text-slate-400">Every approved collection, and whether it is still being advertised.</p></li>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">01</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The day’s collections</h3><p class="text-[14px] text-ink-2">One per niche whenever possible: jewellery, home decoration, women’s fashion and men’s fashion.</p></li>
+        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">02</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The proof for each one</h3><p class="text-[14px] text-ink-2">How many Meta and Google ads are active, for how many days, how many people they reached and in which countries Google demand is rising.</p></li>
+        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">03</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The complete kit with every collection</h3><p class="text-[14px] text-ink-2">Launch Kit with every collection in the daily list — approved and under observation (clearly labelled): reference photographs, 20 creatives to generate in ChatGPT, 4 UGC videos, keywords, Shopping titles and landing-page copy.</p></li>
+        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">04</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The archive</h3><p class="text-[14px] text-ink-2">Every approved collection, and whether it is still being advertised.</p></li>
       </ul>
     </div>
   </section>
 
   <!-- validation -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="how-it-works">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 05 · Validation</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">How a collection earns its place</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">Candidates are scored on 13 metrics across four weighted categories. Every store is checked on the day it is scored: only generic stores make the list. Brands, manufacturers, intellectual-property risks and non-compliant offers are removed.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="how-it-works">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-10 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Validation</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">How a collection earns its place</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">Candidates are scored on 13 metrics across four weighted categories. Every store is checked on the day it is scored: only generic stores make the list. Brands, manufacturers, intellectual-property risks and non-compliant offers are removed.</p>
       </div>
-      <div class="mb-8 flex h-14 gap-px border border-slate-800 bg-slate-800 font-mono text-[13px] font-medium md:h-20 md:text-[18px]" role="img" aria-label="Current weighting: advertising evidence 42 percent, search demand 33 percent, store and collection quality 17 percent, risk assessment 8 percent">
-        <div class="flex min-w-0 flex-[42] items-end bg-slate-100 px-3 py-2 text-base">42%</div><div class="flex min-w-0 flex-[33] items-end bg-slate-400 px-3 py-2 text-base">33%</div><div class="flex min-w-0 flex-[17] items-end bg-slate-700 px-3 py-2 text-slate-100">17%</div><div class="flex min-w-0 flex-[8] items-end justify-center bg-base px-1 py-2 text-slate-400">8%</div>
+      <div class="mb-4 flex h-14 gap-1 text-[13px] font-extrabold md:h-16 md:text-[16px]" role="img" aria-label="Current weighting: advertising evidence 42 percent, search demand 33 percent, store and collection quality 17 percent, risk assessment 8 percent">
+        <div class="flex min-w-0 flex-[42] items-end rounded-l-xl bg-brand px-4 py-2 text-white">42%</div><div class="flex min-w-0 flex-[33] items-end bg-brand/60 px-4 py-2 text-white">33%</div><div class="flex min-w-0 flex-[17] items-end bg-brand/25 px-3 py-2 text-brand-dark">17%</div><div class="flex min-w-0 flex-[8] items-end justify-center rounded-r-xl border border-line bg-white px-1 py-2 text-ink-2">8%</div>
       </div>
-      <div class="grid gap-px border border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="min-w-0 bg-base p-6">
-          <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-300"><span class="mb-2 block font-display text-[44px] font-medium leading-none tracking-tight text-slate-100">42%</span>Advertising evidence</h3>
-          <p class="mt-3 text-slate-400">Are competitors paying to advertise this collection, and for how long?</p>
-          <ul class="mt-4 grid gap-1.5 border-t border-slate-800 pt-3 font-mono text-[12px] leading-snug text-slate-400 marker:text-slate-600 list-disc pl-4"><li>EU audience reach</li><li>Advertising duration</li><li>Active ads and variations, on Meta and Google</li><li>Creative diversity</li><li>Other stores on the same theme</li></ul>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="card min-w-0 p-6">
+          <h3 class="text-[14px] font-bold text-ink"><span class="mb-1 block text-[40px] font-extrabold leading-none tracking-tight text-brand-dark">42%</span>Advertising evidence</h3>
+          <p class="mt-2 text-[14px] text-ink-2">Are competitors paying to advertise this collection, and for how long?</p>
+          <ul class="mt-4 grid gap-1.5 border-t border-line pt-3 text-[13px] font-medium text-ink-2 marker:text-brand list-disc pl-4"><li>EU audience reach</li><li>Advertising duration</li><li>Active ads and variations, on Meta and Google</li><li>Creative diversity</li><li>Other stores on the same theme</li></ul>
         </div>
-        <div class="min-w-0 bg-base p-6">
-          <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-300"><span class="mb-2 block font-display text-[44px] font-medium leading-none tracking-tight text-slate-100">33%</span>Search demand</h3>
-          <p class="mt-3 text-slate-400">Are people searching for it in each market, and is interest growing?</p>
-          <ul class="mt-4 grid gap-1.5 border-t border-slate-800 pt-3 font-mono text-[12px] leading-snug text-slate-400 marker:text-slate-600 list-disc pl-4"><li>Google demand by country</li><li>Recent momentum</li><li>Fit across markets</li></ul>
+        <div class="card min-w-0 p-6">
+          <h3 class="text-[14px] font-bold text-ink"><span class="mb-1 block text-[40px] font-extrabold leading-none tracking-tight text-brand-dark">33%</span>Search demand</h3>
+          <p class="mt-2 text-[14px] text-ink-2">Are people searching for it in each market, and is interest growing?</p>
+          <ul class="mt-4 grid gap-1.5 border-t border-line pt-3 text-[13px] font-medium text-ink-2 marker:text-brand list-disc pl-4"><li>Google demand by country</li><li>Recent momentum</li><li>Fit across markets</li></ul>
         </div>
-        <div class="min-w-0 bg-base p-6">
-          <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-300"><span class="mb-2 block font-display text-[44px] font-medium leading-none tracking-tight text-slate-100">17%</span>Store and collection quality</h3>
-          <p class="mt-3 text-slate-400">Is the store investing, and can the collection be replicated?</p>
-          <ul class="mt-4 grid gap-1.5 border-t border-slate-800 pt-3 font-mono text-[12px] leading-snug text-slate-400 marker:text-slate-600 list-disc pl-4"><li>Store strength</li><li>Collection cohesion</li><li>Social signals</li></ul>
+        <div class="card min-w-0 p-6">
+          <h3 class="text-[14px] font-bold text-ink"><span class="mb-1 block text-[40px] font-extrabold leading-none tracking-tight text-brand-dark">17%</span>Store and collection quality</h3>
+          <p class="mt-2 text-[14px] text-ink-2">Is the store investing, and can the collection be replicated?</p>
+          <ul class="mt-4 grid gap-1.5 border-t border-line pt-3 text-[13px] font-medium text-ink-2 marker:text-brand list-disc pl-4"><li>Store strength</li><li>Collection cohesion</li><li>Social signals</li></ul>
         </div>
-        <div class="min-w-0 bg-base p-6">
-          <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-300"><span class="mb-2 block font-display text-[44px] font-medium leading-none tracking-tight text-slate-100">8%</span>Risk assessment</h3>
-          <p class="mt-3 text-slate-400">Could it cause legal or advertising-policy problems?</p>
-          <ul class="mt-4 grid gap-1.5 border-t border-slate-800 pt-3 font-mono text-[12px] leading-snug text-slate-400 marker:text-slate-600 list-disc pl-4"><li>Legal and IP risk</li><li>Advertising-policy risk</li></ul>
+        <div class="card min-w-0 p-6">
+          <h3 class="text-[14px] font-bold text-ink"><span class="mb-1 block text-[40px] font-extrabold leading-none tracking-tight text-brand-dark">8%</span>Risk assessment</h3>
+          <p class="mt-2 text-[14px] text-ink-2">Could it cause legal or advertising-policy problems?</p>
+          <ul class="mt-4 grid gap-1.5 border-t border-line pt-3 text-[13px] font-medium text-ink-2 marker:text-brand list-disc pl-4"><li>Legal and IP risk</li><li>Advertising-policy risk</li></ul>
         </div>
       </div>
 
-      <div class="mt-16 grid gap-8 lg:grid-cols-12 lg:gap-14">
+      <div class="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-10">
         <div class="lg:col-span-4">
-          <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 05.1 · Re-check</p>
-          <h3 class="mt-2 font-display text-[clamp(28px,3vw,40px)] font-medium leading-[1.1] text-slate-100">Then we check again, 24 hours later</h3>
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Re-check</p>
+          <h3 class="mt-2 text-[clamp(24px,3vw,34px)] font-extrabold leading-[1.1] tracking-tight text-ink">Then we check again, 24 hours later</h3>
         </div>
-        <ol class="grid gap-px border-y border-slate-800 bg-slate-800 sm:grid-cols-3 lg:col-span-8">
-          <li class="min-w-0 bg-base py-5 sm:pr-5"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">01</span><b class="mt-2 block font-mono text-[14px] font-medium text-slate-100">Day one</b><span class="mt-1.5 block text-slate-400">The collection is measured, scored and given a status.</span></li>
-          <li class="min-w-0 bg-base py-5 sm:px-5"><span class="block font-mono text-[11px] tracking-[0.2em] text-slate-400">02</span><b class="mt-2 block font-mono text-[14px] font-medium text-slate-100">24 hours later</b><span class="mt-1.5 block text-slate-400">Active ads and reach are measured again, and the collection link is tested.</span></li>
-          <li class="min-w-0 bg-base py-5 sm:pl-5"><span class="block font-mono text-[11px] tracking-[0.2em] text-ok">03</span><b class="mt-2 block font-mono text-[14px] font-medium text-slate-100">The result</b><span class="mt-1.5 block text-slate-400">If the ads hold, it is confirmed. If they fall or the link fails, its status is downgraded.</span></li>
+        <ol class="grid gap-4 sm:grid-cols-3 lg:col-span-8">
+          <li class="card min-w-0 p-5"><span class="text-[12px] font-bold text-ink-3">Day 1</span><b class="mt-1.5 block text-[16px] font-bold text-ink">Day one</b><span class="mt-1 block text-[14px] text-ink-2">The collection is measured, scored and given a status.</span></li>
+          <li class="card min-w-0 p-5"><span class="text-[12px] font-bold text-ink-3">Day 2</span><b class="mt-1.5 block text-[16px] font-bold text-ink">24 hours later</b><span class="mt-1 block text-[14px] text-ink-2">Active ads and reach are measured again, and the collection link is tested.</span></li>
+          <li class="card min-w-0 border-brand/40 p-5"><span class="text-[12px] font-bold text-brand-dark">Result</span><b class="mt-1.5 block text-[16px] font-bold text-ink">The result</b><span class="mt-1 block text-[14px] text-ink-2">If the ads hold, it is confirmed. If they fall or the link fails, its status is downgraded.</span></li>
         </ol>
       </div>
     </div>
   </section>
 
   <!-- markets -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="markets">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 06 · Markets</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Six markets, measured separately</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">A collection can be strong in one country and weak in another. Advertising activity and search demand are read for each market, so you know where to start.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="markets">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Markets</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Six markets, measured separately</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">A collection can be strong in one country and weak in another. Advertising activity and search demand are read for each market, so you know where to start.</p>
       </div>
-      <ul class="border-t border-slate-800" id="mkList">
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="IT"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">Italy</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400 md:order-none">Searches in Italian</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="ES"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">Spain</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Searches in Spanish</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="FR"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">France</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Searches in French</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="DE"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">Germany</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Searches in German</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="GB"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">United Kingdom</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Searches in English</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
-        <li class="grid items-baseline gap-x-6 gap-y-1 border-b border-slate-800 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="US"><span class="font-display text-[clamp(28px,3vw,42px)] font-medium leading-[1.1] text-slate-100">United States</span><span class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400">Searches in English</span><span class="state col-span-full font-mono text-[12px] text-slate-400 empty:hidden md:col-span-1"></span></li>
+      <ul class="card divide-y divide-line px-5 md:px-7" id="mkList">
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="IT"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">Italy</span><span class="text-[13px] font-medium text-ink-3">Searches in Italian</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="ES"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">Spain</span><span class="text-[13px] font-medium text-ink-3">Searches in Spanish</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="FR"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">France</span><span class="text-[13px] font-medium text-ink-3">Searches in French</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="DE"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">Germany</span><span class="text-[13px] font-medium text-ink-3">Searches in German</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="GB"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">United Kingdom</span><span class="text-[13px] font-medium text-ink-3">Searches in English</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
+        <li class="grid items-baseline gap-x-6 gap-y-1 py-4 grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]" data-mk="US"><span class="text-[22px] font-extrabold tracking-tight text-ink md:text-[26px]">United States</span><span class="text-[13px] font-medium text-ink-3">Searches in English</span><span class="state col-span-full text-[13px] font-semibold text-ink-2 empty:hidden md:col-span-1"></span></li>
       </ul>
-      <p class="mt-5 max-w-[72ch] font-mono text-[12px] leading-relaxed text-slate-400">EU reach comes from Meta’s EU ad transparency data, which does not cover the UK or the US.</p>
-      <p class="mt-2 max-w-[72ch] font-mono text-[12px] leading-relaxed text-slate-400">Also tracked: Netherlands, Austria, Switzerland, Hungary.</p>
+      <p class="mt-4 max-w-[72ch] text-[13px] text-ink-2">EU reach comes from Meta’s EU ad transparency data, which does not cover the UK or the US.</p>
+      <p class="mt-1 max-w-[72ch] text-[13px] text-ink-2">Also tracked: Netherlands, Austria, Switzerland, Hungary.</p>
     </div>
   </section>
 
   <!-- niches -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="niches">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 07 · Niches</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Four niches, one collection each</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">The research looks for one strong collection per niche, from generic stores rather than brands with their own designs.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="niches">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Niches</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Four niches, one collection each</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">The research looks for one strong collection per niche, from generic stores rather than brands with their own designs.</p>
       </div>
-      <ul class="grid gap-px border border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4">
-        <li class="niche flex min-w-0 flex-col gap-6 bg-base p-6 lg:min-h-[320px]" data-niche="Joalharia">
-          <svg class="size-8 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>
-          <div class="mt-auto"><h3 class="font-display text-[clamp(30px,3vw,42px)] font-medium leading-[1.05] text-slate-100">Women’s jewellery</h3><ul class="mt-3 grid gap-1 font-mono text-[12px] leading-snug text-slate-400 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">IT</span><span>gioielli, orecchini</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">FR</span><span>bijoux</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">DE</span><span>Schmuck</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">ES</span><span>pendientes</span></li></ul><p class="count mt-3 border-t border-slate-800 pt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400 empty:hidden" id="cntJoalharia"></p></div>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <li class="niche card flex min-w-0 flex-col gap-5 p-6" data-niche="Joalharia">
+          <span class="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg></span>
+          <div><h3 class="text-[22px] font-extrabold leading-tight tracking-tight text-ink">Women’s jewellery</h3><ul class="mt-3 grid gap-1 text-[13px] text-ink-2 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">IT</span><span>gioielli, orecchini</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">FR</span><span>bijoux</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">DE</span><span>Schmuck</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">ES</span><span>pendientes</span></li></ul><p class="count mt-3 border-t border-line pt-3 text-[13px] font-semibold text-brand-dark empty:hidden" id="cntJoalharia"></p></div>
         </li>
-        <li class="niche flex min-w-0 flex-col gap-6 bg-base p-6 lg:min-h-[320px]" data-niche="House Decor">
-          <svg class="size-8 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M8 2h8l4 10H4L8 2Z"/><path d="M12 12v6"/><path d="M8 22v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2H8Z"/></svg>
-          <div class="mt-auto"><h3 class="font-display text-[clamp(30px,3vw,42px)] font-medium leading-[1.05] text-slate-100">Home decoration</h3><ul class="mt-3 grid gap-1 font-mono text-[12px] leading-snug text-slate-400 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">IT</span><span>decorazioni casa</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">FR</span><span>déco maison</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">DE</span><span>Deko</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">ES</span><span>decoración</span></li></ul><p class="count mt-3 border-t border-slate-800 pt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400 empty:hidden" id="cntHouseDecor"></p></div>
+        <li class="niche card flex min-w-0 flex-col gap-5 p-6" data-niche="House Decor">
+          <span class="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8l4 10H4L8 2Z"/><path d="M12 12v6"/><path d="M8 22v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2H8Z"/></svg></span>
+          <div><h3 class="text-[22px] font-extrabold leading-tight tracking-tight text-ink">Home decoration</h3><ul class="mt-3 grid gap-1 text-[13px] text-ink-2 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">IT</span><span>decorazioni casa</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">FR</span><span>déco maison</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">DE</span><span>Deko</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">ES</span><span>decoración</span></li></ul><p class="count mt-3 border-t border-line pt-3 text-[13px] font-semibold text-brand-dark empty:hidden" id="cntHouseDecor"></p></div>
         </li>
-        <li class="niche flex min-w-0 flex-col gap-6 bg-base p-6 lg:min-h-[320px]" data-niche="Roupa Feminina">
-          <svg class="size-8 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 2 7 4 3 6l1 8h3v8h10v-8h3l1-8-4-2-2-2"/><path d="M9 2a3 3 0 0 0 6 0"/><path d="M12 8v14"/><path d="M9 2 7 14M15 2l2 12"/></svg>
-          <div class="mt-auto"><h3 class="font-display text-[clamp(30px,3vw,42px)] font-medium leading-[1.05] text-slate-100">Women’s fashion</h3><ul class="mt-3 grid gap-1 font-mono text-[12px] leading-snug text-slate-400 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">IT</span><span>cappotti, maglioni donna</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">FR</span><span>manteau femme</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">DE</span><span>Damen</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">ES</span><span>abrigos</span></li></ul><p class="count mt-3 border-t border-slate-800 pt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400 empty:hidden" id="cntRoupaFeminina"></p></div>
+        <li class="niche card flex min-w-0 flex-col gap-5 p-6" data-niche="Roupa Feminina">
+          <span class="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2 7 4 3 6l1 8h3v8h10v-8h3l1-8-4-2-2-2"/><path d="M9 2a3 3 0 0 0 6 0"/><path d="M12 8v14"/><path d="M9 2 7 14M15 2l2 12"/></svg></span>
+          <div><h3 class="text-[22px] font-extrabold leading-tight tracking-tight text-ink">Women’s fashion</h3><ul class="mt-3 grid gap-1 text-[13px] text-ink-2 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">IT</span><span>cappotti, maglioni donna</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">FR</span><span>manteau femme</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">DE</span><span>Damen</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">ES</span><span>abrigos</span></li></ul><p class="count mt-3 border-t border-line pt-3 text-[13px] font-semibold text-brand-dark empty:hidden" id="cntRoupaFeminina"></p></div>
         </li>
-        <li class="niche flex min-w-0 flex-col gap-6 bg-base p-6 lg:min-h-[320px]" data-niche="Roupa Masculina">
-          <svg class="size-8 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M8 2 4 4l-2 9h4v9h12v-9h4L20 4l-4-2"/><path d="M8 2l4 6 4-6"/><path d="M12 8v14"/><path d="M6 15h2M16 15h2"/></svg>
-          <div class="mt-auto"><h3 class="font-display text-[clamp(30px,3vw,42px)] font-medium leading-[1.05] text-slate-100">Men’s fashion</h3><ul class="mt-3 grid gap-1 font-mono text-[12px] leading-snug text-slate-400 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">IT</span><span>giacche uomo</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">FR</span><span>veste homme</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">DE</span><span>Herren Jacken</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="text-[10px] text-slate-400">ES</span><span>chaquetas hombre</span></li></ul><p class="count mt-3 border-t border-slate-800 pt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400 empty:hidden" id="cntRoupaMasculina"></p></div>
+        <li class="niche card flex min-w-0 flex-col gap-5 p-6" data-niche="Roupa Masculina">
+          <span class="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2 4 4l-2 9h4v9h12v-9h4L20 4l-4-2"/><path d="M8 2l4 6 4-6"/><path d="M12 8v14"/><path d="M6 15h2M16 15h2"/></svg></span>
+          <div><h3 class="text-[22px] font-extrabold leading-tight tracking-tight text-ink">Men’s fashion</h3><ul class="mt-3 grid gap-1 text-[13px] text-ink-2 max-sm:hidden" aria-label="Search terms used for this niche"><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">IT</span><span>giacche uomo</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">FR</span><span>veste homme</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">DE</span><span>Herren Jacken</span></li><li class="grid grid-cols-[2.6ch_minmax(0,1fr)] gap-2"><span class="font-bold text-ink-3">ES</span><span>chaquetas hombre</span></li></ul><p class="count mt-3 border-t border-line pt-3 text-[13px] font-semibold text-brand-dark empty:hidden" id="cntRoupaMasculina"></p></div>
         </li>
       </ul>
     </div>
   </section>
 
   <!-- launch kit -->
-  <section class="scroll-mt-16 border-t border-slate-800 bg-panel py-16 md:py-24" id="kit">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 08 · Launch Kit</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Every collection in the daily list ships as a Launch Kit</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">Research tells you what to launch. The Launch Kit gives you what you need to launch it: creative prompts, visual references and the Google Ads material, prepared for the collection’s strongest market. Approved and under observation alike, each one clearly labelled.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="kit">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Launch Kit</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Every collection in the daily list ships as a Launch Kit</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">Research tells you what to launch. The Launch Kit gives you what you need to launch it: creative prompts, visual references and the Google Ads material, prepared for the collection’s strongest market. Approved and under observation alike, each one clearly labelled.</p>
       </div>
-      <ul class="grid gap-px border border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4" aria-label="What a Launch Kit contains">
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Creative production</span><span class="mt-auto font-display text-[clamp(60px,5.8vw,88px)] font-medium leading-[0.9] tracking-tight text-slate-100">20</span><b class="font-mono text-[13px] font-medium text-slate-100">Advertising image prompts</b><span class="text-[14px] text-slate-400">Ready to paste into your image model, one per creative angle.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Creative production</span><span class="mt-auto font-display text-[clamp(60px,5.8vw,88px)] font-medium leading-[0.9] tracking-tight text-slate-100">4</span><b class="font-mono text-[13px] font-medium text-slate-100">UGC video prompts</b><span class="text-[14px] text-slate-400">Script and visual direction for four short-form videos.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Creative production</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><rect x="3" y="4" width="18" height="16"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Visual references</b><span class="text-[14px] text-slate-400">Competitor photographs to guide your creatives and your supplier search. References only.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Research</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Opportunity analysis</b><span class="text-[14px] text-slate-400">The complete research behind the decision: evidence, demand, markets and risks.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Campaign preparation</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Google Ads keywords</b><span class="text-[14px] text-slate-400">Search terms in the language of the market where the collection performs.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Campaign preparation</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Negative keywords</b><span class="text-[14px] text-slate-400">What to exclude so the budget is not spent on the wrong searches.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Campaign preparation</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Shopping titles</b><span class="text-[14px] text-slate-400">Product titles written for Google Shopping listings.</span></li>
-        <li class="flex min-w-0 flex-col gap-2 bg-panel p-6 lg:min-h-[230px]"><span class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Campaign preparation</span><span class="mt-auto text-slate-400"><svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="square" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><path d="M3 9h18M8 14h8"/></svg></span><b class="font-mono text-[13px] font-medium text-slate-100">Landing-page copy</b><span class="text-[14px] text-slate-400">Headline and copy for the page your ads send people to.</span></li>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="What a Launch Kit contains">
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Creative production</span><span class="mt-3 text-[56px] font-extrabold leading-none tracking-tight text-ink">20</span><b class="mt-1 text-[15px] font-bold text-ink">Advertising image prompts</b><span class="text-[14px] text-ink-2">Ready to paste into your image model, one per creative angle.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Creative production</span><span class="mt-3 text-[56px] font-extrabold leading-none tracking-tight text-ink">4</span><b class="mt-1 text-[15px] font-bold text-ink">UGC video prompts</b><span class="text-[14px] text-ink-2">Script and visual direction for four short-form videos.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Creative production</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Visual references</b><span class="text-[14px] text-ink-2">Competitor photographs to guide your creatives and your supplier search. References only.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Research</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Opportunity analysis</b><span class="text-[14px] text-ink-2">The complete research behind the decision: evidence, demand, markets and risks.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Campaign preparation</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Google Ads keywords</b><span class="text-[14px] text-ink-2">Search terms in the language of the market where the collection performs.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Campaign preparation</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Negative keywords</b><span class="text-[14px] text-ink-2">What to exclude so the budget is not spent on the wrong searches.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Campaign preparation</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Shopping titles</b><span class="text-[14px] text-ink-2">Product titles written for Google Shopping listings.</span></li>
+        <li class="card flex min-w-0 flex-col gap-2 p-6"><span class="text-[12px] font-bold text-brand-dark">Campaign preparation</span><span class="mt-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand-dark"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M8 14h8"/></svg></span><b class="mt-1 text-[15px] font-bold text-ink">Landing-page copy</b><span class="text-[14px] text-ink-2">Headline and copy for the page your ads send people to.</span></li>
       </ul>
 
-      <div class="mt-12 grid gap-8 lg:grid-cols-12 lg:gap-14">
-        <div class="border border-slate-800 lg:col-span-7">
-          <div class="flex justify-between gap-3 border-b border-slate-800 px-4 py-3 font-mono text-[12px]"><span class="font-medium text-slate-100">Collection.zip</span><span class="whitespace-nowrap uppercase tracking-[0.14em] text-slate-400">Real kit structure</span></div>
-          <ul class="divide-y divide-slate-800">
-            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3.5"><svg class="mt-0.5 text-slate-400" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="font-mono text-[13px] font-medium text-slate-100">LEIA-ME.txt</b><span class="col-start-2 text-[14px] text-slate-400">One page: the collection, where to sell it, pricing and the first three steps.</span></li>
-            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3.5"><svg class="mt-0.5 text-slate-400" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b class="font-mono text-[13px] font-medium text-slate-100">1 - Imagens</b><span class="col-start-2 text-[14px] text-slate-400">Reference photographs and the instructions for generating 20 advertising images.</span></li>
-            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3.5"><svg class="mt-0.5 text-slate-400" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b class="font-mono text-[13px] font-medium text-slate-100">2 - Videos</b><span class="col-start-2 text-[14px] text-slate-400">A reference photograph and a ready prompt for each of 4 UGC videos.</span></li>
-            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3.5"><svg class="mt-0.5 text-slate-400" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="font-mono text-[13px] font-medium text-slate-100">3 - Google Ads.txt</b><span class="col-start-2 text-[14px] text-slate-400">Keywords, negative keywords, Shopping titles and landing-page copy.</span></li>
-            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-1 px-4 py-3.5"><svg class="mt-0.5 text-slate-400" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="font-mono text-[13px] font-medium text-slate-100">Analise completa.md</b><span class="col-start-2 text-[14px] text-slate-400">The complete research analysis for the collection.</span></li>
+      <div class="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
+        <div class="card overflow-hidden lg:col-span-7">
+          <div class="flex justify-between gap-3 border-b border-line bg-page/60 px-5 py-3 text-[13px]"><span class="font-bold text-ink">Collection.zip</span><span class="whitespace-nowrap font-semibold text-ink-3">Real kit structure</span></div>
+          <ul class="divide-y divide-line">
+            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-0.5 px-5 py-3.5"><svg class="mt-0.5 text-brand" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="text-[14px] font-bold text-ink">LEIA-ME.txt</b><span class="col-start-2 text-[14px] text-ink-2">One page: the collection, where to sell it, pricing and the first three steps.</span></li>
+            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-0.5 px-5 py-3.5"><svg class="mt-0.5 text-brand" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b class="text-[14px] font-bold text-ink">1 - Imagens</b><span class="col-start-2 text-[14px] text-ink-2">Reference photographs and the instructions for generating 20 advertising images.</span></li>
+            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-0.5 px-5 py-3.5"><svg class="mt-0.5 text-brand" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 5h6l2 2h8v10H2Z"/></svg><b class="text-[14px] font-bold text-ink">2 - Videos</b><span class="col-start-2 text-[14px] text-ink-2">A reference photograph and a ready prompt for each of 4 UGC videos.</span></li>
+            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-0.5 px-5 py-3.5"><svg class="mt-0.5 text-brand" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="text-[14px] font-bold text-ink">3 - Google Ads.txt</b><span class="col-start-2 text-[14px] text-ink-2">Keywords, negative keywords, Shopping titles and landing-page copy.</span></li>
+            <li class="grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 gap-y-0.5 px-5 py-3.5"><svg class="mt-0.5 text-brand" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 2h7l4 4v12H5Z"/><path d="M12 2v4h4"/></svg><b class="text-[14px] font-bold text-ink">Analise completa.md</b><span class="col-start-2 text-[14px] text-ink-2">The complete research analysis for the collection.</span></li>
           </ul>
         </div>
-        <div class="grid content-start gap-5 lg:col-span-5">
-          <div class="border border-watch/50 p-5 text-[14px] text-slate-300"><b class="mb-1 block font-mono text-[11px] uppercase tracking-[0.16em] text-watch">Competitor photographs are references only</b>Use them to generate your own creatives and to find the products with your supplier. Never publish them in your ads.</div>
-          <p class="font-mono text-[12px] leading-relaxed text-slate-400">Kit documents are currently written in Portuguese. File names above match the real kit. Prompts are written for the AI image and video tools you already use; ProvenDrop does not run your campaigns.</p>
+        <div class="grid content-start gap-4 lg:col-span-5">
+          <div class="rounded-2xl border border-amber-200 bg-watch-soft p-5 text-[14px] text-ink"><b class="mb-1 block text-[13px] font-bold text-watch">Competitor photographs are references only</b>Use them to generate your own creatives and to find the products with your supplier. Never publish them in your ads.</div>
+          <p class="text-[13px] leading-relaxed text-ink-2">Kit documents are currently written in Portuguese. File names above match the real kit. Prompts are written for the AI image and video tools you already use; ProvenDrop does not run your campaigns.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- delivery -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="delivery">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 09 · Delivery</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Where you receive it</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">In your member area and in your e-mail, every day at <span class="font-mono text-[17px]" data-fill="hour">[HOUR]</span>. You sign in through the link we send you by e-mail, with no password to remember. The area holds today’s collections, the kits to download and the complete archive.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="delivery">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Delivery</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Where you receive it</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">In your member area and in your e-mail, every day at <span class="font-bold text-ink" data-fill="hour">[HOUR]</span>. You sign in through the link we send you by e-mail, with no password to remember. The area holds today’s collections, the kits to download and the complete archive.</p>
       </div>
-      <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
-        <div class="w-full max-w-[440px] border border-slate-800 bg-panel max-lg:mx-auto lg:col-span-5" role="img" aria-label="Example of the daily e-mail: one line per collection with numbers only, and a button that opens the member area">
-          <div class="flex items-center gap-3 border-b border-slate-800 px-4 py-3"><div class="grid size-8 shrink-0 place-items-center bg-slate-100 font-mono text-[12px] font-semibold text-base" aria-hidden="true">P</div><div><div class="font-mono text-[12px] font-medium text-slate-100">ProvenDrop · daily e-mail</div><div class="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400">Example</div></div></div>
-          <div class="grid gap-3 p-4">
-            <div class="min-w-0 whitespace-pre-wrap border border-slate-800 bg-base px-3.5 py-3 font-mono text-[12.5px] leading-[1.6] text-slate-200 [overflow-wrap:anywhere]" id="waMsg">Today’s collections
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <div class="card-deep w-full max-w-[440px] overflow-hidden max-lg:mx-auto lg:col-span-5" role="img" aria-label="Example of the daily e-mail: one line per collection with numbers only, and a button that opens the member area">
+          <div class="flex items-center gap-3 border-b border-white/10 px-5 py-4"><div class="grid size-9 shrink-0 place-items-center rounded-xl bg-brand text-[14px] font-extrabold text-white" aria-hidden="true">P</div><div><div class="text-[14px] font-bold text-white">ProvenDrop · daily e-mail</div><div class="text-[12px] text-white/50">Example</div></div></div>
+          <div class="grid gap-3 p-5">
+            <div class="min-w-0 whitespace-pre-wrap rounded-xl bg-white/5 px-4 py-3 text-[13.5px] leading-[1.6] text-white/90 [overflow-wrap:anywhere]" id="waMsg">Today’s collections
 
 <span class="dot go"></span><span class="redact" style="width:9em" aria-hidden="true"></span> · ES
 <span class="redact" style="width:1.5em" aria-hidden="true"></span> ads · <span class="redact" style="width:1.5em" aria-hidden="true"></span> days · <span class="redact" style="width:3em" aria-hidden="true"></span> people · kit ready
 
 <span class="dot watch"></span><span class="redact" style="width:7em" aria-hidden="true"></span> · FR
 under observation · <span class="redact" style="width:1.5em" aria-hidden="true"></span> ads · kit ready<span class="time" data-fill="hour">[HOUR]</span></div>
-            <div class="border border-slate-800 bg-base px-3.5 py-3"><span class="inline-block border border-slate-100 bg-slate-100 px-3 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-base">Open today’s collections</span><span class="time" data-fill="hour">[HOUR]</span></div>
+            <div class="rounded-xl bg-white/5 px-4 py-3"><span class="inline-block rounded-lg bg-brand px-3.5 py-2 text-[13px] font-bold text-white">Open today’s collections</span><span class="time" data-fill="hour">[HOUR]</span></div>
           </div>
         </div>
         <div class="lg:col-span-7">
-          <div class="border-t border-slate-700 pt-5">
-            <span class="mb-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-ok">Member area</span>
-            <h3 class="font-display text-[clamp(26px,2.4vw,34px)] font-medium leading-[1.1] text-slate-100">Everything in one place, behind your sign-in</h3>
-            <p class="mt-3 text-slate-400">Store links and kits are never in the e-mail: only the day’s summary. They live in the member area, after you sign in.</p>
-            <div class="mt-5 grid gap-px border border-slate-800 bg-slate-800 sm:grid-cols-2">
-              <div class="bg-base p-4"><b class="block font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-100">Today</b><span class="mt-1 block text-[14px] text-slate-400">The day’s collections with their proof, the collection link and the kit download.</span></div>
-              <div class="bg-base p-4"><b class="block font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-100">Archive</b><span class="mt-1 block text-[14px] text-slate-400">Every approved collection, filtered by niche, country and whether it is still advertised.</span></div>
-              <div class="bg-base p-4"><b class="block font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-100">Preferences</b><span class="mt-1 block text-[14px] text-slate-400">Your niche and your countries, so what matters to you comes first.</span></div>
-              <div class="bg-base p-4"><b class="block font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-slate-100">Manage subscription</b><span class="mt-1 block text-[14px] text-slate-400">Change your card or cancel, whenever you want.</span></div>
+          <div>
+            <span class="mb-2 block text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</span>
+            <h3 class="text-[clamp(24px,2.6vw,32px)] font-extrabold leading-[1.1] tracking-tight text-ink">Everything in one place, behind your sign-in</h3>
+            <p class="mt-3 text-ink-2">Store links and kits are never in the e-mail: only the day’s summary. They live in the member area, after you sign in.</p>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Today</b><span class="mt-1 block text-[14px] text-ink-2">The day’s collections with their proof, the collection link and the kit download.</span></div>
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Archive</b><span class="mt-1 block text-[14px] text-ink-2">Every approved collection, filtered by niche, country and whether it is still advertised.</span></div>
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Preferences</b><span class="mt-1 block text-[14px] text-ink-2">Your niche and your countries, so what matters to you comes first.</span></div>
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Manage subscription</b><span class="mt-1 block text-[14px] text-ink-2">Change your card or cancel, whenever you want.</span></div>
             </div>
           </div>
-          <div class="mt-10 border-t border-slate-700 pt-5">
-            <span class="mb-2 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">Click Dynamics customers</span>
-            <h3 class="font-display text-[clamp(26px,2.4vw,34px)] font-medium leading-[1.1] text-slate-100">Are you a Click customer?</h3>
-            <p class="mt-3 text-slate-400">Your access is through the Click WhatsApp group. You do not need to subscribe here.</p>
+          <div class="mt-8 rounded-2xl border border-line bg-white/60 p-5">
+            <span class="mb-1 block text-[12px] font-bold uppercase tracking-[0.14em] text-ink-3">Click Dynamics customers</span>
+            <h3 class="text-[20px] font-bold tracking-tight text-ink">Are you a Click customer?</h3>
+            <p class="mt-1.5 text-[14px] text-ink-2">Your access is through the Click WhatsApp group. You do not need to subscribe here.</p>
           </div>
         </div>
       </div>
@@ -394,120 +398,121 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
   </section>
 
   <!-- exclusivity -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="exclusivity">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
+  <section class="scroll-mt-16 py-14 md:py-20" id="exclusivity">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="card grid gap-8 p-6 md:p-10 lg:grid-cols-12 lg:gap-14">
         <div class="lg:col-span-7">
-          <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 10 · Priority</p>
-          <h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Your niche and your countries first</h2>
-          <p class="mt-6 font-display text-[21px] leading-[1.35] text-slate-400">When you join, you tell us your niche and the countries you sell in. The collections that match come first in your member area and in your daily e-mail; the others stay visible.</p>
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Priority</p>
+          <h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Your niche and your countries first</h2>
+          <p class="mt-4 text-[17px] leading-relaxed text-ink-2">When you join, you tell us your niche and the countries you sell in. The collections that match come first in your member area and in your daily e-mail; the others stay visible.</p>
         </div>
         <figure class="min-w-0 lg:col-span-5">
-          <table class="w-full table-fixed border-separate border-spacing-px bg-slate-800 font-mono" role="img" aria-label="Diagram: memberships are limited per combination of niche and country. One example combination, women’s jewellery in France, is highlighted.">
-            <thead><tr><th class="w-[26%] bg-base"></th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">IT</th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">ES</th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">FR</th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">DE</th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">GB</th><th class="bg-base p-1 text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">US</th></tr></thead>
+          <table class="w-full table-fixed border-separate border-spacing-1" role="img" aria-label="Diagram: memberships are limited per combination of niche and country. One example combination, women’s jewellery in France, is highlighted.">
+            <thead><tr><th class="w-[26%]"></th><th class="p-1 text-[12px] font-bold text-ink-3">IT</th><th class="p-1 text-[12px] font-bold text-ink-3">ES</th><th class="p-1 text-[12px] font-bold text-ink-3">FR</th><th class="p-1 text-[12px] font-bold text-ink-3">DE</th><th class="p-1 text-[12px] font-bold text-ink-3">GB</th><th class="p-1 text-[12px] font-bold text-ink-3">US</th></tr></thead>
             <tbody>
-              <tr><th class="overflow-hidden bg-base pr-2 text-left text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">Jewellery</th><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-slate-100 md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td></tr>
-              <tr><th class="overflow-hidden bg-base pr-2 text-left text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">Home</th><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td></tr>
-              <tr><th class="overflow-hidden bg-base pr-2 text-left text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">Women’s</th><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td></tr>
-              <tr><th class="overflow-hidden bg-base pr-2 text-left text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">Men’s</th><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td><td class="h-10 bg-base md:h-12"></td></tr>
+              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Jewellery</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-brand md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
+              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Home</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
+              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Women’s</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
+              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Men’s</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
             </tbody>
           </table>
-          <figcaption class="mt-3 font-mono text-[12px] text-slate-400">Each square is one combination. Example highlighted: jewellery in France.</figcaption>
+          <figcaption class="mt-3 text-[13px] text-ink-2">Each square is one combination. Example highlighted: jewellery in France.</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
   <!-- access -->
-  <section class="scroll-mt-16 border-t border-slate-800 bg-panel py-16 md:py-24" id="join">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="mb-10 grid gap-6 border-b border-slate-800 pb-8 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 11 · Access</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Access</h2></div>
-        <p class="font-display text-[21px] leading-[1.35] text-slate-400 lg:col-span-5">One subscription, everything above, every day. No minimum term.</p>
+  <section class="scroll-mt-16 py-14 md:py-20" id="join">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Access</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Access</h2></div>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">One subscription, everything above, every day. No minimum term.</p>
       </div>
-      <div class="grid gap-10 lg:grid-cols-12 lg:gap-16">
-        <article class="flex min-w-0 flex-col gap-5 border border-slate-800 border-t-2 border-t-slate-100 bg-base p-6 md:p-9 lg:col-span-7" aria-labelledby="planName">
-          <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">ProvenDrop</p>
-          <h3 class="font-display text-[clamp(30px,3vw,42px)] font-medium leading-[1.05] text-slate-100" id="planName">Daily collections and Launch Kits</h3>
+      <div class="grid gap-6 lg:grid-cols-12 lg:gap-10">
+        <article class="card relative flex min-w-0 flex-col gap-5 overflow-hidden p-6 md:p-9 lg:col-span-7" aria-labelledby="planName">
+          <span class="absolute inset-x-0 top-0 h-1.5 bg-brand" aria-hidden="true"></span>
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">ProvenDrop</p>
+          <h3 class="text-[clamp(26px,3vw,36px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="planName">Daily collections and Launch Kits</h3>
           <!-- Price: filled from config.js (PRICE_MONTHLY / PRICE_JOINING). Must match the Stripe prices. -->
-          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-slate-800 pt-5"><span class="font-mono text-[clamp(44px,4.4vw,60px)] font-medium leading-[0.9] tracking-tight tabular-nums text-slate-100">€<span data-fill="price-monthly">15</span></span><small class="font-mono text-[12px] uppercase tracking-[0.14em] text-slate-400">/ month</small><span class="basis-full font-mono text-[12px] text-slate-400" id="feeLine">€<span data-fill="price-joining">25</span> joining fee with your first subscription</span></div>
-          <ul class="grid gap-2.5 border-t border-slate-800 pt-5 text-[14.5px] text-slate-300">
-            <li class="grid grid-cols-[14px_minmax(0,1fr)] gap-3"><svg class="mt-1.5 text-ok" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Validated collections every day</li>
-            <li class="grid grid-cols-[14px_minmax(0,1fr)] gap-3"><svg class="mt-1.5 text-ok" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Launch Kit with every collection in the daily list — approved and under observation (clearly labelled)</li>
-            <li class="grid grid-cols-[14px_minmax(0,1fr)] gap-3"><svg class="mt-1.5 text-ok" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Complete archive and the status of each collection</li>
-            <li class="grid grid-cols-[14px_minmax(0,1fr)] gap-3"><svg class="mt-1.5 text-ok" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg>Cancel whenever you want</li>
+          <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-5"><span class="text-[clamp(44px,4.4vw,60px)] font-extrabold leading-[0.9] tracking-tight tabular-nums text-ink">€<span data-fill="price-monthly">15</span></span><small class="text-[14px] font-semibold text-ink-2">/ month</small><span class="basis-full text-[14px] font-medium text-ink-2" id="feeLine">€<span data-fill="price-joining">25</span> joining fee with your first subscription</span></div>
+          <ul class="grid gap-2.5 border-t border-line pt-5 text-[15px] text-ink">
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span>Validated collections every day</li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span>Launch Kit with every collection in the daily list — approved and under observation (clearly labelled)</li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span>Complete archive and the status of each collection</li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span>Cancel whenever you want</li>
           </ul>
           <a class="btn btn-go mt-auto w-full" id="btnSubscribe" aria-disabled="true">Subscribe</a>
-          <p class="font-mono text-[12px] text-slate-400" id="noteSubscribe">Subscriptions are not open on this page yet.</p>
-          <p class="font-mono text-[12px] text-slate-400 [&_a]:underline [&_a]:underline-offset-4" id="noteContact" hidden></p>
+          <p class="text-[13px] text-ink-2" id="noteSubscribe">Subscriptions are not open on this page yet.</p>
+          <p class="text-[13px] text-ink-2 [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4" id="noteContact" hidden></p>
         </article>
-        <aside class="border-t border-slate-700 pt-5 lg:col-span-5">
-          <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-100">Are you a Click customer?</h3>
-          <p class="mt-2 text-slate-400">Your access is through the Click WhatsApp group. You do not need to subscribe here.</p>
-          <h3 class="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-100">Coming back later?</h3>
-          <p class="mt-2 text-slate-400">If you cancel and return, you only pay the monthly fee: the joining fee is charged on your first subscription only.</p>
-          <h3 class="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-100">Already a member?</h3>
-          <p class="mt-2 text-slate-400"><a class="underline decoration-slate-600 underline-offset-4 hover:text-slate-100" href="app.html">Sign in to your member area</a>.</p>
+        <aside class="grid content-start gap-3 lg:col-span-5">
+          <div class="card p-5"><h3 class="text-[15px] font-bold text-ink">Are you a Click customer?</h3><p class="mt-1.5 text-[14px] text-ink-2">Your access is through the Click WhatsApp group. You do not need to subscribe here.</p></div>
+          <div class="card p-5"><h3 class="text-[15px] font-bold text-ink">Coming back later?</h3><p class="mt-1.5 text-[14px] text-ink-2">If you cancel and return, you only pay the monthly fee: the joining fee is charged on your first subscription only.</p></div>
+          <div class="card p-5"><h3 class="text-[15px] font-bold text-ink">Already a member?</h3><p class="mt-1.5 text-[14px] text-ink-2"><a class="font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:decoration-brand" href="app.html">Sign in to your member area</a>.</p></div>
         </aside>
       </div>
     </div>
   </section>
 
   <!-- faq -->
-  <section class="scroll-mt-16 border-t border-slate-800 py-16 md:py-24" id="faq">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <div class="grid gap-8 lg:grid-cols-12 lg:gap-16">
-        <div class="lg:col-span-4"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ 12 · Questions</p><h2 class="mt-3 font-display text-[clamp(36px,4.6vw,64px)] font-medium leading-[1.02] tracking-[-0.01em] text-slate-100">Questions</h2></div>
-        <div class="faq border-t border-slate-800 lg:col-span-8">
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">What exactly is ProvenDrop?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">An ecommerce market intelligence service with three components: product research and market validation, AI-powered creative production, and advertising campaign preparation. We discover collections from generic stores already advertising on Meta and Google in international markets, validate them, and deliver each one as a Launch Kit. It is not a store, a product catalogue or an advertising agency.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Do I receive it on WhatsApp?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">No. A subscription on this website is individual: you receive everything in your member area and by e-mail. WhatsApp is only for Click Dynamics customers.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">What time do the collections arrive?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Every day at <span class="font-mono text-[13px] text-slate-200" data-fill="hour">[HOUR]</span>, weekends included.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">What if there is no approved collection one day?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">You receive the best collections still under observation, always labelled as such, and each one comes with its Launch Kit so you can test it with a small budget. We never show a collection as approved before it has passed the next-day confirmation.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Do you ever send brands or manufacturers?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">No. Every store is checked on the day it is scored: only generic (dropshipping) stores make the list. If a store shows any sign of being a brand or a manufacturer, it is excluded.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Will I get the same collection twice?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">No. A collection is sent once. The only exception: a collection under observation that later passes the check is sent once more as approved.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Why Google as well as Meta?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Many of the collections that are selling right now advertise only on Google Shopping and YouTube. We track both, so you don’t miss them.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">How are collections validated?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Each candidate is scored on 13 metrics across advertising evidence (Meta and Google), search demand, store and collection quality, and risk. Brands and manufacturers are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">How many collections do I receive?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Normally 1 to 4 a day, one per niche whenever possible. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Which countries and niches are covered?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Italy, Spain, France, Germany, the United Kingdom and the United States. Four niches: women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">What is included in the Launch Kit?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">A one-page guide, reference photographs, prompts for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete opportunity analysis. The photographs are references only and must not be published in ads.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Do you run my campaigns or produce my creatives?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">No. The Launch Kit gives you the prompts, references and Google Ads material; you generate the images and videos with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Can I cancel?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">Yes, whenever you want, in your member area (“Manage subscription”). There is no minimum term.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">How much does it cost?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400" id="faqPrice">€<span data-fill="price-monthly">15</span> a month<span data-if-joining>, plus a €<span data-fill="price-joining">25</span> joining fee charged with your first payment. If you cancel and come back later, you pay the monthly fee only</span>.</p></details>
-          <details class="border-b border-slate-800"><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 font-display text-[21px] font-medium leading-snug text-slate-100 md:text-[23px]">Why are memberships limited?<svg class="shrink-0 text-slate-400" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-slate-400">To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
+  <section class="scroll-mt-16 py-14 md:py-20" id="faq">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <div class="lg:col-span-4"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">FAQ</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Questions</h2></div>
+        <div class="faq card divide-y divide-line px-5 md:px-7 lg:col-span-8">
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">What exactly is ProvenDrop?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">An ecommerce market intelligence service with three components: product research and market validation, AI-powered creative production, and advertising campaign preparation. We discover collections from generic stores already advertising on Meta and Google in international markets, validate them, and deliver each one as a Launch Kit. It is not a store, a product catalogue or an advertising agency.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Do I receive it on WhatsApp?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">No. A subscription on this website is individual: you receive everything in your member area and by e-mail. WhatsApp is only for Click Dynamics customers.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">What time do the collections arrive?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Every day at <span class="font-bold text-ink" data-fill="hour">[HOUR]</span>, weekends included.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">What if there is no approved collection one day?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">You receive the best collections still under observation, always labelled as such, and each one comes with its Launch Kit so you can test it with a small budget. We never show a collection as approved before it has passed the next-day confirmation.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Do you ever send brands or manufacturers?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">No. Every store is checked on the day it is scored: only generic (dropshipping) stores make the list. If a store shows any sign of being a brand or a manufacturer, it is excluded.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Will I get the same collection twice?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">No. A collection is sent once. The only exception: a collection under observation that later passes the check is sent once more as approved.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Why Google as well as Meta?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Many of the collections that are selling right now advertise only on Google Shopping and YouTube. We track both, so you don’t miss them.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How are collections validated?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Each candidate is scored on 13 metrics across advertising evidence (Meta and Google), search demand, store and collection quality, and risk. Brands and manufacturers are excluded. We then measure it again 24 hours later and downgrade it if the advertising falls or the link stops working.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How many collections do I receive?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Normally 1 to 4 a day, one per niche whenever possible. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Which countries and niches are covered?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Italy, Spain, France, Germany, the United Kingdom and the United States. Four niches: women’s jewellery, home decoration, women’s fashion and men’s fashion.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">What is included in the Launch Kit?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">A one-page guide, reference photographs, prompts for 20 advertising images, prompts for 4 UGC videos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the complete opportunity analysis. The photographs are references only and must not be published in ads.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Do you run my campaigns or produce my creatives?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">No. The Launch Kit gives you the prompts, references and Google Ads material; you generate the images and videos with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Can I cancel?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Yes, whenever you want, in your member area (“Manage subscription”). There is no minimum term.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How much does it cost?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2" id="faqPrice">€<span data-fill="price-monthly">15</span> a month<span data-if-joining>, plus a €<span data-fill="price-joining">25</span> joining fee charged with your first payment. If you cancel and come back later, you pay the monthly fee only</span>.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Why are memberships limited?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
         </div>
       </div>
     </div>
   </section>
 
   <!-- final cta -->
-  <section class="border-t border-slate-800 bg-panel py-20 md:py-32" id="cta">
-    <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">End of report</p>
-      <h2 class="mt-4 max-w-[13ch] font-display text-[clamp(46px,7.4vw,112px)] font-medium leading-[0.98] tracking-[-0.015em] text-slate-100">Discover. Validate. Create. Launch.</h2>
-      <p class="mt-5 max-w-[56ch] font-display text-[22px] leading-[1.35] text-slate-400">From a validated opportunity to a campaign ready to prepare, in one subscription.</p>
-      <a class="btn btn-go mt-8" href="#join">Subscribe</a>
+  <section class="py-14 md:py-20" id="cta">
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div class="card-deep grid items-center gap-8 p-8 md:p-14 lg:grid-cols-12">
+        <div class="lg:col-span-8">
+          <h2 class="max-w-[14ch] text-[clamp(36px,5.5vw,72px)] font-extrabold leading-[1.02] tracking-[-0.03em] text-white">Discover. Validate. Create. Launch.</h2>
+          <p class="mt-4 max-w-[56ch] text-[17px] text-white/70 md:text-[19px]">From a validated opportunity to a campaign ready to prepare, in one subscription.</p>
+        </div>
+        <div class="lg:col-span-4 lg:justify-self-end"><a class="btn btn-go max-sm:w-full" href="#join">Subscribe</a></div>
+      </div>
     </div>
   </section>
 </main>
 
-<footer class="border-t border-slate-800 py-10 font-mono text-[12px] leading-relaxed text-slate-400">
-  <div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">
+<footer class="border-t border-line py-10 text-[13px] leading-relaxed text-ink-2">
+  <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
     <div class="grid gap-8 md:grid-cols-12 md:gap-12">
       <div class="md:col-span-4">
-        <a class="font-semibold uppercase tracking-[0.18em] text-slate-100 no-underline" translate="no" href="#main">ProvenDrop</a>
+        <a class="text-[16px] font-extrabold tracking-tight text-ink no-underline" translate="no" href="#main"><span>Proven<span class="text-brand">Drop</span></span></a>
         <p class="mt-2">Product research, AI-powered creative production and campaign preparation for ecommerce.</p>
       </div>
-      <ul class="grid gap-1.5 uppercase tracking-[0.12em] md:col-span-3">
-        <li><a class="hover:text-slate-100" href="#overview">What it is</a></li>
-        <li><a class="hover:text-slate-100" href="#intelligence">Intelligence</a></li>
-        <li><a class="hover:text-slate-100" href="#kit">Launch Kit</a></li>
-        <li><a class="hover:text-slate-100" href="#markets">Markets</a></li>
-        <li><a class="hover:text-slate-100" href="#join">Subscribe</a></li>
-        <li><a class="hover:text-slate-100" href="app.html">Member area</a></li>
-        <li><a class="hover:text-slate-100" href="#faq">FAQ</a></li>
+      <ul class="grid gap-1.5 font-semibold md:col-span-3">
+        <li><a class="hover:text-ink" href="#overview">What it is</a></li>
+        <li><a class="hover:text-ink" href="#intelligence">Intelligence</a></li>
+        <li><a class="hover:text-ink" href="#kit">Launch Kit</a></li>
+        <li><a class="hover:text-ink" href="#markets">Markets</a></li>
+        <li><a class="hover:text-ink" href="#join">Subscribe</a></li>
+        <li><a class="hover:text-ink" href="app.html">Member area</a></li>
+        <li><a class="hover:text-ink" href="#faq">FAQ</a></li>
       </ul>
       <div class="md:col-span-5">
-        <p class="[&_a]:text-slate-200 [&_a]:underline [&_a]:underline-offset-4" id="footContact" hidden></p>
+        <p class="[&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4" id="footContact" hidden></p>
         <p class="mt-2">Competitor photographs in the Launch Kit are for reference only. Never publish other stores’ photographs in your ads.</p>
         <p class="mt-2">Click Dynamics customers receive ProvenDrop through the Click WhatsApp group and do not subscribe on this website.</p>
       </div>
@@ -631,9 +636,9 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
     });
   }
 
-  /* presentation helpers: classes only (Tailwind utilities + the component classes in src/tailwind.css) */
-  const CAP = 'font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400';
-  const strip = (mk, cell) => `<ul class="strip${cell ? " [&>li:not(.ok)]:bg-panel" : ""}" aria-hidden="true">${MARKETS.map(c => `<li${c===mk?' class="ok"':''}>${c}</li>`).join("")}</ul>`;
+  /* presentation helpers: classes only (Tailwind utilities + the component classes in src/tailwind.css). All of this renders inside dark panels. */
+  const CAP = 'text-[12px] font-semibold text-white/55';
+  const strip = mk => `<ul class="strip" aria-hidden="true">${MARKETS.map(c => `<li${c===mk?' class="ok"':''}>${c}</li>`).join("")}</ul>`;
   const badge = st => st==="go" ? `<span class="status go">Approved</span>` : `<span class="status watch">Under observation</span>`;
   /* Days advertising: counted up to today when the sheet gives data_inicio (first day of the oldest active ad); otherwise the value measured at analysis. */
   const daysNow = r => { const d = r.data_inicio ? date(r.data_inicio) : null; if (!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
@@ -641,22 +646,22 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
   /* Google ads: shown only when the sheet has the column (anuncios_google) with a value for the row; otherwise nothing changes. */
   const gAds = r => num(r.anuncios_google);
   const metaAds = r => num(r.anuncios_meta) != null ? num(r.anuncios_meta) : num(r.anuncios_ativos);
-  const facts = (r, cell) => { const g = gAds(r), bg = cell ? ' class="!bg-panel"' : ""; return `<dl class="facts ${g != null ? "four grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}${cell ? "" : " border-x-0"}">
-            <div${bg}><dt>${g != null ? "Meta ads" : "Active ads"}</dt><dd>${fmt(g != null ? metaAds(r) : num(r.anuncios_ativos))}</dd></div>${g != null ? `
-            <div${bg}><dt>Google ads</dt><dd>${fmt(g)}</dd></div>` : ""}
-            <div${bg}><dt>Days advertising</dt><dd>${days(r)}</dd></div>
-            <div${bg}><dt>EU reach</dt><dd>${fmt(num(r.alcance_eu))}</dd></div>
+  const facts = (r, extra) => { const g = gAds(r); return `<dl class="facts ${g != null ? "four grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}${extra ? " " + extra : ""}">
+            <div><dt>${g != null ? "Meta ads" : "Active ads"}</dt><dd>${fmt(g != null ? metaAds(r) : num(r.anuncios_ativos))}</dd></div>${g != null ? `
+            <div><dt>Google ads</dt><dd>${fmt(g)}</dd></div>` : ""}
+            <div><dt>Days advertising</dt><dd>${days(r)}</dd></div>
+            <div><dt>EU reach</dt><dd>${fmt(num(r.alcance_eu))}</dd></div>
           </dl>`; };
   const redact = w => `<span class="redact" style="width:${w}" aria-hidden="true"></span>`;
   const where = r => { const mk = market(r.mercado_destaque); return mk ? `, strongest in ${COUNTRY[mk]}` : ""; };
   const validated = r => { const n = num(r.trends_validados); return n == null ? "Search demand: no data" : `Search demand validated in ${Math.round(n)} of 6 markets`; };
 
-  function row(r, i){
+  function row(r){
     const st = status(r), mk = market(r.mercado_destaque);
-    return `<article class="row grid gap-px bg-slate-800${i ? " border-t border-slate-800" : ""} md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)]" aria-label="${st==="go"?"Approved":"Under observation"} collection. Name, store and link are reserved for members.">
-      <div class="row-name bg-panel py-6 md:pr-6">${badge(st)}<h3 class="mt-3 font-display text-[30px] font-medium leading-[1.1] text-slate-100">${redact(st==="go"?"78%":"64%")}</h3><p class="shop mt-2 font-mono text-[12px] text-slate-400"><b class="font-medium text-slate-200">${niche(r.nicho)}</b>${where(r)}</p></div>
-      <div class="bg-panel py-6 md:px-6">${facts(r, true)}<div class="mt-4"><p class="mb-2 ${CAP}">${validated(r)}</p>${strip(mk, true)}</div></div>
-      <div class="row-score grid content-start gap-3 bg-panel py-6 md:pl-6"><div class="font-display text-[56px] font-medium leading-none text-slate-100">${score(num(r.score))}<small class="ml-1 ${CAP}">/ 10</small></div><p class="row-note max-w-[32ch] font-mono text-[12px] leading-snug text-slate-400">${st==="go"?"Comes with the collection link and its Launch Kit.":"Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget."}</p></div>
+    return `<article class="row grid gap-6 border-b border-white/10 py-6 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] md:gap-8" aria-label="${st==="go"?"Approved":"Under observation"} collection. Name, store and link are reserved for members.">
+      <div class="row-name">${badge(st)}<h3 class="mt-3 text-[24px] font-extrabold leading-[1.1] text-white">${redact(st==="go"?"78%":"64%")}</h3><p class="shop mt-2 text-[13px] text-white/60"><b class="font-semibold text-white/90">${niche(r.nicho)}</b>${where(r)}</p></div>
+      <div>${facts(r)}<div class="mt-4"><p class="mb-2 ${CAP}">${validated(r)}</p>${strip(mk)}</div></div>
+      <div class="row-score grid content-start gap-3"><div class="text-[48px] font-extrabold leading-none tracking-tight text-white">${score(num(r.score))}<small class="ml-1.5 ${CAP}">/ 10</small></div><p class="row-note max-w-[32ch] text-[13px] leading-snug text-white/60">${st==="go"?"Comes with the collection link and its Launch Kit.":"Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget."}</p></div>
     </article>`;
   }
 
@@ -670,12 +675,12 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
     $("#heroUpd").textContent = ago(upd) || "Members only";
     $("#heroPanel").setAttribute("aria-label", "Latest daily entry: "+(st==="go"?"approved":"observing")+", "+niche(first.nicho)+", score "+score(num(first.score))+" out of 10. Name, store and link are reserved for members.");
     $("#heroPanel").innerHTML = `
-        <div class="flex items-baseline justify-between gap-3 border-b border-slate-800 px-5 py-3 ${CAP}"><span>${$("#heroTop").textContent}</span><span>${esc($("#heroUpd").textContent)}</span></div>
-        <div class="px-5 py-5">${badge(st)}<div class="mt-3 font-display text-[34px] font-medium leading-[1.05] text-slate-100">${redact("86%")}<br>${redact("48%")}</div><p class="mt-3 font-mono text-[12px] text-slate-400"><b class="font-medium text-slate-200">${niche(first.nicho)}</b>${where(first)}</p></div>
-        <div class="flex items-end gap-4 border-t border-slate-800 px-5 py-4"><div class="font-display text-[64px] font-medium leading-none text-slate-100">${score(num(first.score))}</div><span class="pb-2 ${CAP}">/ 10 ProvenDrop score</span></div>
-        ${facts(first, false)}
-        <div class="px-5 py-4"><p class="mb-2 ${CAP}">${validated(first)}</p>${strip(mk, false)}</div>
-        <p class="border-t border-slate-800 px-5 py-3 font-mono text-[11px] leading-snug text-slate-400">Names, stores, links and Launch Kits are reserved for members.</p>`;
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4"><span class="inline-flex items-center gap-2 text-[14px] font-bold text-white"><span class="size-2 rounded-full bg-emerald-400"></span>${$("#heroTop").textContent}</span><span class="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white/70">${esc($("#heroUpd").textContent)}</span></div>
+        <div class="px-6 pt-5">${badge(st)}<div class="mt-3 text-[30px] font-extrabold leading-[1.1] text-white">${redact("86%")}<br>${redact("48%")}</div><p class="mt-2 text-[13px] text-white/60"><b class="font-semibold text-white/90">${niche(first.nicho)}</b>${where(first)}</p></div>
+        <div class="flex items-end gap-3 px-6 pt-5"><div class="text-[56px] font-extrabold leading-none tracking-tight text-white">${score(num(first.score))}</div><span class="pb-2 text-[13px] font-semibold text-white/60">/ 10 ProvenDrop score</span></div>
+        ${facts(first, "px-6 pt-5")}
+        <div class="px-6 pt-4"><p class="mb-2 ${CAP}">${validated(first)}</p>${strip(mk)}</div>
+        <p class="mt-5 border-t border-white/10 px-6 py-4 text-[13px] text-white/55">Names, stores, links and Launch Kits are reserved for members.</p>`;
     $("#cardsHoje").innerHTML = rows.map(row).join("");
     const u = ago(upd); $("#listUpd").textContent = u ? u + (day ? ", list for "+day : "") : (day ? "List for "+day : "");
     const wa = $("#waMsg"); if (wa) {
@@ -699,9 +704,9 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
     box.innerHTML = `<table class="dt"><thead><tr><th scope="col">Approved</th><th scope="col">Niche</th><th scope="col">Market</th><th scope="col" class="text-right">Score</th><th scope="col" class="text-right">Ads at approval</th>${hasG ? '<th scope="col" class="text-right">Google ads</th>' : ""}<th scope="col" class="text-right">Days advertising</th><th scope="col" class="text-right">EU reach</th><th scope="col">Still advertising</th></tr></thead><tbody>${
       rows.slice().reverse().map(r => { const mk = market(r.mercado_destaque); const chk = dayText(r.ultima_verificacao); return `<tr>
         <td data-l="Approved"><span>${esc(dayText(r.data_aprovacao)||"No date")}</span></td>
-        <td data-l="Niche"><span>${niche(r.nicho)}</span></td>
+        <td data-l="Niche"><span class="font-semibold">${niche(r.nicho)}</span></td>
         <td data-l="Market"><span>${mk ? COUNTRY[mk] : "No data"}</span></td>
-        <td class="n md:text-right" data-l="Score"><span>${score(num(r.score))}</span></td>
+        <td class="n md:text-right" data-l="Score"><span class="font-bold">${score(num(r.score))}</span></td>
         <td class="n md:text-right" data-l="Ads at approval"><span>${fmt(num(r.anuncios_na_aprovacao))}</span></td>${hasG ? `
         <td class="n md:text-right" data-l="Google ads"><span>${fmt(gAds(r))}</span></td>` : ""}
         <td class="n md:text-right" data-l="Days advertising"><span>${fmt(num(r.dias_ativo_na_aprovacao))}</span></td>
