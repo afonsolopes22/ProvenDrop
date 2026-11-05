@@ -1,117 +1,155 @@
 /* ProvenDrop · Tailwind source. Build: `npm run build:css` → ../tailwind.css (committed).
-   Theme: dark / industrial. Cormorant Garamond for editorial titles, JetBrains Mono
-   for data, numbers, tables and buttons. No shadows, no large radii, no gradients.
-   Component classes below exist only because app.js / index.html set them by name
-   (className = "msg erro", classList.toggle("top-mk"), generated rows) or because
-   they need pseudo-elements (status dot, stacked table labels). Everything else is utilities. */
+   Theme (2026-11-05, "clean SaaS"): light page, white rounded cards with a soft shadow,
+   teal brand colour, one deep-teal dark panel for the live data. Manrope everywhere.
+   Component classes exist only because app.js / index.html set them by name
+   (className = "msg erro", classList.toggle("top-mk"), generated rows) or need
+   pseudo-elements (status dot, stacked table labels). Everything else is utilities. */
 @import "tailwindcss";
 @source "../index.html";
 @source "../app.html";
 @source "../app.js";
 
 @theme {
-  --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --color-base: #090D16;
-  --color-panel: #0C1120;
-  --color-raised: #111827;
-  --color-ok: #34D399;
-  --color-watch: #FBBF24;
-  --color-bad: #F87171;
+  --color-page: #F4F7F6;
+  --color-line: #E2E8E6;
+  --color-line-2: #CBD5D1;
+  --color-ink: #0E1A17;
+  --color-ink-2: #5B6B66;
+  --color-ink-3: #8A9793;
+  --color-brand: #0D9488;
+  --color-brand-dark: #0F766E;
+  --color-brand-soft: #E3F4F1;
+  --color-deep: #07201E;
+  --color-deep-2: #0B2B28;
+  --color-deep-line: #184842;
+  --color-ok: #059669;
+  --color-ok-soft: #E3F5EC;
+  --color-watch: #C2700A;
+  --color-watch-soft: #FEF2E0;
+  --color-bad: #C62828;
+  --color-bad-soft: #FDECEC;
+  --shadow-card: 0 1px 2px rgb(14 26 23 / 0.04), 0 10px 30px -14px rgb(14 26 23 / 0.14);
+  --shadow-pop: 0 20px 50px -20px rgb(14 26 23 / 0.35);
 }
 
 @layer base {
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-  body { @apply bg-base font-sans text-[15px] leading-relaxed text-slate-300 antialiased; overflow-wrap: break-word; }
+  body { @apply bg-page font-sans text-[15px] leading-relaxed text-ink antialiased; overflow-wrap: break-word; }
   h1, h2, h3 { @apply text-balance; }
-  ::selection { @apply bg-slate-200 text-base; }
-  :focus-visible { @apply outline-2 outline-offset-2 outline-slate-200; }
+  ::selection { @apply bg-brand text-white; }
+  :focus-visible { @apply rounded-md outline-2 outline-offset-2 outline-brand; }
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
 }
 
 @layer components {
-  /* buttons (mono, square, no gradients) */
-  .btn { @apply inline-flex min-h-11 cursor-pointer select-none items-center justify-center gap-2 border px-5 py-2 text-center font-mono text-[12px] font-medium uppercase tracking-[0.14em] no-underline transition-colors duration-150; -webkit-tap-highlight-color: transparent; }
-  .btn-go { @apply border-slate-100 bg-slate-100 text-base hover:border-white hover:bg-white; }
-  .btn-line { @apply border-slate-700 bg-transparent text-slate-200 hover:border-slate-300 hover:text-white; }
-  .btn-sm { @apply min-h-9 px-3.5 py-1.5 text-[11px]; }
-  .btn[disabled], .btn[aria-disabled="true"] { @apply pointer-events-none cursor-not-allowed opacity-40; }
+  /* cards */
+  .card { @apply rounded-2xl border border-line bg-white shadow-card; }
+  .card-deep { @apply rounded-2xl bg-deep text-white shadow-pop; }
 
-  /* status (approved / under observation) */
-  .status { @apply inline-flex items-center gap-2 whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.16em]; }
-  .status::before { content: ""; @apply size-2 shrink-0 bg-current; }
-  .status.go { @apply text-ok; }
-  .status.watch { @apply text-watch; }
-  .status.watch::before { @apply border border-current bg-transparent; }
+  /* buttons */
+  .btn { @apply inline-flex min-h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl border px-5 py-2 text-center text-[14px] font-semibold no-underline transition-colors duration-150; -webkit-tap-highlight-color: transparent; }
+  .btn-go { @apply border-brand bg-brand text-white hover:border-brand-dark hover:bg-brand-dark; }
+  .btn-line { @apply border-line-2 bg-white text-ink hover:border-ink-2; }
+  .card-deep .btn-line { @apply border-white/20 bg-white/5 text-white hover:border-white/50; }
+  .btn-sm { @apply min-h-9 rounded-lg px-3.5 py-1.5 text-[13px]; }
+  .btn[disabled], .btn[aria-disabled="true"] { @apply pointer-events-none cursor-not-allowed opacity-45; }
 
-  /* values reserved for members */
-  .redact { @apply inline-block h-[0.62em] max-w-full bg-slate-700 align-baseline; }
+  /* status pills (approved / under observation) */
+  .status { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-bold; }
+  .status::before { content: ""; @apply size-1.5 shrink-0 rounded-full bg-current; }
+  .status.go { @apply bg-ok-soft text-ok; }
+  .status.watch { @apply bg-watch-soft text-watch; }
+  .card-deep .status.go { @apply bg-ok/20 text-emerald-300; }
+  .card-deep .status.watch { @apply bg-watch/25 text-amber-300; }
+
+  /* values reserved for members (only drawn on dark panels) */
+  .redact { @apply inline-block h-[0.62em] max-w-full rounded-md bg-white/15 align-baseline; }
 
   /* messages set by app.js (el.className = "msg erro") */
-  .msg { @apply mt-3 border border-slate-700 bg-panel px-3.5 py-2.5 font-mono text-[12.5px] leading-snug text-slate-200; }
-  .msg.erro { @apply border-bad/60 text-bad; }
-  .msg.aviso { @apply border-watch/60 text-watch; }
-  .empty { @apply border border-dashed border-slate-800 px-5 py-10 text-center font-mono text-[12.5px] text-slate-400; }
+  .msg { @apply mt-3 rounded-xl bg-brand-soft px-4 py-3 text-[14px] leading-snug text-brand-dark; }
+  .msg.erro { @apply bg-bad-soft text-bad; }
+  .msg.aviso { @apply bg-watch-soft text-watch; }
+  .msg a { @apply font-semibold underline underline-offset-4; }
+  .empty { @apply rounded-xl border border-dashed border-line-2 px-5 py-10 text-center text-[14px] text-ink-2; }
+  .card-deep .empty { @apply border-white/15 text-white/60; }
 
-  /* facts: a 1px grid of label/value cells */
-  .facts { @apply grid gap-px border border-slate-800 bg-slate-800; }
-  .facts > div { @apply min-w-0 bg-base px-3 py-2; }
-  .facts dt { @apply font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400; }
-  .facts dd { @apply mt-1 font-mono text-[17px] leading-tight tabular-nums text-slate-100; }
-  .at { @apply mt-0.5 block font-mono text-[10px] normal-case tracking-normal text-slate-400; }
-  /* e-mail mock-up on index.html (rendered by script) */
-  .dot { @apply mr-2 inline-block size-2 align-middle; }
-  .dot.go { @apply bg-ok; }
-  .dot.watch { @apply border border-watch bg-transparent; }
-  .time { @apply mt-1 block text-right font-mono text-[10px] text-slate-400; }
-  /* member area: rows of the member's own niche come first and carry a mark */
-  .dt .pref-first > td:first-child { @apply border-l-2 border-l-ok pl-3; }
-  .msg a { @apply underline underline-offset-4; }
+  /* KPI cells (dark panels): label + value */
+  .facts { @apply grid gap-2; }
+  .facts > div { @apply min-w-0 rounded-xl bg-white/5 px-3 py-3; }
+  .facts dt { @apply text-[12px] font-medium text-white/55; }
+  .facts dd { @apply mt-1 whitespace-nowrap text-[20px] font-extrabold leading-tight tracking-tight tabular-nums text-white; }
+  .at { @apply mt-0.5 block text-[11px] font-medium normal-case tracking-normal text-white/50; }
+  .dt .at { @apply text-ink-3; }
+  .dt-dark .at { @apply text-white/50; }
 
   /* six-market strip */
-  .strip { @apply grid grid-cols-6 gap-px border border-slate-800 bg-slate-800; }
-  .strip li { @apply grid h-7 place-items-center bg-base font-mono text-[11px] font-medium text-slate-400; }
-  .strip .ok { @apply bg-slate-100 text-base; }
+  .strip { @apply grid grid-cols-6 gap-1; }
+  .strip li { @apply grid h-8 place-items-center rounded-lg bg-white/5 text-[12px] font-bold text-white/55; }
+  .strip .ok { @apply bg-brand text-white; }
 
   /* advertising platforms */
-  .plat { @apply inline-flex items-center gap-1.5 border border-slate-700 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-slate-400; }
-  .plat.meta { @apply border-sky-900 text-sky-300; }
-  .plat.google { @apply border-amber-900 text-amber-300; }
+  .plat { @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-0.5 text-[12px] font-semibold text-ink-2; }
+  .plat.meta { @apply border-sky-200 bg-sky-50 text-sky-700; }
+  .plat.google { @apply border-amber-200 bg-amber-50 text-amber-700; }
+  .dt-dark .plat { @apply border-white/15 bg-white/10 text-white/80; }
+  .dt-dark .plat.meta { @apply text-sky-200; }
+  .dt-dark .plat.google { @apply text-amber-200; }
 
   /* data tables (index archive, app today/archive). Stacked key/value blocks under 768px. */
-  .dt { @apply w-full border-collapse font-mono text-[13px]; }
-  .dt th { @apply whitespace-nowrap border-b border-slate-800 px-3 py-2.5 text-left text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400; }
-  .dt td { @apply border-b border-slate-800 px-3 py-3 align-top text-slate-200; }
-  .dt tbody tr { @apply transition-colors duration-150 hover:bg-raised/50; }
+  .dt { @apply w-full border-collapse text-[14px]; }
+  .dt th { @apply whitespace-nowrap border-b border-line px-3 py-3 text-left text-[12px] font-bold text-ink-2; }
+  .dt td { @apply border-b border-line px-3 py-3.5 align-top text-ink; }
+  .dt tbody tr:last-child td { @apply border-b-0; }
+  .dt tbody tr { @apply transition-colors duration-150 hover:bg-page; }
   .dt tr > :first-child { @apply pl-0; }
   .dt tr > :last-child { @apply pr-0; }
   .dt .n { @apply tabular-nums; }
-  .dt .sub { @apply block text-[11px] leading-snug text-slate-400; }
-  .dt a { @apply underline decoration-slate-600 underline-offset-4 hover:decoration-slate-300; }
+  .dt .sub { @apply block text-[12px] font-medium leading-snug text-ink-3; }
+  .dt a { @apply font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:decoration-brand; }
+  .dt-dark th { @apply border-white/10 text-white/50; }
+  .dt-dark td { @apply border-white/10 text-white; }
+  .dt-dark tbody tr { @apply hover:bg-white/5; }
+  .dt-dark .sub { @apply text-white/50; }
+  .dt-dark a { @apply text-emerald-300 decoration-emerald-300/30 hover:decoration-emerald-300; }
+  .dt .pref-first > td:first-child { @apply border-l-[3px] border-l-brand pl-3; }
   @media (max-width: 767px) {
     .dt thead { @apply sr-only; }
     .dt, .dt tbody, .dt tr, .dt td { @apply block w-full; }
-    .dt tr { @apply border-b border-slate-800 py-3; }
+    .dt tr { @apply border-b border-line py-3; }
+    .dt-dark tr { @apply border-white/10; }
+    .dt tbody tr:last-child { @apply border-b-0; }
     .dt td { @apply grid grid-cols-[104px_minmax(0,1fr)] gap-2.5 border-0 px-0 py-1; }
-    .dt td::before { content: attr(data-l); @apply pt-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400; }
+    .dt td::before { content: attr(data-l); @apply pt-0.5 text-[12px] font-semibold text-ink-3; }
+    .dt-dark td::before { @apply text-white/50; }
     .dt td > * { @apply col-start-2; }
   }
 
   /* forms */
-  .field { @apply min-h-11 w-full border border-slate-700 bg-panel px-3 py-2 font-mono text-[13px] text-slate-100 placeholder:text-slate-600 focus:border-slate-300 focus:outline-none; }
-  select.field { @apply appearance-none bg-no-repeat pr-9; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M2.5 4.5 6 8l3.5-3.5'/></svg>"); background-size: 12px 12px; background-position: right 12px center; }
-  .check { @apply flex cursor-pointer items-center gap-2.5 border border-slate-800 bg-panel px-3 py-2.5 font-mono text-[12.5px] text-slate-200 has-checked:border-slate-300 has-checked:text-white; }
-  .check input { @apply m-0 size-4 accent-slate-100; }
+  .field { @apply min-h-11 w-full rounded-xl border border-line-2 bg-white px-3.5 py-2 text-[15px] text-ink placeholder:text-ink-3 focus:border-brand focus:outline-none; }
+  select.field { @apply appearance-none bg-no-repeat pr-10; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12' fill='none' stroke='%235B6B66' stroke-width='1.6'><path d='M2.5 4.5 6 8l3.5-3.5'/></svg>"); background-size: 14px 14px; background-position: right 14px center; }
+  .check { @apply flex cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] font-medium text-ink transition-colors has-checked:border-brand has-checked:bg-brand-soft; }
+  .check input { @apply m-0 size-4 accent-brand; }
 
   /* index: the strongest market in the markets list (toggled by script) */
-  .top-mk { @apply text-ok; }
+  .top-mk { @apply text-brand-dark; }
+  /* e-mail mock-up on index.html (rendered by script) */
+  .dot { @apply mr-2 inline-block size-2 rounded-full align-middle; }
+  .dot.go { @apply bg-emerald-400; }
+  .dot.watch { @apply bg-amber-400; }
+  .time { @apply mt-1 block text-right text-[11px] text-white/45; }
   /* faq */
   .faq details[open] summary svg { transform: rotate(45deg); }
   .faq summary svg { transition: transform 200ms ease; }
+  /* app sidebar links */
+  .side-link { @apply flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-[14px] font-semibold text-ink-2 transition-colors hover:bg-page hover:text-ink aria-selected:bg-brand-soft aria-selected:text-brand-dark; }
+  .side-link svg { @apply size-[18px] shrink-0; }
 }
 
 /* index: mobile menu (class toggled by script). Unlayered on purpose: it must beat the `hidden` utility. */
 #nav.open { display: flex; }
+/* app: the sidebar only exists while signed in (app.js toggles #tabs[hidden]). */
+body:has(#tabs[hidden]) #side { display: none; }
