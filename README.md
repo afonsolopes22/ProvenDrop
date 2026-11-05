@@ -43,8 +43,8 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
 | `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
-| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). Desde 2026-11-05 o "Today" e o "Archive" são tabelas densas (uma linha por coleção; blocos chave/valor abaixo de 768 px). |
-| `src/tailwind.css` | Fonte do CSS (Tailwind v4): tema escuro/industrial (`#090D16`), Cormorant Garamond nos títulos, JetBrains Mono em dados, tabelas e botões, e as poucas classes de componente que o `app.js` usa por nome (`.msg`, `.status`, `.dt`, `.strip`, `.plat`, `.redact`). |
+| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). Desde 2026-11-05 o "Today" e o "Archive" são tabelas (uma linha por coleção, kit por baixo do nome; blocos chave/valor abaixo de 768 px) e `renderFeed` preenche os 4 contadores do dia (`#kpiTotal`, `#kpiOk`, `#kpiWatch`, `#kpiKits`). |
+| `src/tailwind.css` | Fonte do CSS (Tailwind v4): tema "clean SaaS" (página clara `#F4F7F6`, cartões brancos arredondados com sombra suave, marca teal `#0D9488`, um painel escuro `#07201E` para os dados do dia, Manrope), e as poucas classes de componente que o `app.js` usa por nome (`.msg`, `.status`, `.dt`/`.dt-dark`, `.strip`, `.plat`, `.redact`, `.side-link`). |
 | `tailwind.css` | CSS compilado e minificado, lido por `index.html` e `app.html` (fica no repo: o GitHub Pages não faz build). Regenerar com `npm run build:css` sempre que se mudarem classes nas páginas ou no `app.js`. |
 | `package.json` | Só o build do CSS (`@tailwindcss/cli`). `node_modules/` está no `.gitignore`. |
 | `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0005, `public.config`. Enter = não alterar; recusa misturas teste/real. |
@@ -61,7 +61,7 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 
 ## Estilos (redesign de 2026-11-05)
 
-`index.html` e `app.html` usam Tailwind **compilado** (sem CDN em runtime, por causa da CSP estrita do `app.html`). Regras do tema: fundo `#090D16`, bordas finas de 1 px (`slate-800`), sem sombras, sem cantos arredondados, sem gradientes; títulos em Cormorant Garamond, dados/números/tabelas/botões em JetBrains Mono (Google Fonts, já permitidas na CSP). Texto secundário em `slate-400` (contraste ≥ 4,5:1 sobre o fundo). Depois de alterar classes:
+`index.html` e `app.html` usam Tailwind **compilado** (sem CDN em runtime, por causa da CSP estrita do `app.html`). Tema "clean SaaS", à imagem de um dashboard moderno: página clara `#F4F7F6`, cartões brancos `rounded-2xl` com sombra suave, bordas `#E2E8E6`, marca em teal (`#0D9488`, botão de ação sólido com texto branco), verde-esmeralda para "Approved", âmbar para "Under observation", e um único painel escuro (`#07201E`) para os dados do dia (hero e lista no site; tabela "Today" na área). Tipografia Manrope (Google Fonts, já permitida na CSP), números tabulares. A área de membros é um dashboard: barra lateral à esquerda (Today, Archive, Preferences, Subscription) que vira barra inferior em telemóvel, faixa de 4 contadores do dia e a tabela dentro do painel escuro. Depois de alterar classes:
 
 ```bash
 npm install
