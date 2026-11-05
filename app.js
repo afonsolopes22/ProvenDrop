@@ -153,8 +153,11 @@
   function renderFeed(){
     const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
     const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
-    /* Today is a high-density table (one row per collection); stacked key/value blocks under 768px (.dt). */
-    $("#feed").innerHTML = rows.length ? `<table class="dt"><thead><tr><th>Status</th><th>Collection</th><th>Niche · market</th><th class="text-right">Meta</th><th class="text-right">Google</th><th class="text-right">Days</th><th class="text-right">Reach</th><th>Markets</th><th class="text-right">Score</th><th>Kit</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
+    /* Today is a high-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
+    $("#feed").innerHTML = rows.length ? `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Meta</th><th class="text-right">Google</th><th class="text-right">Days</th><th class="text-right">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
+    /* KPI strip above the table (counts only; nothing else is computed here) */
+    const kpi = (id, v) => { const el = $(id); if(el) el.textContent = String(v); };
+    kpi("#kpiTotal", rows.length); kpi("#kpiOk", rows.filter(aprovada).length); kpi("#kpiWatch", rows.filter(r => !aprovada(r)).length); kpi("#kpiKits", rows.filter(temKit).length);
   }
 
   function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
@@ -164,20 +167,19 @@
   function cartao(r){
     const ok = aprovada(r), link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = temKit(r) ? `<button class="btn btn-go btn-sm min-w-[128px] whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
-                          : `<span class="nota font-mono text-[11px] text-slate-400">Kit being prepared</span>`;
-    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 text-slate-300">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
-    return `<tr class="card${pref ? " pref-first" : ""}">
-      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[10px] leading-snug text-watch">Under observation — test with a small budget</span>`}${chips(r, "mt-2")}</td>
-      <td data-l="Collection"><h3 class="min-w-[14ch] font-display text-[22px] font-medium leading-[1.1] text-slate-100">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 text-[11px] text-slate-400">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : esc(r.loja || "")}</p>${r.nota ? `<p class="nota sub mt-1.5">${esc(r.nota)}</p>` : ""}</td>
-      <td data-l="Niche"><div class="min-w-[150px]"><b class="font-medium text-slate-200">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(PAIS[mk] || mk)}</span>` : ""}${adv}</div></td>
+    const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
+                          : `<span class="nota text-[12px] font-medium text-white/50">Kit being prepared</span>`;
+    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
+    return `<tr class="${pref ? "pref-first" : ""}">
+      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${chips(r, "mt-2")}</td>
+      <td data-l="Collection"><div class="min-w-[160px] max-w-[240px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 text-[12px]">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${r.nota ? `<p class="nota sub mt-1.5">${esc(r.nota)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
+      <td data-l="Niche"><div class="min-w-[124px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(PAIS[mk] || mk)}</span>` : ""}${adv}</div></td>
       <td class="n md:text-right" data-l="Meta ads">${fmt(metaAds(r))}</td>
       <td class="n md:text-right" data-l="Google ads">${fmt(googleAds(r))}</td>
       <td class="n md:text-right" data-l="Days">${dias(r)}</td>
       <td class="n md:text-right" data-l="Reach">${fmt(r.alcance_eu)}</td>
-      <td data-l="Markets"><div class="min-w-[156px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand validated in ${esc(r.trends_validados)} of 6` : "Demand: no data"}</span></div></td>
-      <td class="n md:text-right" data-l="Score"><span class="font-display text-[26px] font-medium leading-none text-slate-100">${score(r.score)}</span><span class="sub">/ 10</span></td>
-      <td data-l="Kit">${kit}</td>
+      <td data-l="Markets"><div class="min-w-[132px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand: ${esc(r.trends_validados)} of 6 markets` : "Demand: no data"}</span></div></td>
+      <td class="n md:text-right" data-l="Score"><span class="text-[22px] font-extrabold leading-none tracking-tight text-white">${score(r.score)}</span><span class="sub">/ 10</span></td>
     </tr>`;
   }
 
@@ -214,7 +216,7 @@
       const kit = temKit(r) ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
       return `<tr>
         <td class="n whitespace-nowrap" data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
-        <td data-l="Collection"><span class="block min-w-[14ch]">${link ? `<a class="font-display text-[18px] font-medium leading-tight text-slate-100 no-underline hover:underline" href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="font-display text-[18px] font-medium leading-tight text-slate-100">${esc(r.colecao)}</span>`}<span class="sub">${esc(r.loja||"")}</span></span></td>
+        <td data-l="Collection"><span class="block min-w-[14ch]">${link ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}<span class="sub">${esc(r.loja||"")}</span></span></td>
         <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
         <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
         <td class="n md:text-right" data-l="Score"><span>${score(r.score)}</span></td>

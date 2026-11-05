@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="en" class="bg-base">
+<html lang="en" class="bg-page">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#090D16">
+<meta name="theme-color" content="#F4F7F6">
 <title>Member area · ProvenDrop</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' fill='%23090D16'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%23F1F5F9' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='8' fill='%230D9488'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Same theme as index.html. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Same clean SaaS theme as index.html; dashboard shell with a sidebar. -->
 <link rel="stylesheet" href="tailwind.css">
 <!-- S6: strict CSP (no inline scripts: the logic lives in app.js) and SRI on the pinned supabase-js.
      connect-src must match SUPABASE_URL in config.js. -->
@@ -21,133 +21,165 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
 <script src="app.js" defer></script>
 </head>
-<body class="bg-base text-slate-300">
-<!-- no backdrop-filter here: it would become the containing block of the fixed tab bar on phones -->
-<header class="sticky top-0 z-10 border-b border-slate-800 bg-base">
-  <div class="mx-auto flex min-h-14 w-full max-w-[1320px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
-    <a class="inline-flex items-center gap-3 font-mono text-[13px] font-semibold uppercase tracking-[0.18em] text-slate-100 no-underline" translate="no" href="./">
-      <svg width="20" height="20" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" fill="#F1F5F9"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#090D16" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      ProvenDrop
+<body class="bg-page text-ink">
+<div class="flex min-h-dvh">
+  <!-- sidebar (desktop) / bottom tab bar (phones). Hidden entirely while signed out (CSS: body:has(#tabs[hidden])). -->
+  <aside class="sticky top-0 flex h-dvh w-64 shrink-0 flex-col border-r border-line bg-white px-4 py-5 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:z-20 max-lg:h-auto max-lg:w-auto max-lg:border-r-0 max-lg:border-t max-lg:px-2 max-lg:py-0 max-lg:pb-[env(safe-area-inset-bottom)]" id="side">
+    <a class="inline-flex items-center gap-2.5 px-2 text-[18px] font-extrabold tracking-tight text-ink no-underline max-lg:hidden" translate="no" href="./">
+      <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0D9488"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Proven<span class="text-brand">Drop</span></span>
     </a>
-    <nav class="flex self-stretch max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:z-10 max-md:justify-around max-md:border-t max-md:border-slate-800 max-md:bg-base max-md:pb-[max(6px,env(safe-area-inset-bottom))]" id="tabs" role="tablist" aria-label="Sections" hidden>
-      <button class="border-b-2 border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 hover:text-slate-200 aria-selected:border-slate-100 aria-selected:text-slate-100 max-md:border-b-0 max-md:border-t-2 max-md:px-2 max-md:py-3 max-md:text-[10px]" role="tab" data-tab="hoje" aria-selected="true">Today</button>
-      <button class="border-b-2 border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 hover:text-slate-200 aria-selected:border-slate-100 aria-selected:text-slate-100 max-md:border-b-0 max-md:border-t-2 max-md:px-2 max-md:py-3 max-md:text-[10px]" role="tab" data-tab="arquivo" aria-selected="false">Archive</button>
-      <button class="border-b-2 border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 hover:text-slate-200 aria-selected:border-slate-100 aria-selected:text-slate-100 max-md:border-b-0 max-md:border-t-2 max-md:px-2 max-md:py-3 max-md:text-[10px]" role="tab" data-tab="prefs" aria-selected="false">Preferences</button>
-      <button class="border-b-2 border-transparent px-4 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400 hover:text-slate-200 aria-selected:border-slate-100 aria-selected:text-slate-100 max-md:border-b-0 max-md:border-t-2 max-md:px-2 max-md:py-3 max-md:text-[10px]" role="tab" data-tab="conta" aria-selected="false">Subscription</button>
+    <nav class="mt-7 grid gap-1 max-lg:mt-0 max-lg:flex max-lg:justify-around max-lg:gap-0" id="tabs" role="tablist" aria-label="Sections" hidden>
+      <p class="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3 max-lg:hidden">General</p>
+      <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="hoje" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg>Today</button>
+      <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="arquivo" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg>Archive</button>
+      <p class="mt-4 px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3 max-lg:hidden">Account</p>
+      <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="prefs" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.5"/><circle cx="9" cy="17" r="2.5"/></svg>Preferences</button>
+      <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="conta" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Subscription</button>
     </nav>
-    <div class="flex min-w-0 items-center gap-3 font-mono text-[11px] text-slate-400" id="who" hidden><span class="max-w-[28ch] truncate max-md:hidden" id="whoEmail"></span><button class="btn btn-line btn-sm" id="btnSair" type="button">Sign out</button></div>
-  </div>
-</header>
-
-<main class="mx-auto w-full max-w-[1320px] px-4 pb-28 pt-8 sm:px-6 md:pb-16 lg:px-10">
-  <!-- 0. not configured -->
-  <section id="vConfig" hidden>
-    <div class="mx-auto mt-6 max-w-[520px] border border-slate-800 bg-panel p-7 md:mt-16">
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">Member area</p>
-      <h1 class="mt-3 font-display text-[clamp(32px,4vw,44px)] font-medium leading-[1.05] text-slate-100">The member area is not active yet</h1>
-      <p class="mt-3 text-slate-400">This page starts working once the connection to the server is configured. Until then there is nothing to see here.</p>
-      <p class="mt-5"><a class="btn btn-line" href="./">Back to the site</a></p>
+    <div class="mt-auto rounded-2xl bg-page p-4 text-[13px] text-ink-2 max-lg:hidden">
+      <b class="block text-ink">Need help?</b>
+      Reply to any ProvenDrop e-mail and we answer you.
     </div>
-  </section>
+  </aside>
 
-  <!-- 1. sign in -->
-  <section id="vLogin" hidden>
-    <form class="mx-auto mt-6 max-w-[520px] border border-slate-800 bg-panel p-7 md:mt-16" id="formLogin" novalidate>
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">Member area · sign in</p>
-      <h1 class="mt-3 font-display text-[clamp(32px,4vw,44px)] font-medium leading-[1.05] text-slate-100">Sign in to your area</h1>
-      <p class="mt-3 text-slate-400">Enter the e-mail you paid with. We send you a sign-in link: no password.</p>
-      <div class="mt-6">
-        <label class="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400" for="email">E-mail</label>
-        <input class="field" type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
+  <div class="min-w-0 flex-1">
+    <header class="sticky top-0 z-10 border-b border-line bg-white/85 backdrop-blur">
+      <div class="mx-auto flex min-h-16 w-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <a class="inline-flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight text-ink no-underline lg:hidden" translate="no" href="./">
+          <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0D9488"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Proven<span class="text-brand">Drop</span></span>
+        </a>
+        <p class="hidden text-[13px] font-medium text-ink-3 lg:block"><a class="hover:text-ink" href="./">ProvenDrop</a><span class="mx-2">/</span><span class="font-semibold text-ink">Member area</span></p>
+        <div class="flex min-w-0 items-center gap-3 text-[13px] font-medium text-ink-2" id="who" hidden><span class="max-w-[28ch] truncate max-md:hidden" id="whoEmail"></span><button class="btn btn-line btn-sm" id="btnSair" type="button">Sign out</button></div>
       </div>
-      <button class="btn btn-go mt-3 w-full" id="btnLogin" type="submit">Send sign-in link</button>
-      <div class="msg" id="msgLogin" hidden></div>
-      <p class="mt-5 font-mono text-[12px] leading-relaxed text-slate-400 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-slate-200">Not a member yet? <a href="./#join">Subscribe on the site</a>. Click customer? Your access is through the Click WhatsApp group.</p>
-    </form>
-  </section>
+    </header>
 
-  <!-- 2. signed in but no active subscription -->
-  <section id="vSemAcesso" hidden>
-    <div class="mx-auto mt-6 max-w-[520px] border border-slate-800 bg-panel p-7 md:mt-16">
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">Member area · access</p>
-      <h1 class="mt-3 font-display text-[clamp(32px,4vw,44px)] font-medium leading-[1.05] text-slate-100" id="semTitulo">No active subscription</h1>
-      <p class="mt-3 text-slate-400" id="semTexto"></p>
-      <div class="mt-6 flex flex-wrap gap-2.5">
-        <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
-        <a class="btn btn-go" id="semRegresso" href="#" target="_blank" rel="noopener" hidden>Subscribe again (monthly fee only)</a>
-        <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. member area -->
-  <section id="vApp" hidden>
-    <div id="tHoje" role="tabpanel">
-      <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-slate-800 pb-5">
-        <div><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ Today · restricted</p><h1 class="mt-2 font-display text-[clamp(32px,4vw,46px)] font-medium leading-[1.05] text-slate-100" id="hojeTitulo">Today’s collections</h1><p class="mt-1.5 font-mono text-[12px] text-slate-400" id="hojeSub"></p></div>
-        <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-slate-400" id="hojeHora"></p>
-      </div>
-      <div class="msg aviso" id="aviso" hidden></div>
-      <div class="msg aviso" id="hojePrefs" hidden>You have not chosen your niche and your countries yet. <a href="#" data-go="prefs">Choose now</a>: what matters to you comes first.</div>
-      <div class="mt-5 md:overflow-x-auto" id="feed"></div>
-    </div>
-
-    <div id="tArquivo" role="tabpanel" hidden>
-      <div class="border-b border-slate-800 pb-5"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ Archive · restricted</p><h1 class="mt-2 font-display text-[clamp(32px,4vw,46px)] font-medium leading-[1.05] text-slate-100">Archive of approved collections</h1><p class="mt-2 max-w-[64ch] text-slate-400">Every approved collection, where it advertises (Meta, Google or both), and whether the store is still advertising it.</p></div>
-      <div class="mt-5 grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div><label class="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
-        <div><label class="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400" for="fPais">Strongest market</label><select class="field" id="fPais"><option value="">All</option></select></div>
-        <div><label class="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400" for="fPlat">Platform</label><select class="field" id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
-        <label class="check min-h-11"><input type="checkbox" id="fAtivas"> Only still advertising</label>
-      </div>
-      <div class="mt-5 md:overflow-x-auto" id="arqBox"></div>
-    </div>
-
-    <div id="tPrefs" role="tabpanel" hidden>
-      <div class="border-b border-slate-800 pb-5"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ Preferences</p><h1 class="mt-2 font-display text-[clamp(32px,4vw,46px)] font-medium leading-[1.05] text-slate-100">Preferences</h1><p class="mt-2 max-w-[64ch] text-slate-400">Your niche and your countries. The collections that matter to you come first; the others stay visible.</p></div>
-      <form class="mt-5 max-w-[760px] border border-slate-800 bg-panel p-6" id="formPrefs">
-        <h3 class="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">Niches</h3>
-        <div class="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2" id="prefNichos"></div>
-        <h3 class="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-400">Countries you sell in</h3>
-        <div class="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2" id="prefPaises"></div>
-        <button class="btn btn-go mt-6" type="submit">Save preferences</button>
-        <div class="msg" id="msgPrefs" hidden></div>
-      </form>
-    </div>
-
-    <div id="tConta" role="tabpanel" hidden>
-      <div class="border-b border-slate-800 pb-5"><p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">§ Subscription</p><h1 class="mt-2 font-display text-[clamp(32px,4vw,46px)] font-medium leading-[1.05] text-slate-100">Subscription</h1><p class="mt-2 text-slate-400">No minimum term: cancel whenever you want.</p></div>
-      <div class="mt-5 max-w-[760px] border border-slate-800 bg-panel">
-        <dl class="grid gap-px bg-slate-800 sm:grid-cols-3">
-          <div class="bg-panel px-5 py-4"><dt class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">E-mail</dt><dd class="mt-1 truncate font-mono text-[13px] text-slate-100" id="contaEmail"></dd></div>
-          <div class="bg-panel px-5 py-4"><dt class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Status</dt><dd class="mt-1 font-mono text-[13px] text-slate-100" id="contaEstado"></dd></div>
-          <div class="bg-panel px-5 py-4"><dt class="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">Member since</dt><dd class="mt-1 font-mono text-[13px] text-slate-100" id="contaDesde"></dd></div>
-        </dl>
-        <div class="border-t border-slate-800 px-5 py-5">
-          <div class="flex flex-wrap gap-2.5">
-            <a class="btn btn-go" id="contaPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
-            <button class="btn btn-line" type="button" id="btnGuia">See the 1-minute guide</button>
-          </div>
-          <p class="mt-4 font-mono text-[12px] leading-relaxed text-slate-400" id="contaNota"></p>
+    <main class="mx-auto w-full max-w-[1280px] px-4 pb-28 pt-7 sm:px-6 lg:px-8 lg:pb-12">
+      <!-- 0. not configured -->
+      <section id="vConfig" hidden>
+        <div class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9">
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink">The member area is not active yet</h1>
+          <p class="mt-3 text-ink-2">This page starts working once the connection to the server is configured. Until then there is nothing to see here.</p>
+          <p class="mt-6"><a class="btn btn-line" href="./">Back to the site</a></p>
         </div>
-      </div>
-    </div>
-  </section>
-</main>
+      </section>
 
-<footer class="border-t border-slate-800 py-6 font-mono text-[11px] leading-relaxed text-slate-400 max-md:pb-24"><div class="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10">The photographs in the kits belong to competitor stores and are for reference only: never publish them in your ads. No fake discounts, countdowns or health claims. Kit documents are currently written in Portuguese.</div></footer>
+      <!-- 1. sign in -->
+      <section id="vLogin" hidden>
+        <form class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9" id="formLogin" novalidate>
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink">Sign in to your area</h1>
+          <p class="mt-3 text-ink-2">Enter the e-mail you paid with. We send you a sign-in link: no password.</p>
+          <div class="mt-6">
+            <label class="mb-1.5 block text-[13px] font-bold text-ink" for="email">E-mail</label>
+            <input class="field" type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
+          </div>
+          <button class="btn btn-go mt-3 w-full" id="btnLogin" type="submit">Send sign-in link</button>
+          <div class="msg" id="msgLogin" hidden></div>
+          <p class="mt-5 text-[13px] leading-relaxed text-ink-2 [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4">Not a member yet? <a href="./#join">Subscribe on the site</a>. Click customer? Your access is through the Click WhatsApp group.</p>
+        </form>
+      </section>
+
+      <!-- 2. signed in but no active subscription -->
+      <section id="vSemAcesso" hidden>
+        <div class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9">
+          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="semTitulo">No active subscription</h1>
+          <p class="mt-3 text-ink-2" id="semTexto"></p>
+          <div class="mt-6 flex flex-wrap gap-2.5">
+            <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
+            <a class="btn btn-go" id="semRegresso" href="#" target="_blank" rel="noopener" hidden>Subscribe again (monthly fee only)</a>
+            <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. member area -->
+      <section id="vApp" hidden>
+        <div id="tHoje" role="tabpanel">
+          <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+            <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="hojeTitulo">Today’s collections</h1><p class="mt-1 text-[14px] text-ink-2" id="hojeSub"></p></div>
+            <p class="rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink-2 empty:hidden" id="hojeHora"></p>
+          </div>
+          <div class="msg aviso" id="aviso" hidden></div>
+          <div class="msg aviso" id="hojePrefs" hidden>You have not chosen your niche and your countries yet. <a href="#" data-go="prefs">Choose now</a>: what matters to you comes first.</div>
+          <dl class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Today in numbers">
+            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Collections today</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-ink" id="kpiTotal">—</dd></div>
+            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Approved</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-ok" id="kpiOk">—</dd></div>
+            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Under observation</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-watch" id="kpiWatch">—</dd></div>
+            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Kits ready</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-brand-dark" id="kpiKits">—</dd></div>
+          </dl>
+          <div class="card-deep mt-4 p-5 md:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <span class="inline-flex items-center gap-2 text-[15px] font-bold text-white"><span class="size-2 rounded-full bg-emerald-400"></span>Daily list</span>
+              <span class="text-[12px] font-semibold text-white/50">Your niche first · kit on every collection</span>
+            </div>
+            <div class="md:overflow-x-auto" id="feed"></div>
+          </div>
+        </div>
+
+        <div id="tArquivo" role="tabpanel" hidden>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Archive of approved collections</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Every approved collection, where it advertises (Meta, Google or both), and whether the store is still advertising it.</p></div>
+          <div class="card mt-6 p-5 md:p-6">
+            <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
+              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPais">Strongest market</label><select class="field" id="fPais"><option value="">All</option></select></div>
+              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPlat">Platform</label><select class="field" id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
+              <label class="check min-h-11"><input type="checkbox" id="fAtivas"> Only still advertising</label>
+            </div>
+            <div class="mt-5 md:overflow-x-auto" id="arqBox"></div>
+          </div>
+        </div>
+
+        <div id="tPrefs" role="tabpanel" hidden>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Preferences</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Your niche and your countries. The collections that matter to you come first; the others stay visible.</p></div>
+          <form class="card mt-6 max-w-[760px] p-5 md:p-7" id="formPrefs">
+            <h3 class="text-[13px] font-bold text-ink">Niches</h3>
+            <div class="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2" id="prefNichos"></div>
+            <h3 class="mt-6 text-[13px] font-bold text-ink">Countries you sell in</h3>
+            <div class="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2" id="prefPaises"></div>
+            <button class="btn btn-go mt-6" type="submit">Save preferences</button>
+            <div class="msg" id="msgPrefs" hidden></div>
+          </form>
+        </div>
+
+        <div id="tConta" role="tabpanel" hidden>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Subscription</h1><p class="mt-1 text-[14px] text-ink-2">No minimum term: cancel whenever you want.</p></div>
+          <div class="mt-6 max-w-[760px]">
+            <dl class="grid gap-3 sm:grid-cols-3">
+              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">E-mail</dt><dd class="mt-1 truncate text-[15px] font-bold text-ink" id="contaEmail"></dd></div>
+              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Status</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaEstado"></dd></div>
+              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Member since</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaDesde"></dd></div>
+            </dl>
+            <div class="card mt-3 p-5 md:p-6">
+              <div class="flex flex-wrap gap-2.5">
+                <a class="btn btn-go" id="contaPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
+                <button class="btn btn-line" type="button" id="btnGuia">See the 1-minute guide</button>
+              </div>
+              <p class="mt-4 text-[13px] leading-relaxed text-ink-2" id="contaNota"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-line py-6 text-[12px] leading-relaxed text-ink-3 max-lg:pb-24"><div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">The photographs in the kits belong to competitor stores and are for reference only: never publish them in your ads. No fake discounts, countdowns or health claims. Kit documents are currently written in Portuguese.</div></footer>
+  </div>
+</div>
 
 <!-- first-visit guide -->
-<div class="fixed inset-0 z-30 grid place-items-center bg-base/85 p-4" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
-  <div class="relative max-h-[calc(100dvh-32px)] w-full max-w-[640px] overflow-y-auto border border-slate-700 bg-panel p-7 pr-14">
-    <button class="absolute right-3 top-3 grid size-9 place-items-center border border-slate-700 font-mono text-[14px] text-slate-200 hover:border-slate-300" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>
-    <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-400">Briefing · 1 minute</p>
-    <h2 class="mt-2 font-display text-[clamp(26px,3vw,34px)] font-medium leading-[1.1] text-slate-100" id="guiaTitulo">Welcome. One minute to get started.</h2>
-    <ol class="mt-5 grid gap-px border-y border-slate-800 bg-slate-800">
-      <li class="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 bg-panel py-3.5"><span class="font-mono text-[11px] text-slate-400" aria-hidden="true">01</span><b class="font-mono text-[13px] font-medium text-slate-100">Open a collection</b><span class="col-start-2 mt-1 text-[14px] text-slate-400">“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
-      <li class="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 bg-panel py-3.5"><span class="font-mono text-[11px] text-slate-400" aria-hidden="true">02</span><b class="font-mono text-[13px] font-medium text-slate-100">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-slate-400">Every collection in the list comes with a kit: reference photographs, 20 creative prompts, 4 UGC videos and the Google Ads material. Collections under observation are labelled: test them with a small budget. Read LEIA-ME first.</span></li>
-      <li class="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 bg-panel py-3.5"><span class="font-mono text-[11px] text-slate-400" aria-hidden="true">03</span><b class="font-mono text-[13px] font-medium text-slate-100">Paste the prompts into ChatGPT</b><span class="col-start-2 mt-1 text-[14px] text-slate-400">With the reference photographs attached, you generate the 20 images ready to advertise. Never publish the original photographs.</span></li>
-      <li class="grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 bg-panel py-3.5"><span class="font-mono text-[11px] text-slate-400" aria-hidden="true">04</span><b class="font-mono text-[13px] font-medium text-slate-100">Launch Google Ads</b><span class="col-start-2 mt-1 text-[14px] text-slate-400">Keywords, negative keywords, Shopping titles and landing-page copy are in the file 3 - Google Ads. Start with the strongest market.</span></li>
+<div class="fixed inset-0 z-30 grid place-items-center bg-ink/55 p-4 backdrop-blur-sm" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
+  <div class="card relative max-h-[calc(100dvh-32px)] w-full max-w-[640px] overflow-y-auto p-7 pr-14 md:p-8 md:pr-14">
+    <button class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-line bg-white text-[14px] font-bold text-ink hover:border-ink-2" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>
+    <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Welcome · 1 minute</p>
+    <h2 class="mt-2 text-[clamp(24px,3vw,32px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="guiaTitulo">Welcome. One minute to get started.</h2>
+    <ol class="mt-5 grid gap-3">
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">1</span><b class="text-[14px] font-bold text-ink">Open a collection</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">2</span><b class="text-[14px] font-bold text-ink">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Every collection in the list comes with a kit: reference photographs, 20 creative prompts, 4 UGC videos and the Google Ads material. Collections under observation are labelled: test them with a small budget. Read LEIA-ME first.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">3</span><b class="text-[14px] font-bold text-ink">Paste the prompts into ChatGPT</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">With the reference photographs attached, you generate the 20 images ready to advertise. Never publish the original photographs.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">4</span><b class="text-[14px] font-bold text-ink">Launch Google Ads</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Keywords, negative keywords, Shopping titles and landing-page copy are in the file 3 - Google Ads. Start with the strongest market.</span></li>
     </ol>
     <div class="mt-6 flex flex-wrap gap-2.5">
       <button class="btn btn-go" type="button" id="guiaOk">Choose my niche and countries</button>
