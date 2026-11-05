@@ -1,0 +1,117 @@
+/* ProvenDrop · Tailwind source. Build: `npm run build:css` → ../tailwind.css (committed).
+   Theme: dark / industrial. Cormorant Garamond for editorial titles, JetBrains Mono
+   for data, numbers, tables and buttons. No shadows, no large radii, no gradients.
+   Component classes below exist only because app.js / index.html set them by name
+   (className = "msg erro", classList.toggle("top-mk"), generated rows) or because
+   they need pseudo-elements (status dot, stacked table labels). Everything else is utilities. */
+@import "tailwindcss";
+@source "../index.html";
+@source "../app.html";
+@source "../app.js";
+
+@theme {
+  --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-base: #090D16;
+  --color-panel: #0C1120;
+  --color-raised: #111827;
+  --color-ok: #34D399;
+  --color-watch: #FBBF24;
+  --color-bad: #F87171;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { @apply bg-base font-sans text-[15px] leading-relaxed text-slate-300 antialiased; overflow-wrap: break-word; }
+  h1, h2, h3 { @apply text-balance; }
+  ::selection { @apply bg-slate-200 text-base; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-slate-200; }
+  summary::-webkit-details-marker { display: none; }
+  summary { list-style: none; }
+}
+
+@layer components {
+  /* buttons (mono, square, no gradients) */
+  .btn { @apply inline-flex min-h-11 cursor-pointer select-none items-center justify-center gap-2 border px-5 py-2 text-center font-mono text-[12px] font-medium uppercase tracking-[0.14em] no-underline transition-colors duration-150; -webkit-tap-highlight-color: transparent; }
+  .btn-go { @apply border-slate-100 bg-slate-100 text-base hover:border-white hover:bg-white; }
+  .btn-line { @apply border-slate-700 bg-transparent text-slate-200 hover:border-slate-300 hover:text-white; }
+  .btn-sm { @apply min-h-9 px-3.5 py-1.5 text-[11px]; }
+  .btn[disabled], .btn[aria-disabled="true"] { @apply pointer-events-none cursor-not-allowed opacity-40; }
+
+  /* status (approved / under observation) */
+  .status { @apply inline-flex items-center gap-2 whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.16em]; }
+  .status::before { content: ""; @apply size-2 shrink-0 bg-current; }
+  .status.go { @apply text-ok; }
+  .status.watch { @apply text-watch; }
+  .status.watch::before { @apply border border-current bg-transparent; }
+
+  /* values reserved for members */
+  .redact { @apply inline-block h-[0.62em] max-w-full bg-slate-700 align-baseline; }
+
+  /* messages set by app.js (el.className = "msg erro") */
+  .msg { @apply mt-3 border border-slate-700 bg-panel px-3.5 py-2.5 font-mono text-[12.5px] leading-snug text-slate-200; }
+  .msg.erro { @apply border-bad/60 text-bad; }
+  .msg.aviso { @apply border-watch/60 text-watch; }
+  .empty { @apply border border-dashed border-slate-800 px-5 py-10 text-center font-mono text-[12.5px] text-slate-400; }
+
+  /* facts: a 1px grid of label/value cells */
+  .facts { @apply grid gap-px border border-slate-800 bg-slate-800; }
+  .facts > div { @apply min-w-0 bg-base px-3 py-2; }
+  .facts dt { @apply font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400; }
+  .facts dd { @apply mt-1 font-mono text-[17px] leading-tight tabular-nums text-slate-100; }
+  .at { @apply mt-0.5 block font-mono text-[10px] normal-case tracking-normal text-slate-400; }
+  /* e-mail mock-up on index.html (rendered by script) */
+  .dot { @apply mr-2 inline-block size-2 align-middle; }
+  .dot.go { @apply bg-ok; }
+  .dot.watch { @apply border border-watch bg-transparent; }
+  .time { @apply mt-1 block text-right font-mono text-[10px] text-slate-400; }
+  /* member area: rows of the member's own niche come first and carry a mark */
+  .dt .pref-first > td:first-child { @apply border-l-2 border-l-ok pl-3; }
+  .msg a { @apply underline underline-offset-4; }
+
+  /* six-market strip */
+  .strip { @apply grid grid-cols-6 gap-px border border-slate-800 bg-slate-800; }
+  .strip li { @apply grid h-7 place-items-center bg-base font-mono text-[11px] font-medium text-slate-400; }
+  .strip .ok { @apply bg-slate-100 text-base; }
+
+  /* advertising platforms */
+  .plat { @apply inline-flex items-center gap-1.5 border border-slate-700 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-slate-400; }
+  .plat.meta { @apply border-sky-900 text-sky-300; }
+  .plat.google { @apply border-amber-900 text-amber-300; }
+
+  /* data tables (index archive, app today/archive). Stacked key/value blocks under 768px. */
+  .dt { @apply w-full border-collapse font-mono text-[13px]; }
+  .dt th { @apply whitespace-nowrap border-b border-slate-800 px-3 py-2.5 text-left text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400; }
+  .dt td { @apply border-b border-slate-800 px-3 py-3 align-top text-slate-200; }
+  .dt tbody tr { @apply transition-colors duration-150 hover:bg-raised/50; }
+  .dt tr > :first-child { @apply pl-0; }
+  .dt tr > :last-child { @apply pr-0; }
+  .dt .n { @apply tabular-nums; }
+  .dt .sub { @apply block text-[11px] leading-snug text-slate-400; }
+  .dt a { @apply underline decoration-slate-600 underline-offset-4 hover:decoration-slate-300; }
+  @media (max-width: 767px) {
+    .dt thead { @apply sr-only; }
+    .dt, .dt tbody, .dt tr, .dt td { @apply block w-full; }
+    .dt tr { @apply border-b border-slate-800 py-3; }
+    .dt td { @apply grid grid-cols-[104px_minmax(0,1fr)] gap-2.5 border-0 px-0 py-1; }
+    .dt td::before { content: attr(data-l); @apply pt-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400; }
+    .dt td > * { @apply col-start-2; }
+  }
+
+  /* forms */
+  .field { @apply min-h-11 w-full border border-slate-700 bg-panel px-3 py-2 font-mono text-[13px] text-slate-100 placeholder:text-slate-600 focus:border-slate-300 focus:outline-none; }
+  select.field { @apply appearance-none bg-no-repeat pr-9; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%2394a3b8' stroke-width='1.5'><path d='M2.5 4.5 6 8l3.5-3.5'/></svg>"); background-size: 12px 12px; background-position: right 12px center; }
+  .check { @apply flex cursor-pointer items-center gap-2.5 border border-slate-800 bg-panel px-3 py-2.5 font-mono text-[12.5px] text-slate-200 has-checked:border-slate-300 has-checked:text-white; }
+  .check input { @apply m-0 size-4 accent-slate-100; }
+
+  /* index: the strongest market in the markets list (toggled by script) */
+  .top-mk { @apply text-ok; }
+  /* faq */
+  .faq details[open] summary svg { transform: rotate(45deg); }
+  .faq summary svg { transition: transform 200ms ease; }
+}
+
+/* index: mobile menu (class toggled by script). Unlayered on purpose: it must beat the `hidden` utility. */
+#nav.open { display: flex; }

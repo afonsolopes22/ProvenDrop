@@ -1,0 +1,13 @@
+{
+  "name": "provendrop",
+  "private": true,
+  "description": "ProvenDrop · site público e área de membros (GitHub Pages). Só o CSS tem build: Tailwind compilado para tailwind.css.",
+  "scripts": {
+    "build:css": "tailwindcss -i src/tailwind.css -o tailwind.css --minify",
+    "watch:css": "tailwindcss -i src/tailwind.css -o tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}
