@@ -40,6 +40,11 @@
 //
 // Logs e respostas sem e-mails nem erros internos (B5/S13): os e-mails aparecem
 // como "u:<hash>" e as respostas 500 dizem só "erro interno".
+//
+// Versões da API (2026-11-06): o endpoint real entrega os eventos na API
+// 2026-10-28.endive; as chamadas do SDK ficam fixadas em 2025-02-24.acacia. Os
+// campos que mudaram entre as duas (subscrição da fatura, price_id das linhas,
+// current_period_end, origem) são lidos nas duas formas por compat.ts.
 
 import Stripe from "npm:stripe@17.7.0";
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
@@ -47,9 +52,12 @@ import { enviarEmail, esc, molde } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
+import {
+  fimDoPeriodo, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat, precosDasLinhas, subscricaoDaInvoice, type Origem,
+} from "./compat.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-02-24.acacia", // a versão do SDK stripe@17.7.0 (forma "acacia"); os eventos chegam na 2026-10-28.endive (compat.ts)
   httpClient: Stripe.createFetchHttpClient(),
 });
 const cryptoProvider = Stripe.createSubtleCryptoProvider();
@@ -76,7 +84,6 @@ function horaTexto(): string {
 }
 const HORA = horaTexto();
 
-type Origem = "direto" | "click";
 type Estado = "ativo" | "em_atraso" | "incompleto" | "cancelado";
 
 interface Subscritor {
@@ -165,8 +172,8 @@ Deno.serve(async (req) => {
       }
       case "invoice.paid":
       case "invoice.payment_failed": {
-        const inv = evento.data.object as Stripe.Invoice;
-        const subId = typeof inv.subscription === "string" ? inv.subscription : inv.subscription?.id ?? null;
+        // invoice.subscription (acacia) ou invoice.parent.subscription_details.subscription (endive): compat.ts
+        const subId = subscricaoDaInvoice(evento.data.object);
         if (!subId) { console.warn(`${evento.type} ${evento.id} sem subscrição: ignorado`); break; } // B2
         resultado = await sincronizarSubscricao(subId, null, false);
         break;
@@ -193,34 +200,21 @@ Deno.serve(async (req) => {
 // ───────────────────────────────────────────────────────────────────────
 // Origem
 
-function origemDeMetadata(m: Stripe.Metadata | null | undefined): Origem | null {
-  const o = (m?.origem ?? "").trim().toLowerCase();
-  return o === "direto" || o === "click" ? o : null;
-}
-
-function origemDePrecos(precos: string[]): Origem | null {
-  if (PRICE_DIRETO && precos.includes(PRICE_DIRETO)) return "direto";
-  if (PRICE_CLICK && precos.includes(PRICE_CLICK)) return "click";
-  return null;
-}
-
-/** M5: um erro da API ao listar as linhas é um erro (o Stripe repete), não "sem preços". */
-async function precosDaSessao(s: Stripe.Checkout.Session): Promise<string[]> {
-  const linhas = await stripe.checkout.sessions.listLineItems(s.id, { limit: 20 });
-  return linhas.data.map((l) => l.price?.id ?? "").filter(Boolean);
-}
-
+// Metadata da sessão/subscrição → price_id das linhas (nas duas formas da API,
+// compat.ts) → payment link. M5: um erro da API ao listar as linhas é um erro
+// (o Stripe repete), não "sem preços".
 async function origemDaSessao(s: Stripe.Checkout.Session): Promise<Origem | null> {
-  const m = origemDeMetadata(s.metadata);
-  if (m) return m;
-  const porPreco = origemDePrecos(await precosDaSessao(s));
+  const semLinhas = origemCompat(s, [], PRICE_DIRETO, PRICE_CLICK);
+  if (semLinhas) return semLinhas;
+  const linhas = await stripe.checkout.sessions.listLineItems(s.id, { limit: 20 });
+  const porPreco = origemCompat(s, precosDasLinhas(linhas.data).map((id) => ({ price: { id } })), PRICE_DIRETO, PRICE_CLICK);
   if (porPreco) return porPreco;
   if (LINK_DIRETO && s.payment_link === LINK_DIRETO) return "direto";
   return null;
 }
 
 function origemDaSubscricao(sub: Stripe.Subscription): Origem | null {
-  return origemDeMetadata(sub.metadata) ?? origemDePrecos(sub.items.data.map((i) => i.price?.id ?? ""));
+  return origemSubCompat(sub, PRICE_DIRETO, PRICE_CLICK);
 }
 
 // ───────────────────────────────────────────────────────────────────────
@@ -265,8 +259,10 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
 
   const estado = estadoDe(sub.status);
   const emAtrasoDesde = estado === "em_atraso" ? (existente.data?.em_atraso_desde ?? new Date().toISOString()) : null;
+  // current_period_end no topo (acacia) ou em items.data[0] (endive): compat.ts
+  const fim = fimDoPeriodo(sub);
   const cancelAt = sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString()
-    : sub.cancel_at_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null;
+    : sub.cancel_at_period_end && fim ? new Date(fim * 1000).toISOString() : null;
 
   const up = await admin.from("subscricoes").upsert({
     stripe_subscription_id: sub.id, stripe_customer_id: customer, email, origem, estado,

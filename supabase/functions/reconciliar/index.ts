@@ -17,7 +17,7 @@ import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-02-24.acacia", // a versão do SDK stripe@17.7.0 (só lê status e customer: igual nas duas formas)
   httpClient: Stripe.createFetchHttpClient(),
 });
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
