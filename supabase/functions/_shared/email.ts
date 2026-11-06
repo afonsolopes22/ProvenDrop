@@ -53,17 +53,26 @@ export function esc(v: unknown): string {
   return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
-/** Molde HTML simples e legível em qualquer cliente de e-mail. */
+/** Base pública do site (pasta de APP_URL), para o logo dos e-mails (PNG: os clientes de e-mail não mostram SVG). */
+function baseSite(): string {
+  const app = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
+  return app.replace(/[^/]*$/, "");
+}
+
+/** Molde HTML simples e legível em qualquer cliente de e-mail. Cores do tema (teal #0F766E). */
 export function molde(titulo: string, corpoHtml: string, botao?: { texto: string; url: string }, rodape?: string): string {
   const b = botao
-    ? `<p style="margin:28px 0"><a href="${esc(botao.url)}" style="display:inline-block;background:#78C995;color:#101310;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:6px">${esc(botao.texto)}</a></p>`
+    ? `<p style="margin:28px 0"><a href="${esc(botao.url)}" style="display:inline-block;background:#0F766E;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:10px">${esc(botao.texto)}</a></p>`
     : "";
-  return `<!doctype html><html lang="en"><body style="margin:0;background:#F7F8F6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#171A18">
+  return `<!doctype html><html lang="en"><body style="margin:0;background:#F4F7F6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0E1A17">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px">
-  <p style="font-weight:700;font-size:18px;margin:0 0 24px">ProvenDrop</p>
-  <h1 style="font-size:24px;line-height:1.25;margin:0 0 16px;font-weight:600">${esc(titulo)}</h1>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px"><tr>
+    <td style="padding:0 10px 0 0;vertical-align:middle"><img src="${esc(baseSite())}assets/logo-email.png" width="36" height="36" alt="" style="display:block;border:0;border-radius:9px"></td>
+    <td style="vertical-align:middle;font-weight:800;font-size:19px;letter-spacing:-0.01em"><span style="color:#0B1F1E">Proven</span><span style="color:#0F766E">Drop</span></td>
+  </tr></table>
+  <h1 style="font-size:24px;line-height:1.25;margin:0 0 16px;font-weight:700">${esc(titulo)}</h1>
   <div style="font-size:16px;line-height:1.55">${corpoHtml}</div>
   ${b}
-  ${rodape ? `<p style="font-size:13px;color:#5C645E;line-height:1.5;margin-top:32px;border-top:1px solid #E6E9E5;padding-top:16px">${rodape}</p>` : ""}
+  ${rodape ? `<p style="font-size:13px;color:#5B6B66;line-height:1.5;margin-top:32px;border-top:1px solid #E2E8E6;padding-top:16px">${rodape}</p>` : ""}
 </div></body></html>`;
 }
