@@ -9,3 +9,10 @@ verify_jwt = false
 
 [functions.email-diario]
 verify_jwt = false
+
+[functions.reconciliar]
+verify_jwt = false
+
+# Chamada pelo browser (bem-vindo.html) sem sessão: valida a sessão de checkout no Stripe e tem rate-limit por IP.
+[functions.corrigir-email]
+verify_jwt = false
