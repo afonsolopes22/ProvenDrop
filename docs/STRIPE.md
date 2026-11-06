@@ -12,7 +12,7 @@ Rótulos dos menus: o Dashboard do Stripe em português (Europa). Entre parênte
 | Produto **ProvenDrop via Click**, 15 €/mês | `price_1UYaWLJPREpzETp6beErOUxC` | segredo `STRIPE_PRICE_CLICK` (valor por omissão do `setup-supabase.ps1`) |
 | Produto **Adesão ProvenDrop**, 25 € uma vez, **só no link Direct** | `price_1UYaXiJPREpzETp6GoaPRcuA` (produto `prod_VZk1TG0Nv8evG3`) | só no Stripe |
 | Payment Link **Direct** (Direct + Adesão: 40 € no 1.º mês, depois 15 €/mês) | `https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00` | `config.js` → `STRIPE_LINK_DIRECT` |
-| Payment Link **via Click** (só ProvenDrop via Click, 15 €/mês, **sem adesão**) | `https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01` | só a Click o usa; nunca aparece no site |
+| Payment Link **via Click** (só ProvenDrop via Click, 15 €/mês, **sem adesão**) | `https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01` | `config.js` → `STRIPE_LINK_CLICK`: botão "Subscribe with Click — €15/month" nos cartões "Are you a Click customer?" do site (desde 2026-11-06, visível a todos); a Click também o pode enviar |
 | Portal de cliente | `https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00` | `config.js` → `STRIPE_PORTAL_LINK` |
 | Webhook `provendrop-supabase` | `we_1UYavbJPREpzETp6L1Gn66lh` → `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/stripe-webhook` | segredo `STRIPE_WEBHOOK_SECRET` (o `whsec_` deste endpoint) |
 | Payment Link **Direct de regresso** (só mensalidade, para ex-membros) | **ainda não existe em modo real** | `config.js` → `STRIPE_LINK_RETURN` fica vazio; a área mostra o Subscribe normal a ex-membros até existir |
@@ -37,9 +37,9 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 - **Produtos**: só ProvenDrop via Click 15,00 €/mês. **Sem** adesão.
 - **Opções**: e-mail e **telefone** obrigatório (para a Click juntar ao grupo); sem códigos promocionais.
 - **Metadados**: `origem` = `click`.
-- **Depois do pagamento** → `https://afonsolopes22.github.io/ProvenDrop/bem-vindo-click.html`.
+- **Depois do pagamento** → `https://afonsolopes22.github.io/ProvenDrop/bem-vindo-click.html` com `?session_id={CHECKOUT_SESSION_ID}` (confirmar que o redirecionamento inclui este parâmetro: a página põe o código da compra na mensagem de WhatsApp para o +351 920 414 823).
 
-Quem paga por este link fica em `subscricoes`/`subscritores` com `origem = click` e o estado da subscrição (para a comissão), **sem login e sem acesso** à área (RLS).
+Quem paga por este link fica em `subscricoes`/`subscritores` com `origem = click` e o estado da subscrição (para a comissão), **sem login e sem acesso** à área (RLS). Recebe as coleções no grupo de WhatsApp da Click.
 
 ## c) Portal de cliente: confirmar
 
@@ -86,8 +86,8 @@ O estado **nunca** é copiado do evento: em todos os casos a função relê a su
 | `checkout.session.completed` (pago) | Sincroniza a subscrição da sessão. Origem: metadata do link → price_id → payment link. Alerta se o e-mail ficar com duas subscrições a cobrar. |
 | `customer.subscription.created` / `updated` / `deleted` | Sincroniza: `ativo` (active/trialing), `em_atraso` (past_due/unpaid; guarda `em_atraso_desde`), `incompleto` (incomplete: sem login nem e-mail), `cancelado` (canceled/paused/incomplete_expired). `cancel_at_period_end` → `acesso_fim` (B4). |
 | `invoice.paid` / `invoice.payment_failed` | Sincroniza a subscrição da fatura (relida no Stripe). |
-| `charge.dispute.created` | Bloqueia o acesso de todos os subscritores desse cliente (`bloqueado_em`) e envia alerta com o prazo de resposta (A4). |
-| `charge.refunded` | Só alerta (pode ser parcial ou de boa vontade); cancelar à mão no Stripe se for caso disso. |
+| `charge.dispute.created` | Marca todos os subscritores desse cliente (`bloqueado_em`, `bloqueado_motivo = "disputa dp_…"`), o que revoga o acesso (`tem_acesso` → false), e envia alerta com o prazo de resposta (A4). |
+| `charge.refunded` | **Total** (`amount_refunded ≥ amount`): marca o subscritor (`bloqueado_motivo = "reembolso ch_…"`) e revoga o acesso, alerta a pedir o cancelamento da subscrição no Stripe. **Parcial**: só alerta (A4, 2026-11-06). |
 
 Acesso (`public.tem_acesso`): origem direto, não bloqueado, `ativo` **ou** `em_atraso` há menos de **7 dias** (M1). Depois disso a área mostra "Payment overdue" e o e-mail diário deixa de sair; `invoice.paid` repõe tudo.
 
@@ -104,8 +104,9 @@ Em modo real o Checkout, o portal, os recibos e as faturas mostram o **Nome púb
 ## Por fazer (à mão, no painel ou no terminal)
 
 - [ ] Correr `scripts\setup-supabase.ps1` com `sk_live_` e o `whsec_` do endpoint real (os `price_` reais já são os valores por omissão). No fim o script volta a fazer deploy do `stripe-webhook` com `--no-verify-jwt`.
-- [ ] Acrescentar `charge.dispute.created` e `charge.refunded` ao endpoint `provendrop-supabase` (A4).
-- [ ] Criar o Payment Link **Direct de regresso** em modo real (só o preço mensal Direct; metadata `origem=direto`, `tipo=regresso`; → `bem-vindo.html`; sem códigos) e pôr o URL em `config.js` → `STRIPE_LINK_RETURN`. O `scripts\stripe-teste.ps1` só trabalha em modo de teste.
+- [ ] Acrescentar `charge.dispute.created` e `charge.refunded` ao endpoint `provendrop-supabase` (A4): Programadores → Webhooks → `provendrop-supabase` → ⋯ → **Atualizar detalhes** → **Eventos** → procurar e marcar os dois → Guardar. Sem eles, uma disputa ou um reembolso total não revoga o acesso.
+- [ ] Criar o Payment Link **Direct de regresso** em modo real (só o preço mensal Direct; metadata `origem=direto`, `tipo=regresso`; → `bem-vindo.html`; sem códigos) e pôr o URL em `config.js` → `STRIPE_LINK_RETURN`. O `scripts\stripe-teste.ps1` só trabalha em modo de teste. Até existir, o site não promete "só mensalidade" a quem volta (frase e cartão "Coming back later?" retirados a 2026-11-06).
+- [ ] Galeria de 4 exemplos de criativos no Launch Kit: só com imagens sem qualquer marca.
 - [ ] Teste real (TESTE.md §7): pagar o Direct (40 €), ver a linha, entrar por magic link, descarregar o kit, cancelar no portal, perder o acesso, reembolsar; pelo link Click confirmar `origem = click`, sem acesso e sem adesão.
 - [ ] Termos / privacidade / reembolsos publicados; links em **Dados públicos**; "Exigir termos de serviço" nos 2 links.
 - [ ] Quando houver domínio: redirecionamentos dos 2 links e do portal, `APP_URL`, Redirect URLs do Supabase (DOMINIO.md).
