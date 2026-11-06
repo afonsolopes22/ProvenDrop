@@ -15,24 +15,23 @@ window.PROVENDROP_CONFIG = {
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hbGpyZmdubmh0cmp1bm53bHJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1Njg4NTEsImV4cCI6MjEwOTE0NDg1MX0.wMbnDi7rG9nz4tVUYZ4Z_gEF28V3IJaSxnnjyydVzjU",
 
   /* Stripe Payment Link of the direct subscription (https://buy.stripe.com/…).
-     Redirects to bem-vindo.html after payment. Empty = button disabled.
-     Decision S1 (2026-11-02): EMPTY on main until live mode, so the published
-     site never opens a test Checkout. The TEST links live in config.local.js
-     (git-ignored, loaded only on localhost; copy config.local.example.js).
-     The live link goes here only with explicit approval (docs/STRIPE.md,
-     "Modo real"). */
-  STRIPE_LINK_DIRECT: "",
+     LIVE link since 2026-11-06 (account activated; docs/STRIPE.md): monthly fee
+     + joining fee, metadata origem=direto, redirects to bem-vindo.html after
+     payment. Empty = button disabled. The Click Dynamics link (monthly fee only,
+     no joining fee) is never on this site: Click sends it to its own customers.
+     Test links (test mode) go to config.local.js, loaded only on localhost. */
+  STRIPE_LINK_DIRECT: "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00",
 
-  /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee).
-     Created by scripts/stripe-teste.ps1; shown in the member area to former members.
-     Empty = the normal link is shown instead (nothing, when that one is empty too).
-     Empty on main until live mode (S1); test URL in config.local.js. */
+  /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee),
+     shown in the member area to former members. No live link exists yet
+     (docs/STRIPE.md, "Por fazer"): while empty, former members see the normal
+     Subscribe button and the "monthly fee only" promise is not shown. */
   STRIPE_LINK_RETURN: "",
 
   /* Stripe customer portal login link (https://billing.stripe.com/p/login/…).
-     Empty = "Manage subscription" buttons hidden (bem-vindo-click.html falls back
-     to WhatsApp). Empty on main until live mode (S1); test URL in config.local.js. */
-  STRIPE_PORTAL_LINK: "",
+     LIVE link since 2026-11-06. Empty = "Manage subscription" buttons hidden
+     (bem-vindo-click.html falls back to WhatsApp). */
+  STRIPE_PORTAL_LINK: "https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00",
 
   /* Time the daily collections are delivered, Europe/Lisbon, "HH:MM".
      Must match the HORA_ENVIO secret of the email-diario function
@@ -54,10 +53,10 @@ window.PROVENDROP_CONFIG = {
 
 /* S1: local tests only. When the page is served from localhost / 127.0.0.1 /
    [::1] (or *.localhost), config.local.js is loaded right after this file and
-   overrides the Stripe TEST links (file git-ignored; copy
+   overrides the Stripe links with TEST ones (file git-ignored; copy
    config.local.example.js). Any other host (GitHub Pages, provendrop.com) never
-   requests it, so the published site keeps Subscribe disabled until the live
-   links are written above. document.write is used on purpose: the load stays
+   requests it, so the published site always uses the live links written above.
+   document.write is used on purpose: the load stays
    synchronous, so the pages' inline scripts and the deferred app.js all see the
    overrides. */
 (function(){

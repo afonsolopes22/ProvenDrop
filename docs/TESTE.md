@@ -1,6 +1,6 @@
 # Teste completo em modo de teste
 
-Preencher a coluna **Resultado** a cada passo (data, quem, o que se viu). Nada passa a `main` sem todos os passos verdes. Última actualização: 2026-11-02.
+Preencher a coluna **Resultado** a cada passo (data, quem, o que se viu). Nada passa a `main` sem todos os passos verdes. Última actualização: 2026-11-06 (modo real: §0 novas linhas, §2.1 sem adesão na porta Click, §7 teste real).
 
 Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ainda não existem: Stripe, Resend, deploy).
 
@@ -23,6 +23,14 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | Segurança do site (automático): `index.html`, `bem-vindo*.html`, `app.html`, `config.js` sem `/collections/`, `drive.google`, `zip_url`, `link_colecao`, ID da folha proibida, nomes de lojas do `feed_bot.json` nem nomes do `anunciantes_google.json`; `data.json` → 404 | ✅ 2026-11-03 (único "match" foi a palavra genérica `paises`) |
 | Migração `0005_google_e_kits.sql` aplicada com `supabase db query --linked` (colunas confirmadas em `feed_dia` e `verdes`, `kit_pronto` true nas 2 linhas com zip, `anon` sem privilégios) e `email-diario` com novo deploy (`--no-verify-jwt`) | ✅ 2026-11-03 |
 | Função publicada responde: POST sem assinatura → 400; `?reenviar_boas_vindas=` sem `x-cron-secret` → 401 `{"erro":"não autorizado"}`; GET → 405 | ✅ 2026-11-02 (curl) |
+| **Modo real + montra (2026-11-06)** · Segurança do site: `index.html`, `bem-vindo*.html`, `app.html`, `config.js`, `app.js` sem `/collections/`, `drive.google`, `zip_url`, ID da folha proibida, `docs.google.com`/`gviz`, "Bellora", nomes de lojas (`feed_bot.json`) nem de anunciantes (`anunciantes_google.json`, 95 nomes); `data.json` → 404 | ✅ 2026-11-06 (Playwright + fetch local; únicos "matches": a coluna `link_colecao` lida por `app.js` na área privada e a data `2026-11-04` num comentário) |
+| `index.html` **não faz pedidos à folha pública**: 0 pedidos a `docs.google.com`/`gviz` a 1280 e 375 px; só `fonts.googleapis.com`/`fonts.gstatic.com`; 0 erros de consola; sem overflow a 375; nenhum "0" visível nas maquetes (números desfocados); sem secção de arquivo; vídeo UGC com `muted loop playsinline controls preload="none"` | ✅ 2026-11-06 |
+| Área de membros continua a ler do Supabase (`feed_dia` → `select dia` + `select *`, `verdes`, `subscritores`; REST simulado com o mesmo caminho de código, `app.js` sem alterações ao fetch): Today com 4 linhas; **Meta ads** = `anuncios_meta` ou `anuncios_ativos − anuncios_google` (14 − 3 = 11); linha sem Meta → **"No Meta data"** em vez de 0; alcance com anúncios só no Reino Unido/Suíça marcado com o país, nunca "EU reach"; **Switzerland / Netherlands / Hungary** com nome (7.ª célula na faixa de mercados); Archive com coluna **Meta reach** e score por mercado (**7.2 CH**, **7.2 HU**); 0 erros de consola | ✅ 2026-11-06 (Playwright, Supabase simulado) |
+| Lighthouse mobile (`index.html`, performance): **antes 91 / depois 93**; LCP 2,8 s → 2,6 s; **CLS 0** nos dois; peso 189 → 171 KiB | ✅ 2026-11-06 |
+| Screenshots desktop (1280) e mobile (375) das secções alteradas | ✅ `docs/screenshots/antes/` e `docs/screenshots/depois/` (JPEG) |
+| `bem-vindo-click.html`: botão WhatsApp `wa.me/351920414823` com a mensagem pré-definida; com `?session_id=cs_live_…` a mensagem leva "Código da compra: …"; sem `session_id` ou com valor inválido (`<script>`) vai sem a linha do código; a página só pede fontes (nenhum pedido ao Stripe); 0 erros | ✅ 2026-11-06 |
+| `stripe-webhook`: `compat.test.ts` (8 testes, fixtures acacia e 2026-10-28.endive) verdes com `deno test`; `deno check` limpo em `stripe-webhook`, `reconciliar` e `email-diario` | ✅ 2026-11-06 |
+| `scripts/setup-supabase.ps1` sem erros de sintaxe (parser do PowerShell) | ✅ 2026-11-06 (não executado: só o Afonso, com as chaves reais) |
 | Edge Functions: sintaxe TypeScript verificada com o compilador TypeScript (transpileModule, sem erros); não executadas: sem Deno nem deploy | ✅ |
 
 ## 1. Pagamento Direct → acesso → cancelamento
@@ -52,7 +60,7 @@ Pré-requisitos: STRIPE.md a), c), d), e) feitos; EMAIL.md 1–5 feitos; `setup-
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 2.1 | Abrir o Payment Link da Click (teste) e pagar com `4242…` e **outro** e-mail | Redireciona para `bem-vindo-click.html` (WhatsApp da Click) | ⏳ |
+| 2.1 | Abrir o Payment Link da Click (teste) e pagar com `4242…` e **outro** e-mail | Checkout **só** com "ProvenDrop via Click · 15,00 €/mês" (**sem** adesão, decisão de 2026-11-06); redireciona para `bem-vindo-click.html` (WhatsApp da Click, "No joining fee") | ⏳ |
 | 2.2 | SQL `select email, origem, estado, user_id from public.subscritores` | Nova linha `origem = click`, `estado = ativo`, `user_id` **null** | ⏳ |
 | 2.3 | Caixa de correio desse e-mail | **Nenhum** e-mail de boas-vindas do ProvenDrop | ⏳ |
 | 2.4 | `app.html` → pedir link de entrada com esse e-mail | "This e-mail has no subscription…" (não tem conta Auth) | ⏳ |
@@ -115,6 +123,20 @@ Cartões de teste do Stripe (qualquer validade futura e CVC):
 | 6.26 | Varrimento das boas-vindas | SQL: `update public.subscritores set boas_vindas_em = null where email = '…'`; esperar ≤ 15 min (ou `POST …/stripe-webhook?varrer_boas_vindas=1` com `x-cron-secret`) | Resposta `{candidatos:1, enviadas:1}`; e-mail novo; `boas_vindas_em` preenchido | ⏳ |
 | 6.27 | Reconciliação | `POST …/reconciliar` com `x-cron-secret` | JSON `{ok:true, stripe:N, base:N, divergencias:0}`; com uma divergência forçada (ex.: `update subscricoes set estado='cancelado' …`) → alerta por e-mail; nada é alterado | ⏳ |
 | 6.28 | Sem segredo | `POST …/reconciliar`, `…?varrer_boas_vindas=1`, `…?reenviar_boas_vindas=x` sem `x-cron-secret`; webhook sem assinatura | 401 `{"erro":"não autorizado"}`; 400 `{"erro":"assinatura inválida"}` | ✅ 2026-11-02 (curl, funções publicadas) |
+
+## 7. Teste real (modo real, desde 2026-11-06) — feito pelo Afonso, com pagamentos reais
+
+Pré-requisitos: PR fundido em `main`; `scripts\setup-supabase.ps1` corrido com `sk_live_` e o `whsec_` do endpoint real (os `price_` reais são os valores por omissão); eventos `charge.dispute.created`/`charge.refunded` acrescentados ao endpoint real; dados de teste apagados (§5). Usar um e-mail que **não** seja o da conta Resend e um cartão real (os valores voltam no passo 7.6).
+
+| # | Passo | Esperado | Resultado |
+|---|---|---|---|
+| 7.1 | Site publicado → **Subscribe** → pagar o Direct (**40 €**: 15 € + 25 € de adesão) | Checkout real "ProvenDrop" (nome público); redireciona para `bem-vindo.html` | ⏳ |
+| 7.2 | SQL: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido; logs do webhook com `checkout.session.completed` / `customer.subscription.created` / `invoice.paid` a 200 (eventos na API 2026-10-28.endive lidos sem aviso de "sem subscrição") | ⏳ |
+| 7.3 | E-mail "Welcome to ProvenDrop: your access" → **Sign in to ProvenDrop** | Abre `app.html` com sessão; Today mostra as coleções do dia; **Download Launch Kit** descarrega o zip | ⏳ |
+| 7.4 | Subscription → **Manage subscription** → portal real → **Cancel subscription** | `customer.subscription.updated` com `cancel_at_period_end`; a área mostra "ends on <data>"; para cortar já: Stripe → cliente → subscrição → Cancelar **imediatamente** → `deleted` → `cancelado` → `app.html` "Subscription cancelled", sem acesso (RLS devolve 0 linhas) | ⏳ |
+| 7.5 | Stripe → Pagamentos → o pagamento de 40 € → **Reembolsar** (total) | `charge.refunded` → alerta "Reembolso total" em `ALERT_EMAIL` (se o evento estiver no endpoint); nada muda no acesso (já cancelado) | ⏳ |
+| 7.6 | Abrir o **link da Click** (o que a Click envia; não está no site) e pagar com **outro** e-mail | Checkout só com "ProvenDrop via Click · 15,00 €/mês", **sem adesão**; redireciona para `bem-vindo-click.html` ("No joining fee"); SQL: linha `origem = click`, `estado = ativo`, `user_id` null; **nenhum** e-mail de boas-vindas; `app.html` com esse e-mail → "This e-mail has no subscription…". Depois: cancelar imediatamente e reembolsar no Stripe | ⏳ |
+| 7.7 | Depois dos dois reembolsos | `select * from public.subscricoes` mostra as duas linhas `cancelado`; `reconciliar` (06:30 UTC ou `POST …/reconciliar` com `x-cron-secret`) sem divergências | ⏳ |
 
 ## 5. Depois do teste
 

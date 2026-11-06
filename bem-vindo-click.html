@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Welcome to ProvenDrop</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='7' fill='%23101310'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%2378C995' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -46,7 +49,12 @@ h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02e
 h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.05}
 h1 em{font-style:normal;color:var(--go)}
 .lead{color:var(--muted);font-size:18px;margin:14px 0 0;max-width:56ch}
-.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-block;margin-bottom:28px}
+.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin-bottom:28px}
+.brand svg{display:block}.brand b{color:#0B1F1E;font-weight:800}.brand i{color:#0F766E;font-style:normal;font-weight:800}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .brand b{color:#fff}:root:not([data-theme="light"]) .brand i{color:#5EEAD4}}
+:root[data-theme="dark"] .brand b{color:#fff}:root[data-theme="dark"] .brand i{color:#5EEAD4}
+.ig{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin-top:12px;border-radius:8px;color:var(--muted);transition:color 150ms ease}
+.ig:hover{color:#0F766E}.ig svg{display:block}
 ol.steps{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:14px;counter-reset:s}
 ol.steps>li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 20px 64px;position:relative}
 ol.steps>li::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-family:var(--mono);font-weight:500;display:grid;place-items:center}
@@ -57,6 +65,12 @@ ol.steps ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
 code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
 .btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--go);background:var(--go);color:var(--bg);transition:transform 160ms cubic-bezier(.23,1,.32,1)}
 .btn:active{transform:scale(.97)}
+.btn-wa{width:100%;justify-content:center;min-height:56px;margin-top:20px;font-size:17px;font-weight:700;border-radius:14px;background:#0F766E;border-color:#0F766E;color:#fff}
+.btn-wa svg{flex:none}
+.btn-wa small{display:block;font-size:13px;font-weight:500;opacity:.85}
+.pt{color:var(--muted);font-size:15px;margin:10px 0 0}
+.fee{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-size:13px;font-weight:600}
+.fee::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--go)}
 .btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
 .num{font-family:var(--mono);user-select:all}
 .rules{margin-top:28px;background:var(--wait-soft);border-radius:16px;padding:20px}
@@ -70,20 +84,22 @@ footer{margin-top:36px;color:var(--muted);font-size:14px}
 </head>
 <body>
 <main class="wrap">
-  <a class="brand" href="./">ProvenDrop</a>
-  <h1>Payment received. <em>Welcome.</em></h1>
-  <p class="lead">You are two minutes away from receiving collections. Follow these steps in order.</p>
+  <a class="brand" translate="no" href="./"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0F766E"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#fff" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#fff" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#fff"/><circle cx="44.5" cy="13" r="4" fill="#14B8A6"/></svg><span><b>Proven</b><i>Drop</i></span></a>
+  <h1>Payment confirmed. <em>Welcome.</em></h1>
+  <p class="lead">Last step: send us the message on WhatsApp to join the Click group.</p>
+  <p class="pt" lang="pt">Pagamento confirmado. Último passo: envia-nos a mensagem no WhatsApp para entrares no grupo da Click.</p>
+  <span class="fee">No joining fee · <span lang="pt">Sem taxa de adesão</span></span>
+  <!-- Pre-filled WhatsApp message with the Stripe checkout session id read from ?session_id=… (nothing else is read, stored or requested). -->
+  <a class="btn btn-wa" id="btnWa" href="https://wa.me/351920414823" target="_blank" rel="noopener"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.3 4.4c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.3s1 2.7 1.2 2.9c.1.2 2 3.1 4.9 4.3 2.4 1 2.9.8 3.4.7.5 0 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-1c-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.4.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.5-.5-.5-.7-.5h-.6Z"/></svg><span>Send message on WhatsApp<small lang="pt">Enviar mensagem no WhatsApp</small></span></a>
 
   <ol class="steps">
     <li>
-      <h2>Save the assistant’s number</h2>
-      <p>It is the Click Dynamics assistant on WhatsApp: <span class="num">+351 920 117 648</span>. Save it as “ProvenDrop” so the messages do not end up with unknown senders.</p>
+      <h2>Send the message and wait for the reply</h2>
+      <p>The message already carries your purchase code, so we can confirm your payment. We reply the same day and add you to the group.</p>
     </li>
     <li>
-      <h2>Send us your niche and your countries</h2>
-      <p>Tap the button and complete the message. Use the same email you paid with, so we can confirm your subscription.</p>
-      <a class="btn" id="btnEntrar" href="#" target="_blank" rel="noopener">Send a WhatsApp message</a>
-      <p>We reply the same day and add you to the group.</p>
+      <h2>Save the assistant’s number</h2>
+      <p>It is the Click Dynamics assistant on WhatsApp: <span class="num">+351 920 117 648</span>. Save it as “ProvenDrop” so the messages do not end up with unknown senders.</p>
     </li>
     <li>
       <h2>Receive the list every morning</h2>
@@ -121,14 +137,19 @@ footer{margin-top:36px;color:var(--muted);font-size:14px}
   </div>
 
   <footer>
-    <p>You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
+    <p>Your subscription is the monthly fee only: no joining fee. You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
     <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=I%27d%20like%20to%20manage%20my%20ProvenDrop%20subscription" target="_blank" rel="noopener">Manage subscription</a>
+    <br><a class="ig" href="https://www.instagram.com/provendrop/" target="_blank" rel="noopener" aria-label="ProvenDrop on Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
   </footer>
 </main>
 <script>
 (function(){
-  var t="Hi! I have just subscribed to ProvenDrop.\nPayment email: \nNiche (jewellery, home decoration, women's fashion or men's fashion): \nCountries I sell in: \nStore name (optional): ";
-  document.getElementById("btnEntrar").href="https://wa.me/351920117648?text="+encodeURIComponent(t);
+  /* WhatsApp button: the Stripe Payment Link redirects here with ?session_id=cs_live_…; the id goes into the
+     pre-filled message only (no other use, nothing stored, no call to the Stripe API). Without it, the message has no code line. */
+  var sid=String(new URLSearchParams(location.search).get("session_id")||"").trim();
+  if(!/^cs_[A-Za-z0-9_]{8,}$/.test(sid)) sid="";
+  var t="Olá! Acabei de comprar o acesso à PR de coleções (ProvenDrop)."+(sid?" Código da compra: "+sid+".":"")+" Quero entrar no grupo.";
+  document.getElementById("btnWa").href="https://wa.me/351920414823?text="+encodeURIComponent(t);
   var p=String((window.PROVENDROP_CONFIG||{}).STRIPE_PORTAL_LINK||"").trim(); if(/^https:\/\//.test(p)){var g=document.getElementById("btnGerir");g.href=p;}
 })();
 </script>

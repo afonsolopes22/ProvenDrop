@@ -13,7 +13,7 @@ paths = [
 regexes = [
   '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hbGpyZmdubmh0cmp1bm53bHJlIiwicm9sZSI6ImFub24i''',  # anon key do Supabase (pública)
   '''sk_test_…|whsec_…|re_…|sk_live_…''',   # reticências nos docs e nos comentários
-  '''buy\.stripe\.com/test_[A-Za-z0-9]+''',
-  '''billing\.stripe\.com/p/login/test_[A-Za-z0-9]+''',
+  '''buy\.stripe\.com/(test_)?[A-Za-z0-9]+''',          # Payment Links (públicos por desenho; os reais em config.js desde 2026-11-06)
+  '''billing\.stripe\.com/p/login/(test_)?[A-Za-z0-9]+''', # portal de cliente
   '''sha384-[A-Za-z0-9+/=]+''',              # SRI
 ]

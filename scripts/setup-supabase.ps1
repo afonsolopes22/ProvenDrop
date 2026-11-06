@@ -5,17 +5,21 @@
 .DESCRIPTION
   Depois de instalares o Supabase CLI e fazeres `supabase login`, este script:
     1. liga o repositório ao projecto (supabase link --project-ref maljrfgnnhtrjunnwlre);
-    2. pede os segredos e os identificadores (sem eco nos segredos). Enter em
-       qualquer campo = NÃO ALTERAR esse valor (A6): não há valores de teste por
-       omissão. Gera um CRON_SECRET aleatório, lê HORA_ENVIO de config.js
-       (DAILY_TIME) e define STRIPE_ACCEPT_TEST a partir do prefixo da chave.
-       Os segredos vão num .env temporário só legível por ti (ACL), para
-       `supabase secrets set --env-file`, e o ficheiro é apagado no fim (S8);
+    2. pede os segredos (Read-Host -AsSecureString: sem eco, nunca mostrados nem
+       gravados no repositório) e os identificadores. Enter num segredo = NÃO
+       ALTERAR esse valor no Supabase (A6): RESEND_API_KEY e EMAIL_FROM vazios
+       ficam como estão. Enter em STRIPE_PRICE_DIRETO / STRIPE_PRICE_CLICK = os
+       preços REAIS (modo real desde 2026-11-06, docs/STRIPE.md). Gera um
+       CRON_SECRET aleatório, lê HORA_ENVIO de config.js (DAILY_TIME) e define
+       STRIPE_ACCEPT_TEST a partir do prefixo da chave. Os segredos vão num .env
+       temporário só legível por ti (ACL), para `supabase secrets set --env-file`,
+       e o ficheiro é sobrescrito e apagado no fim (S8);
     3. recusa misturas de teste e real: chave sk_live_ com links/ids de teste em
        config.js ou nos valores escritos, e vice-versa (A6);
-    4. faz deploy das funções stripe-webhook, email-diario e reconciliar (--no-verify-jwt);
-    5. aplica as migrações 0002–0005 e actualiza public.config (email_diario_url,
-       stripe_webhook_url, reconciliar_url, cron_secret) com `supabase db query --linked`.
+    4. aplica as migrações 0002–0005 e actualiza public.config (email_diario_url,
+       stripe_webhook_url, reconciliar_url, cron_secret) com `supabase db query --linked`;
+    5. faz deploy de email-diario e reconciliar e, no fim, volta a fazer deploy do
+       stripe-webhook (todas com --no-verify-jwt), já com os segredos novos.
 
   Nada é escrito em ficheiros do repositório.
 
@@ -77,26 +81,30 @@ function LerSegredo($nome, $ajuda) {
   try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($b).Trim() }
   finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
 }
-function LerValor($nome, $ajuda) {
+function LerValor($nome, $ajuda, $omissao = "") {
   Write-Host "  $nome  ($ajuda)" -ForegroundColor Gray
-  $v = Read-Host "  $nome (Enter = não alterar)"
-  if ([string]::IsNullOrWhiteSpace($v)) { return "" }
+  $v = Read-Host "  $nome (Enter = $(if ($omissao) { $omissao } else { 'não alterar' }))"
+  if ([string]::IsNullOrWhiteSpace($v)) { return $omissao }
   return $v.Trim()
 }
 
+# Preços REAIS (modo real desde 2026-11-06; docs/STRIPE.md). São os valores por omissão.
+$precoDiretoReal = "price_1UYaVjJPREpzETp6wboEOplv"
+$precoClickReal  = "price_1UYaWLJPREpzETp6beErOUxC"
+$idsReais = @($precoDiretoReal, $precoClickReal)
 # Ids de TESTE conhecidos (vault: "Stripe — modo de teste"): servem só para detetar misturas.
 $idsTeste = @("price_1UX9ThJMAlqVy4dKYnrmwGb3", "price_1UX9UYJMAlqVy4dK2FZi3k9w", "plink_1UX9UkJMAlqVy4dKAXTumtyZ", "plink_1UX9UxJMAlqVy4dKAbyhkQk7")
 
 $cronSecret = ""
 if (-not $SemSegredos) {
-  Passo "Segredos (sem eco; Enter = não alterar; nunca gravados no repositório)"
+  Passo "Segredos (sem eco; Enter = não alterar; nunca mostrados nem gravados no repositório)"
   $valores = [ordered]@{}
-  $valores["STRIPE_SECRET_KEY"]     = LerSegredo "STRIPE_SECRET_KEY"     "sk_test_… ou sk_live_… (Programadores → Chaves de API → Chave secreta)"
-  $valores["STRIPE_WEBHOOK_SECRET"] = LerSegredo "STRIPE_WEBHOOK_SECRET" "whsec_… do endpoint deste modo (Programadores → Webhooks → Segredo de assinatura → Revelar)"
-  $valores["RESEND_API_KEY"]        = LerSegredo "RESEND_API_KEY"        "re_… (Resend → API Keys)"
-  Passo "Identificadores e remetente (Enter = não alterar)"
-  $valores["STRIPE_PRICE_DIRETO"]        = LerValor "STRIPE_PRICE_DIRETO"        "price_… mensal ProvenDrop Direct deste modo"
-  $valores["STRIPE_PRICE_CLICK"]         = LerValor "STRIPE_PRICE_CLICK"         "price_… mensal ProvenDrop via Click deste modo"
+  $valores["STRIPE_SECRET_KEY"]     = LerSegredo "STRIPE_SECRET_KEY"     "sk_live_… (Programadores → Chaves de API → Chave secreta); sk_test_… só para voltar ao modo de teste"
+  $valores["STRIPE_WEBHOOK_SECRET"] = LerSegredo "STRIPE_WEBHOOK_SECRET" "whsec_… do endpoint provendrop-supabase (Programadores → Webhooks → Segredo de assinatura → Revelar)"
+  $valores["RESEND_API_KEY"]        = LerSegredo "RESEND_API_KEY"        "re_… (Resend → API Keys); Enter = não alterar"
+  Passo "Identificadores e remetente (Enter = não alterar; nos preços, Enter = preços reais)"
+  $valores["STRIPE_PRICE_DIRETO"]        = LerValor "STRIPE_PRICE_DIRETO"        "price_… mensal ProvenDrop Direct" $precoDiretoReal
+  $valores["STRIPE_PRICE_CLICK"]         = LerValor "STRIPE_PRICE_CLICK"         "price_… mensal ProvenDrop via Click" $precoClickReal
   $valores["STRIPE_PAYMENT_LINK_DIRETO"] = LerValor "STRIPE_PAYMENT_LINK_DIRETO" "plink_… do link Direct deste modo (opcional)"
   $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 'sem domínio verificado: ProvenDrop <onboarding@resend.dev>; com domínio: ProvenDrop <noreply@provendrop.com>'
   $valores["EMAIL_REPLY_TO"]             = LerValor "EMAIL_REPLY_TO"             "onde recebes as respostas dos clientes (opcional)"
@@ -124,7 +132,9 @@ if (-not $SemSegredos) {
       if ($ok -ne "SIM") { Falhar "cancelado: usa sk_test_ até haver aprovação" }
       $valores["STRIPE_ACCEPT_TEST"] = "0"
     } else {
-      if ($configLive) { Falhar "chave de TESTE mas config.js tem links REAIS: incoerente" }
+      if ($configLive) { Falhar "chave de TESTE mas config.js tem links REAIS (modo real desde 2026-11-06): para testar, usa config.local.js em localhost e não corras este script com sk_test_" }
+      $algumReal = $idsEscritos | Where-Object { $idsReais -contains $_ }
+      if ($algumReal) { Falhar "chave de TESTE com preços REAIS ($($algumReal -join ', ')): escreve os price_ de teste (vault) em vez de aceitar os valores por omissão" }
       $valores["STRIPE_ACCEPT_TEST"] = "1"
     }
   }
@@ -154,15 +164,7 @@ if (-not $SemSegredos) {
   }
 }
 
-# ── 3. deploy das funções ───────────────────────────────────────────────
-if (-not $SemDeploy) {
-  Passo "Deploy das Edge Functions"
-  foreach ($fn in @("stripe-webhook","email-diario","reconciliar")) {
-    if ((Supa @("functions","deploy",$fn,"--project-ref",$ProjectRef,"--no-verify-jwt") @("Docker is not running")) -ne 0) { Falhar "deploy de $fn falhou" }
-  }
-}
-
-# ── 4. SQL: migrações 0002–0005 + public.config ─────────────────────────
+# ── 3. SQL: migrações 0002–0005 + public.config ─────────────────────────
 Passo "Migrações 0002, 0003, 0004, 0005 e public.config"
 $base = "https://$ProjectRef.supabase.co/functions/v1"
 $sql = ""
@@ -187,5 +189,15 @@ try {
   if (Test-Path $tmp) { Remove-Item $tmp -Force }
 }
 
+# ── 4. deploy das funções (stripe-webhook por último, já com os segredos novos) ──
+if (-not $SemDeploy) {
+  Passo "Deploy das Edge Functions (email-diario, reconciliar)"
+  foreach ($fn in @("email-diario","reconciliar")) {
+    if ((Supa @("functions","deploy",$fn,"--project-ref",$ProjectRef,"--no-verify-jwt") @("Docker is not running")) -ne 0) { Falhar "deploy de $fn falhou" }
+  }
+  Passo "Deploy final do stripe-webhook (--no-verify-jwt)"
+  if ((Supa @("functions","deploy","stripe-webhook","--project-ref",$ProjectRef,"--no-verify-jwt") @("Docker is not running")) -ne 0) { Falhar "deploy de stripe-webhook falhou" }
+}
+
 Passo "Concluído"
-Write-Host "Falta (à mão): SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); 'Allow new users to sign up' desligado; confirmar config.js; depois o teste de docs/TESTE.md."
+Write-Host "Falta (à mão): eventos charge.dispute.created/charge.refunded no endpoint real do Stripe (docs/STRIPE.md d); SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); 'Allow new users to sign up' desligado; confirmar config.js; depois o teste real de docs/TESTE.md §7."

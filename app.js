@@ -7,14 +7,20 @@
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const url = v => /^https?:\/\//i.test(String(v||"")) ? String(v) : "";
   const MARKETS = ["IT","ES","FR","DE","GB","US"];
-  const PAIS = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States"};
-  /* Niche values are stored as the Portuguese labels used by the research routine. */
-  const NICHOS = [["Joalharia","Women’s jewellery"],["House Decor","Home decoration"],["Roupa Feminina","Women’s fashion"],["Roupa Masculina","Men’s fashion"]];
-  const nicho = v => (NICHOS.find(n => n[0].toLowerCase() === String(v||"").trim().toLowerCase()) || [v, v])[1] || "";
+  /* The six markets plus the countries also tracked by the routine (NL/AT/CH/HU): always shown by name, never "No data". */
+  const PAIS = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States",NL:"Netherlands",AT:"Austria",CH:"Switzerland",HU:"Hungary"};
+  const EU = new Set(["IT","ES","FR","DE","NL","AT","HU"]);   /* countries covered by Meta's EU ad data (GB/US/CH are not) */
+  const pais = c => { const k = String(c||"").trim().toUpperCase(); return k ? (PAIS[k] || k) : ""; };
+  /* Niche values are stored as the Portuguese labels used by the research routine.
+     Selectable niches (preferences): three since 2026-11-04 (jewellery left). Labels keep jewellery for older rows in the archive. */
+  const NICHOS = [["Roupa Feminina","Women’s fashion"],["Roupa Masculina","Men’s fashion"],["House Decor","Home decoration"]];
+  const NICHO_LABEL = Object.assign({ "joalharia": "Women’s jewellery" }, Object.fromEntries(NICHOS.map(([v, l]) => [v.toLowerCase(), l])));
+  const nicho = v => NICHO_LABEL[String(v||"").trim().toLowerCase()] || String(v||"");
   const C = window.PROVENDROP_CONFIG || {};
   const HORA = String(C.DAILY_TIME||"").trim();
   const PORTAL = url(C.STRIPE_PORTAL_LINK);
-  const LINK_RETURN = url(C.STRIPE_LINK_RETURN) || url(C.STRIPE_LINK_DIRECT);
+  /* Returning members: only the dedicated monthly-only link (no fallback to the Direct link, which carries the joining fee). */
+  const LINK_RETURN = url(C.STRIPE_LINK_RETURN);
   const SIGNED_URL_SECONDS = 120;   /* S7: kit download links are valid for 2 minutes */
   const TOLERANCIA_DIAS = 7;        /* M1: days of access after the first failed payment */
   const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("en-GB");
@@ -23,9 +29,18 @@
   const dia = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : ""; };
   const diaCurto = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}) : ""; };
   const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
-  /* Ads per platform (0005). Rows published before 2026-11-02 only have anuncios_ativos (Meta). */
-  const metaAds = r => r.anuncios_meta != null ? r.anuncios_meta : r.anuncios_ativos;
+  /* Ads per platform (0005). Meta ads = anuncios_meta, or anuncios_ativos − anuncios_google when only the total is known
+     (rows published before 2026-11-02 only have anuncios_ativos, which were Meta). Google ads = anuncios_google. */
   const googleAds = r => r.anuncios_google != null ? r.anuncios_google : 0;
+  const metaAds = r => r.anuncios_meta != null ? r.anuncios_meta : (r.anuncios_ativos != null ? Math.max(0, Number(r.anuncios_ativos) - (r.anuncios_google != null ? Number(r.anuncios_google) : 0)) : null);
+  /* Reach comes from Meta's ad data: without Meta ads there is no reach to show ("No Meta data", never a false 0).
+     Ads only in the UK/US/CH are outside the EU data: the number is shown as "UK" reach etc., never as EU reach. */
+  const adCountries = r => (Array.isArray(r.paises_ads) && r.paises_ads.length ? r.paises_ads : [r.mercado_destaque]).map(c => String(c||"").toUpperCase()).filter(Boolean);
+  const reach = r => {
+    if(!(Number(metaAds(r)) > 0) || r.alcance_eu == null || r.alcance_eu === "") return `<span class="sub !text-inherit">No Meta data</span>`;
+    const cs = adCountries(r), naoUE = cs.length && cs.every(c => !EU.has(c));
+    return `${fmt(r.alcance_eu)}${naoUE ? `<span class="sub">${cs.length === 1 ? esc(pais(cs[0])) : "outside the EU"}</span>` : ""}`;
+  };
   const plats = r => {
     const p = (Array.isArray(r.plataformas) ? r.plataformas : []).map(s => String(s).toLowerCase()).filter(s => s === "meta" || s === "google");
     if(p.length) return [...new Set(p)];
@@ -108,7 +123,7 @@
     else if(sub.bloqueado_em){ t.textContent = "Access suspended"; p.textContent = "Your access was suspended because of a payment dispute. Reply to any ProvenDrop e-mail and we sort it out with you."; s.hidden = true; }
     else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
     else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
-    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; p.textContent = sub.boas_vindas_em ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(LINK_RETURN && sub.boas_vindas_em){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
+    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
     else { t.textContent = "No access to the member area"; p.textContent = "Click customers receive the collections in the Click WhatsApp group, not in this area."; }
     g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
     show("vSemAcesso");
@@ -154,13 +169,17 @@
     const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
     const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
     /* Today is a high-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
-    $("#feed").innerHTML = rows.length ? `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Meta</th><th class="text-right">Google</th><th class="text-right">Days</th><th class="text-right">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
+    $("#feed").innerHTML = rows.length ? `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Meta ads">Meta</th><th class="text-right" title="Google ads">Google</th><th class="text-right">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
     /* KPI strip above the table (counts only; nothing else is computed here) */
     const kpi = (id, v) => { const el = $(id); if(el) el.textContent = String(v); };
     kpi("#kpiTotal", rows.length); kpi("#kpiOk", rows.filter(aprovada).length); kpi("#kpiWatch", rows.filter(r => !aprovada(r)).length); kpi("#kpiKits", rows.filter(temKit).length);
   }
 
-  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); return `<ul class="strip" aria-label="Markets">${MARKETS.map(c => `<li${ok.has(c) ? ' class="ok"' : ''}>${c}</li>`).join("")}</ul>`; }
+  /* Six-market strip; a strongest market outside the six (NL/AT/CH/HU) is added as a seventh cell so it is never lost. */
+  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); const cols = MARKETS.concat(mk && !MARKETS.includes(mk) ? [mk] : []); return `<ul class="strip" aria-label="Markets"${cols.length > 6 ? ` style="grid-template-columns:repeat(${cols.length},minmax(0,1fr))"` : ""}>${cols.map(c => `<li${ok.has(c) ? ' class="ok"' : ''} title="${esc(pais(c))}">${esc(c)}</li>`).join("")}</ul>`; }
+  /* Score: when the verdict is 🟢 for one market ("🟢 ANUNCIAR (CH)"), show that market next to the score (the routine's per-market score when the row carries one, else the collection score). */
+  const mercadoDoVeredito = r => { const m = String(r.veredito||"").match(/🟢[^()]*\(([A-Z]{2})\)/); return m ? m[1] : ""; };
+  const scoreMercado = r => { const mk = mercadoDoVeredito(r); const porMk = mk && r.scores_mercado && typeof r.scores_mercado === "object" ? r.scores_mercado[mk] : null; return { valor: score(porMk != null ? porMk : r.score), mk }; };
 
   /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02.
      One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css). */
@@ -173,11 +192,11 @@
     return `<tr class="${pref ? "pref-first" : ""}">
       <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${chips(r, "mt-2")}</td>
       <td data-l="Collection"><div class="min-w-[160px] max-w-[240px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 text-[12px]">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${r.nota ? `<p class="nota sub mt-1.5">${esc(r.nota)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
-      <td data-l="Niche"><div class="min-w-[124px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(PAIS[mk] || mk)}</span>` : ""}${adv}</div></td>
+      <td data-l="Niche"><div class="min-w-[124px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
       <td class="n md:text-right" data-l="Meta ads">${fmt(metaAds(r))}</td>
       <td class="n md:text-right" data-l="Google ads">${fmt(googleAds(r))}</td>
       <td class="n md:text-right" data-l="Days">${dias(r)}</td>
-      <td class="n md:text-right" data-l="Reach">${fmt(r.alcance_eu)}</td>
+      <td class="n md:text-right" data-l="Meta reach">${reach(r)}</td>
       <td data-l="Markets"><div class="min-w-[132px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand: ${esc(r.trends_validados)} of 6 markets` : "Demand: no data"}</span></div></td>
       <td class="n md:text-right" data-l="Score"><span class="text-[22px] font-extrabold leading-none tracking-tight text-white">${score(r.score)}</span><span class="sub">/ 10</span></td>
     </tr>`;
@@ -201,7 +220,7 @@
     verdes = data || [];
     const nichos = [...new Set(verdes.map(r => r.nicho).filter(Boolean))], paises = [...new Set(verdes.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))];
     $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
-    $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(PAIS[p] || p)}</option>`).join("");
+    $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(pais(p))}</option>`).join("");
     renderArquivo();
   }
   ["#fNicho","#fPais","#fPlat","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
@@ -211,17 +230,18 @@
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
     const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
     if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
-      const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right">Meta reach</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+      const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
       const kit = temKit(r) ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
       return `<tr>
         <td class="n whitespace-nowrap" data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
         <td data-l="Collection"><span class="block min-w-[14ch]">${link ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}<span class="sub">${esc(r.loja||"")}</span></span></td>
         <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
-        <td data-l="Market"><span>${esc(PAIS[mk] || mk || "—")}</span></td>
-        <td class="n md:text-right" data-l="Score"><span>${score(r.score)}</span></td>
+        <td data-l="Market"><span>${esc(pais(mk) || "—")}</span></td>
+        <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap">${sc.valor}${sc.mk ? ` <span class="rounded bg-brand-soft px-1.5 py-0.5 text-[11px] font-bold text-brand-dark" title="Approved for ${esc(pais(sc.mk))}">${esc(sc.mk)}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} at approval</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
         <td data-l="Platforms"><span>${chips(r)}</span></td>
+        <td class="n md:text-right" data-l="Meta reach"><span>${reach(r)}</span></td>
         <td class="n md:text-right" data-l="Days advertising"><span>${dias(r)}</span></td>
         <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
         <td data-l="Kit"><span>${kit}</span></td>
@@ -232,7 +252,7 @@
   function renderPrefsForm(){
     const n = new Set(sub?.nichos||[]), p = new Set(sub?.paises||[]);
     $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
-    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${PAIS[c]}</label>`).join("");
+    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${pais(c)}</label>`).join("");
   }
   $("#formPrefs").addEventListener("submit", async e => {
     e.preventDefault();
