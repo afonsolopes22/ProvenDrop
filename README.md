@@ -8,9 +8,9 @@ Site estático (GitHub Pages) + plataforma de membros para a subscrição direta
 
 | | Via Click | Direto |
 |---|---|---|
-| Como paga | Payment Link que a Click envia aos clientes dela (fica como está) | Botão **Subscribe** do site → Payment Link "ProvenDrop Direct" |
+| Como paga | Botão **Subscribe with Click — €15/month** do site (ou o mesmo Payment Link enviado pela Click) → Payment Link "ProvenDrop via Click", sem adesão | Botão **Subscribe** do site → Payment Link "ProvenDrop Direct" (15 €/mês + 25 € de adesão) |
 | Onde recebe | Grupo de WhatsApp da Click (bot `/pr`) | Área pessoal `app.html` + e-mail diário |
-| Depois de pagar | `bem-vindo-click.html` | `bem-vindo.html` → e-mail com magic link → `app.html` |
+| Depois de pagar | `bem-vindo-click.html?session_id=…` → botão WhatsApp (+351 920 414 823) com o código da compra | `bem-vindo.html` → e-mail com magic link → `app.html` |
 | Registo | `subscritores.origem = 'click'` (sem login, sem e-mail; serve para a comissão) | `subscritores.origem = 'direto'` + utilizador Auth |
 
 O research, a Metodologia v7, o bot da Click, as folhas Google e a rotina diária não mudam. A única novidade na rotina é a chamada ao script `publicar_plataforma.py` (ver abaixo).
@@ -29,7 +29,7 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 |---|---|
 | `config.js` | Configuração pública (ver acima). Desde 2026-11-06 com os links **reais** do Stripe (Direct e portal); `STRIPE_LINK_RETURN` vazio até existir o link de regresso real. |
 | `config.local.example.js` | Modelo do `config.local.js` (links de **teste** do Stripe, só carregado em `localhost`; o próprio `config.local.js` está no `.gitignore`; os links de teste ficam no vault, não no repo). |
-| `index.html` | Página pública (inglês), **montra** desde 2026-11-06: não lê a folha pública nem mostra números reais (hero e lista do dia são maquetes estáticas com números desfocados e selo "Members only"; sem arquivo; validação em 3 frases; nichos só com nomes; mercados só com nomes; kit sem a estrutura do zip; FAQ genérico). Vídeo UGC de exemplo (`assets/ugc-example.mp4`), blocos Click com logo e "No joining fee", faixa "In partnership with Click Dynamics", Instagram no rodapé, meta tags Open Graph. |
+| `index.html` | Página pública (inglês), **montra** desde 2026-11-06: não lê a folha pública nem mostra números reais (hero e lista do dia são maquetes estáticas com números desfocados e selo "Members only"; sem arquivo; validação em 3 frases; nichos só com nomes; mercados só com nomes; kit em alto nível: creative prompt, reference photos, keywords, negative keywords, Shopping titles, landing-page copy, opportunity analysis; FAQ genérico). Cartões "Are you a Click customer?" com logo e botão "Subscribe with Click — €15/month", faixa "In partnership with Click Dynamics", Instagram no rodapé, meta tags Open Graph. Galeria de exemplos por fazer. |
 | `bem-vindo.html` | Pós-pagamento da subscrição direta. Logo novo, Instagram no rodapé. |
 | `bem-vindo-click.html` | Pós-pagamento dos clientes Click: lê `?session_id=` do redirecionamento do Stripe e abre o WhatsApp (`wa.me/351920414823`) com a mensagem pré-definida que leva o código da compra (nada mais é lido, guardado ou pedido ao Stripe). Texto PT/EN, "No joining fee". |
 | `app.html` | Área pessoal (inglês): login por magic link, Today, Archive, Preferences, Subscription, guia de 1 minuto. Só usa a chave *anon*; o acesso é decidido pelas políticas RLS. Kits por URL assinada (15 min) do bucket privado. |
@@ -44,7 +44,7 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
 | `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). "Today" e "Archive" são tabelas (uma linha por coleção, kit por baixo do nome; blocos chave/valor abaixo de 768 px); `renderFeed` preenche os 4 contadores do dia. Métricas (2026-11-06, só aqui, nunca no site): **Meta ads** = `anuncios_meta` ou `anuncios_ativos − anuncios_google`; **Google ads** = `anuncios_google`; **Meta reach** = `alcance_eu`, "No Meta data" quando não há anúncios Meta (nunca um 0 falso) e marcado com o país quando os anúncios são só fora da UE (GB/US/CH); NL/AT/CH/HU com nome (7.ª célula na faixa de mercados); no arquivo, coluna "Meta reach" e o mercado do veredito 🟢 ao lado do score (`7.2 CH`). Nichos selecionáveis: três (joalharia só como rótulo de linhas antigas). O fluxo Supabase (`feed_dia`, `verdes`, `subscritores`, kits) não mudou. |
-| `assets/` | `logo.svg` / `logo-email.png` (logo ProvenDrop: quadrado teal com 3 barras e um ponto), `og-image.png` (1200×630), `click-logo-{128,256}.{webp,png}` (logo da Click Dynamics), `ugc-example.mp4` + `ugc-example-poster.webp` (vídeo UGC de exemplo, gerado pelos prompts do kit, cortado para não mostrar marcas, H.264 ≤ 3 MB). Na raiz: `favicon.svg`, `favicon-32.png`, `favicon-16.png` (versão simplificada sem ponto, legível a 16 px), `apple-touch-icon.png`. |
+| `assets/` | `logo.svg` / `logo-email.png` (logo ProvenDrop: quadrado teal com 3 barras e um ponto), `og-image.png` (1200×630), `click-logo-{128,256}.{webp,png}` (logo da Click Dynamics). Na raiz: `favicon.svg`, `favicon-32.png`, `favicon-16.png` (versão simplificada sem ponto, legível a 16 px), `apple-touch-icon.png`. |
 | `docs/screenshots/` | `antes/` e `depois/` (1280 e 375 px, JPEG) das secções alteradas a 2026-11-06. |
 | `src/tailwind.css` | Fonte do CSS (Tailwind v4): tema "clean SaaS" (página clara `#F4F7F6`, cartões brancos arredondados com sombra suave, marca teal `#0D9488`, um painel escuro `#07201E` para os dados do dia, Manrope), e as poucas classes de componente que o `app.js` usa por nome (`.msg`, `.status`, `.dt`/`.dt-dark`, `.strip`, `.plat`, `.redact`, `.side-link`). |
 | `tailwind.css` | CSS compilado e minificado, lido por `index.html` e `app.html` (fica no repo: o GitHub Pages não faz build). Regenerar com `npm run build:css` sempre que se mudarem classes nas páginas ou no `app.js`. |
@@ -96,7 +96,8 @@ Códigos de saída: 0 ok · 3 rede bloqueada · 4 credenciais. Os zips encontrad
 
 - Acesso (`public.tem_acesso`): subscrição **direto**, não bloqueada, `ativo` ou `em_atraso` há menos de **7 dias** (decisão de 2026-11-02). Depois a área fecha e o e-mail diário pára; `invoice.paid` repõe.
 - Quem cancela e volta **não paga a adesão outra vez**: a área mostra o link de regresso (`STRIPE_LINK_RETURN`, só mensalidade) a ex-membros, quando esse link existir (em modo real ainda não existe: até lá a área mostra o Subscribe normal). O site diz que a adesão é cobrada na primeira subscrição.
-- **Adesão só no Direct** (decisão de 2026-11-06): quem entra pela Click paga 15 €/mês sem adesão; o link via Click nunca aparece no site.
+- **Adesão só no Direct** (decisão de 2026-11-06): quem entra pela Click paga 15 €/mês sem adesão. O link via Click está no site (`STRIPE_LINK_CLICK`, botão "Subscribe with Click" nos cartões "Are you a Click customer?"): botão → Stripe → `bem-vindo-click.html?session_id=…` → WhatsApp (+351 920 414 823) com o código da compra.
+- **Reembolso total e disputa revogam o acesso** (`charge.refunded` total e `charge.dispute.created` marcam `subscritores.bloqueado_em`); os dois eventos têm de estar ligados no endpoint real.
 - Não há promessa de vagas por nicho/país nem de reembolso (A9): o nicho e os países servem para ordenar as coleções.
 - Disputa → acesso suspenso + alerta; reembolso → só alerta. Alertas vão para `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`).
 

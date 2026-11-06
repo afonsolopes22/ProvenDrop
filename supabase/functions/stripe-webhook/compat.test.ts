@@ -3,8 +3,8 @@
 // à basil 2025-03-31 nestes campos). Correr com:  deno test supabase/functions/stripe-webhook/compat.test.ts
 import { assertEquals } from "jsr:@std/assert@1";
 import {
-  fimDoPeriodo, origemDaSessao, origemDaSubscricao, origemDeMetadata, origemDePrecos,
-  precoDaLinha, precosDasLinhas, subscricaoDaInvoice,
+  chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao, origemDaSubscricao, origemDeMetadata, origemDePrecos,
+  prazoDaDisputa, precoDaLinha, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto,
 } from "./compat.ts";
 
 const DIRETO = "price_1UYaVjJPREpzETp6wboEOplv";
@@ -88,6 +88,36 @@ Deno.test("origem por preços: direto ganha ao click quando os dois aparecem; de
 const sessaoDireto = { id: "cs_1", metadata: { origem: "direto" }, subscription: "sub_x" };
 const sessaoSemMetadata = { id: "cs_2", metadata: {}, subscription: "sub_y" };
 const sessaoSubExpandida = { id: "cs_3", metadata: {}, subscription: { id: "sub_z", metadata: { origem: "click" } } };
+
+// ── fixtures: charge.refunded e charge.dispute.created (A4, revogam o acesso) ──
+const chargeTotal = { id: "ch_1", object: "charge", amount: 4000, amount_refunded: 4000, currency: "eur", customer: "cus_a", refunded: true };
+const chargeParcial = { id: "ch_2", object: "charge", amount: 4000, amount_refunded: 1500, currency: "eur", customer: { id: "cus_b", object: "customer" }, refunded: false };
+const chargeSemCliente = { id: "ch_3", amount: 1500, amount_refunded: 1500, currency: "eur", customer: null };
+const disputaAcacia = { id: "dp_1", object: "dispute", amount: 4000, currency: "eur", charge: "ch_1", customer: null, reason: "fraudulent", status: "needs_response", evidence_details: { due_by: 1_768_780_800 } };
+const disputaEndive = { id: "dp_2", object: "dispute", amount: 1500, currency: "eur", charge: { id: "ch_9", customer: "cus_z" }, evidence_details: { due_by: null } };
+
+Deno.test("charge: reembolso total só quando amount_refunded >= amount (parcial → false)", () => {
+  assertEquals(reembolsoTotal(chargeTotal), true);
+  assertEquals(reembolsoTotal(chargeParcial), false);
+  assertEquals(reembolsoTotal(chargeSemCliente), true);
+  assertEquals(reembolsoTotal({ amount: 0, amount_refunded: 0 }), false);
+  assertEquals(reembolsoTotal(null), false);
+});
+Deno.test("charge/disputa: customer e charge nas duas formas (string e expandida)", () => {
+  assertEquals(clienteDe(chargeTotal), "cus_a");
+  assertEquals(clienteDe(chargeParcial), "cus_b");
+  assertEquals(clienteDe(chargeSemCliente), null);
+  assertEquals(chargeDe(disputaAcacia), "ch_1");
+  assertEquals(chargeDe(disputaEndive), "ch_9");
+  assertEquals(clienteDe(disputaAcacia), null); // a disputa não traz customer: vai-se à charge
+});
+Deno.test("disputa: prazo de resposta e motivo de bloqueio", () => {
+  assertEquals(prazoDaDisputa(disputaAcacia), "2026-01-19");
+  assertEquals(prazoDaDisputa(disputaEndive), null);
+  assertEquals(motivoBloqueio("disputa", "dp_1"), "disputa dp_1");
+  assertEquals(motivoBloqueio("reembolso", "ch_1"), "reembolso ch_1");
+  assertEquals(valorTexto(4000, "eur"), "40.00 EUR");
+});
 
 Deno.test("checkout session: metadata da sessão → metadata da subscrição expandida → price_ids das linhas", () => {
   assertEquals(origemDaSessao(sessaoDireto, [], DIRETO, CLICK), "direto");

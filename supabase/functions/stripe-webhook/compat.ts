@@ -76,6 +76,41 @@ export function origemDaSubscricao(sub: unknown, priceDireto: string, priceClick
   return origemDeMetadata(s.metadata) ?? origemDePrecos(precosDasLinhas(s.items), priceDireto, priceClick);
 }
 
+// ── charges, reembolsos e disputas (A4; desde 2026-11-06 os dois revogam o acesso) ──
+
+/** customer de uma charge ou disputa: "cus_…" ou objeto expandido → id (null se faltar). */
+export function clienteDe(o: unknown): string | null {
+  return idDe(obj(o)?.customer);
+}
+
+/** charge de uma disputa: "ch_…" ou objeto expandido → id (null se faltar). */
+export function chargeDe(o: unknown): string | null {
+  return idDe(obj(o)?.charge);
+}
+
+/** Reembolso total: amount_refunded >= amount, com amount > 0 (parcial ou de boa vontade → false). */
+export function reembolsoTotal(ch: unknown): boolean {
+  const c = obj(ch);
+  const amount = Number(c?.amount ?? 0), refunded = Number(c?.amount_refunded ?? 0);
+  return amount > 0 && refunded >= amount;
+}
+
+/** "40.00 EUR" a partir de um valor em cêntimos e da moeda. */
+export function valorTexto(centimos: unknown, moeda: unknown): string {
+  return `${(Number(centimos ?? 0) / 100).toFixed(2)} ${String(moeda ?? "").toUpperCase()}`;
+}
+
+/** Prazo de resposta de uma disputa (evidence_details.due_by, unix) → "YYYY-MM-DD" ou null. */
+export function prazoDaDisputa(d: unknown): string | null {
+  const due = obj(obj(d)?.evidence_details)?.due_by;
+  return typeof due === "number" ? new Date(due * 1000).toISOString().slice(0, 10) : null;
+}
+
+/** Motivo guardado em subscritores.bloqueado_motivo. */
+export function motivoBloqueio(tipo: "disputa" | "reembolso", id: string): string {
+  return `${tipo} ${id}`;
+}
+
 /** Origem de uma sessão de checkout: metadata da sessão, senão metadata da subscrição expandida, senão price_ids das linhas dadas. */
 export function origemDaSessao(sessao: unknown, linhas: unknown, priceDireto: string, priceClick: string): Origem | null {
   const s = obj(sessao);

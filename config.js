@@ -17,10 +17,16 @@ window.PROVENDROP_CONFIG = {
   /* Stripe Payment Link of the direct subscription (https://buy.stripe.com/…).
      LIVE link since 2026-11-06 (account activated; docs/STRIPE.md): monthly fee
      + joining fee, metadata origem=direto, redirects to bem-vindo.html after
-     payment. Empty = button disabled. The Click Dynamics link (monthly fee only,
-     no joining fee) is never on this site: Click sends it to its own customers.
+     payment. Empty = Subscribe button disabled.
      Test links (test mode) go to config.local.js, loaded only on localhost. */
   STRIPE_LINK_DIRECT: "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00",
+
+  /* Stripe Payment Link of the CLICK plan (monthly fee only, no joining fee;
+     metadata origem=click; redirects to bem-vindo-click.html?session_id=…, where
+     the WhatsApp button carries the purchase code). Shown on the site, to
+     everyone, in the "Are you a Click customer?" cards ("Subscribe with Click").
+     Empty = those buttons disabled, like Subscribe. */
+  STRIPE_LINK_CLICK: "https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01",
 
   /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee),
      shown in the member area to former members. No live link exists yet
