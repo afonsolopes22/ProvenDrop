@@ -14,7 +14,8 @@
   const C = window.PROVENDROP_CONFIG || {};
   const HORA = String(C.DAILY_TIME||"").trim();
   const PORTAL = url(C.STRIPE_PORTAL_LINK);
-  const LINK_RETURN = url(C.STRIPE_LINK_RETURN) || url(C.STRIPE_LINK_DIRECT);
+  /* Returning members: only the dedicated monthly-only link (no fallback to the Direct link, which carries the joining fee). */
+  const LINK_RETURN = url(C.STRIPE_LINK_RETURN);
   const SIGNED_URL_SECONDS = 120;   /* S7: kit download links are valid for 2 minutes */
   const TOLERANCIA_DIAS = 7;        /* M1: days of access after the first failed payment */
   const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("en-GB");
@@ -108,7 +109,7 @@
     else if(sub.bloqueado_em){ t.textContent = "Access suspended"; p.textContent = "Your access was suspended because of a payment dispute. Reply to any ProvenDrop e-mail and we sort it out with you."; s.hidden = true; }
     else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
     else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
-    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; p.textContent = sub.boas_vindas_em ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(LINK_RETURN && sub.boas_vindas_em){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
+    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
     else { t.textContent = "No access to the member area"; p.textContent = "Click customers receive the collections in the Click WhatsApp group, not in this area."; }
     g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
     show("vSemAcesso");
