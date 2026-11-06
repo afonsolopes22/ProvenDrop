@@ -1,6 +1,6 @@
 # Teste completo em modo de teste
 
-Preencher a coluna **Resultado** a cada passo (data, quem, o que se viu). Nada passa a `main` sem todos os passos verdes. Última actualização: 2026-11-02.
+Preencher a coluna **Resultado** a cada passo (data, quem, o que se viu). Nada passa a `main` sem todos os passos verdes. Última actualização: 2026-11-06 (modo real: §0 novas linhas, §2.1 sem adesão na porta Click, §7 teste real).
 
 Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ainda não existem: Stripe, Resend, deploy).
 
@@ -23,6 +23,14 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | Segurança do site (automático): `index.html`, `bem-vindo*.html`, `app.html`, `config.js` sem `/collections/`, `drive.google`, `zip_url`, `link_colecao`, ID da folha proibida, nomes de lojas do `feed_bot.json` nem nomes do `anunciantes_google.json`; `data.json` → 404 | ✅ 2026-11-03 (único "match" foi a palavra genérica `paises`) |
 | Migração `0005_google_e_kits.sql` aplicada com `supabase db query --linked` (colunas confirmadas em `feed_dia` e `verdes`, `kit_pronto` true nas 2 linhas com zip, `anon` sem privilégios) e `email-diario` com novo deploy (`--no-verify-jwt`) | ✅ 2026-11-03 |
 | Função publicada responde: POST sem assinatura → 400; `?reenviar_boas_vindas=` sem `x-cron-secret` → 401 `{"erro":"não autorizado"}`; GET → 405 | ✅ 2026-11-02 (curl) |
+| **Modo real + montra (2026-11-06)** · Segurança do site: `index.html`, `bem-vindo*.html`, `app.html`, `config.js`, `app.js` sem `/collections/`, `drive.google`, `zip_url`, ID da folha proibida, `docs.google.com`/`gviz`, "Bellora", nomes de lojas (`feed_bot.json`) nem de anunciantes (`anunciantes_google.json`, 95 nomes); `data.json` → 404 | ✅ 2026-11-06 (Playwright + fetch local; únicos "matches": a coluna `link_colecao` lida por `app.js` na área privada e a data `2026-11-04` num comentário) |
+| `index.html` **não faz pedidos à folha pública**: 0 pedidos a `docs.google.com`/`gviz` a 1280 e 375 px; só `fonts.googleapis.com`/`fonts.gstatic.com`; 0 erros de consola; sem overflow a 375; nenhum "0" visível nas maquetes (números desfocados); sem secção de arquivo; vídeo UGC com `muted loop playsinline controls preload="none"` | ✅ 2026-11-06 |
+| Área de membros continua a ler do Supabase (`feed_dia` → `select dia` + `select *`, `verdes`, `subscritores`; REST simulado com o mesmo caminho de código, `app.js` sem alterações ao fetch): Today com 4 linhas; **Meta ads** = `anuncios_meta` ou `anuncios_ativos − anuncios_google` (14 − 3 = 11); linha sem Meta → **"No Meta data"** em vez de 0; alcance com anúncios só no Reino Unido/Suíça marcado com o país, nunca "EU reach"; **Switzerland / Netherlands / Hungary** com nome (7.ª célula na faixa de mercados); Archive com coluna **Meta reach** e score por mercado (**7.2 CH**, **7.2 HU**); 0 erros de consola | ✅ 2026-11-06 (Playwright, Supabase simulado) |
+| Lighthouse mobile (`index.html`, performance): **antes 91 / depois 93**; LCP 2,8 s → 2,6 s; **CLS 0** nos dois; peso 189 → 171 KiB | ✅ 2026-11-06 |
+| Screenshots desktop (1280) e mobile (375) das secções alteradas | ✅ `docs/screenshots/antes/` e `docs/screenshots/depois/` (JPEG) |
+| `bem-vindo-click.html`: botão WhatsApp `wa.me/351920414823` com a mensagem pré-definida; com `?session_id=cs_live_…` a mensagem leva "Código da compra: …"; sem `session_id` ou com valor inválido (`<script>`) vai sem a linha do código; a página só pede fontes (nenhum pedido ao Stripe); 0 erros | ✅ 2026-11-06 |
+| `stripe-webhook`: `compat.test.ts` (8 testes, fixtures acacia e 2026-10-28.endive) verdes com `deno test`; `deno check` limpo em `stripe-webhook`, `reconciliar` e `email-diario` | ✅ 2026-11-06 |
+| `scripts/setup-supabase.ps1` sem erros de sintaxe (parser do PowerShell) | ✅ 2026-11-06 (não executado: só o Afonso, com as chaves reais) |
 | Edge Functions: sintaxe TypeScript verificada com o compilador TypeScript (transpileModule, sem erros); não executadas: sem Deno nem deploy | ✅ |
 
 ## 1. Pagamento Direct → acesso → cancelamento

@@ -27,11 +27,11 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 
 | Ficheiro | Função |
 |---|---|
-| `config.js` | Configuração pública (ver acima). Links do Stripe vazios em `main` (S1). |
-| `config.local.example.js` | Modelo do `config.local.js` (links de **teste** do Stripe, só carregado em `localhost`; o próprio `config.local.js` está no `.gitignore`). |
-| `index.html` | Página pública (inglês). Montra com números da folha pública (nomes em barras), secções de produto, preço e FAQ. Dias de anúncio contados a partir de `data_inicio` quando a folha a tiver; senão "at analysis". |
-| `bem-vindo.html` | Pós-pagamento da subscrição direta. |
-| `bem-vindo-click.html` | Pós-pagamento dos clientes Click (WhatsApp). |
+| `config.js` | Configuração pública (ver acima). Desde 2026-11-06 com os links **reais** do Stripe (Direct e portal); `STRIPE_LINK_RETURN` vazio até existir o link de regresso real. |
+| `config.local.example.js` | Modelo do `config.local.js` (links de **teste** do Stripe, só carregado em `localhost`; o próprio `config.local.js` está no `.gitignore`; os links de teste ficam no vault, não no repo). |
+| `index.html` | Página pública (inglês), **montra** desde 2026-11-06: não lê a folha pública nem mostra números reais (hero e lista do dia são maquetes estáticas com números desfocados e selo "Members only"; sem arquivo; validação em 3 frases; nichos só com nomes; mercados só com nomes; kit sem a estrutura do zip; FAQ genérico). Vídeo UGC de exemplo (`assets/ugc-example.mp4`), blocos Click com logo e "No joining fee", faixa "In partnership with Click Dynamics", Instagram no rodapé, meta tags Open Graph. |
+| `bem-vindo.html` | Pós-pagamento da subscrição direta. Logo novo, Instagram no rodapé. |
+| `bem-vindo-click.html` | Pós-pagamento dos clientes Click: lê `?session_id=` do redirecionamento do Stripe e abre o WhatsApp (`wa.me/351920414823`) com a mensagem pré-definida que leva o código da compra (nada mais é lido, guardado ou pedido ao Stripe). Texto PT/EN, "No joining fee". |
 | `app.html` | Área pessoal (inglês): login por magic link, Today, Archive, Preferences, Subscription, guia de 1 minuto. Só usa a chave *anon*; o acesso é decidido pelas políticas RLS. Kits por URL assinada (15 min) do bucket privado. |
 | `supabase/migrations/0001_plataforma.sql` | Tabelas, RLS, bucket privado `kits`, job pg_cron (já aplicada). |
 | `supabase/migrations/0002_kits_datas.sql` | `data_inicio` em `feed_dia`/`verdes`; `feed_dia` em `envios_diarios` (aplicada pelo setup-supabase.ps1). |
@@ -43,16 +43,19 @@ Os **segredos** (Stripe, Resend, CRON) nunca entram no repositório: vão para `
 | `supabase/functions/reconciliar` | Reconciliação diária Stripe ↔ base, só leitura, alerta por e-mail se divergir (M7). |
 | `supabase/functions/_shared/` | `email.ts` (Resend + molde), `auth.ts` (x-cron-secret em tempo constante), `log.ts` (sem e-mails nem chaves nos logs), `alerta.ts` (e-mail ao Afonso: `ALERT_EMAIL`). |
 | `supabase/.env.example` | Nomes das variáveis (sem valores). |
-| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). Desde 2026-11-05 o "Today" e o "Archive" são tabelas (uma linha por coleção, kit por baixo do nome; blocos chave/valor abaixo de 768 px) e `renderFeed` preenche os 4 contadores do dia (`#kpiTotal`, `#kpiOk`, `#kpiWatch`, `#kpiKits`). |
+| `app.js` | Lógica da área pessoal (fora do HTML para a CSP ser estrita). "Today" e "Archive" são tabelas (uma linha por coleção, kit por baixo do nome; blocos chave/valor abaixo de 768 px); `renderFeed` preenche os 4 contadores do dia. Métricas (2026-11-06, só aqui, nunca no site): **Meta ads** = `anuncios_meta` ou `anuncios_ativos − anuncios_google`; **Google ads** = `anuncios_google`; **Meta reach** = `alcance_eu`, "No Meta data" quando não há anúncios Meta (nunca um 0 falso) e marcado com o país quando os anúncios são só fora da UE (GB/US/CH); NL/AT/CH/HU com nome (7.ª célula na faixa de mercados); no arquivo, coluna "Meta reach" e o mercado do veredito 🟢 ao lado do score (`7.2 CH`). Nichos selecionáveis: três (joalharia só como rótulo de linhas antigas). O fluxo Supabase (`feed_dia`, `verdes`, `subscritores`, kits) não mudou. |
+| `assets/` | `logo.svg` / `logo-email.png` (logo ProvenDrop: quadrado teal com 3 barras e um ponto), `og-image.png` (1200×630), `click-logo-{128,256}.{webp,png}` (logo da Click Dynamics), `ugc-example.mp4` + `ugc-example-poster.webp` (vídeo UGC de exemplo, gerado pelos prompts do kit, cortado para não mostrar marcas, H.264 ≤ 3 MB). Na raiz: `favicon.svg`, `favicon-32.png`, `favicon-16.png` (versão simplificada sem ponto, legível a 16 px), `apple-touch-icon.png`. |
+| `docs/screenshots/` | `antes/` e `depois/` (1280 e 375 px, JPEG) das secções alteradas a 2026-11-06. |
 | `src/tailwind.css` | Fonte do CSS (Tailwind v4): tema "clean SaaS" (página clara `#F4F7F6`, cartões brancos arredondados com sombra suave, marca teal `#0D9488`, um painel escuro `#07201E` para os dados do dia, Manrope), e as poucas classes de componente que o `app.js` usa por nome (`.msg`, `.status`, `.dt`/`.dt-dark`, `.strip`, `.plat`, `.redact`, `.side-link`). |
 | `tailwind.css` | CSS compilado e minificado, lido por `index.html` e `app.html` (fica no repo: o GitHub Pages não faz build). Regenerar com `npm run build:css` sempre que se mudarem classes nas páginas ou no `app.js`. |
 | `package.json` | Só o build do CSS (`@tailwindcss/cli`). `node_modules/` está no `.gitignore`. |
-| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos), funções, migrações 0002–0005, `public.config`. Enter = não alterar; recusa misturas teste/real. |
+| `scripts/setup-supabase.ps1` | Deploy num comando: link, segredos por `.env` temporário com ACL (nunca na linha de comandos; `sk_`/`whsec_` pedidos com `Read-Host -AsSecureString`), migrações 0002–0005 e `public.config`, deploy de `email-diario`/`reconciliar` e, no fim, do `stripe-webhook` (`--no-verify-jwt`). Enter = não alterar (nos preços, Enter = preços reais); recusa misturas teste/real. |
+| `supabase/functions/stripe-webhook/compat.ts` + `compat.test.ts` | Leitura dos objetos do Stripe nas duas formas da API (acacia e 2026-10-28.endive: subscrição da fatura, price_id das linhas, `current_period_end`, origem) e os testes com fixtures das duas (`deno test`). |
 | `scripts/stripe-teste.ps1` | Uma vez, em modo de teste: cria o Payment Link de regresso e acrescenta os eventos de disputa/reembolso ao webhook (pela API, com a tua chave sem eco). |
 | `.gitleaks.toml`, `.pre-commit-config.yaml`, `.github/workflows/secret-scan.yml` | Gate de segredos local (`pip install pre-commit && pre-commit install`) e em CI (histórico completo). |
 | `docs/SEGURANCA.md`, `docs/PAGAMENTOS.md` | Revisões de 2026-11-02 e o estado de cada achado. |
 | `docs/SETUP.md` | Ordem completa de configuração. |
-| `docs/STRIPE.md` | O que já existe no Stripe em modo de teste (ids e links), como confirmar e como repetir no modo real. |
+| `docs/STRIPE.md` | Configuração real do Stripe (preços, links, portal, webhook 2026-10-28.endive), o que falta fazer à mão, e um histórico curto do modo de teste. |
 | `docs/EMAIL.md` | Resend: conta, domínio, chave, SMTP do Supabase Auth. |
 | `docs/DOMINIO.md` | provendrop.com: DNS do GitHub Pages e do Resend, `CNAME` (só quando o domínio existir), URLs a mudar. |
 | `docs/TESTE.md` | Plano de teste com resultados. |
@@ -72,6 +75,8 @@ npm run build:css
 ```
 
 e fazer commit do `tailwind.css` gerado. Nada muda na lógica: `app.js` e `config.js` mantêm as mesmas funções, ids e variáveis.
+
+Logo (2026-11-06): quadrado teal `#0F766E` arredondado com três barras a subir e um ponto (`assets/logo.svg`, inline nas páginas); wordmark "Proven" `#0B1F1E` + "Drop" `#0F766E`, e em fundo escuro branco + `#5EEAD4`. O site público é uma **montra**: vende o resultado, sem dados reais nem método; as métricas vivem só na área de membros.
 
 ## Pôr a funcionar
 
