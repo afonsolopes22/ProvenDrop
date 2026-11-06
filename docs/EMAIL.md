@@ -62,3 +62,18 @@ O magic link de boas-vindas vai pelo Resend (API), mas o link que o cliente pede
    (`{{ .RedirectTo }}` é o `app.html` pedido pela página de login.) O e-mail de boas-vindas e o de regresso já usam este formato, enviados pelo Resend a partir do webhook.
 5. **Authentication** → **URL Configuration**: **Site URL** `https://afonsolopes22.github.io/ProvenDrop/` e, em **Redirect URLs**, `https://afonsolopes22.github.io/ProvenDrop/app.html`.
 6. A validade do link está em **Authentication → Settings → Email OTP expiration** (3600 s por defeito) e tem de ser igual a `MAGIC_LINK_MINUTOS` (60).
+
+## 6. Enquanto o domínio não está verificado: frases do site
+
+Até o domínio estar verificado no Resend (§2), o site **não promete** que o e-mail de acesso chega logo. Em `index.html` (secção Access, texto do `#noteSubscribe`) e em `bem-vindo.html` (frase de abertura) está, desde 2026-11-06: *"You'll receive your access link by e-mail. If it doesn't arrive within 10 minutes, message us on WhatsApp: +351 920 414 823."* Os dois sítios têm um comentário `TODO (Afonso)` com a frase original, para voltar a ela quando o domínio estiver verificado. A página de entrada (`app.html`) e `bem-vindo.html` têm ainda a linha "Problems signing in? WhatsApp +351 920 414 823".
+
+## 7. Correção do e-mail errado no checkout (`corrigir-email`)
+
+Quem se engana no e-mail ao pagar o link Direct nunca receberia o acesso. Desde 2026-11-06 o link Direct redireciona para `bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (STRIPE.md a) e a página, com esse `session_id`:
+
+1. pede à Edge Function `corrigir-email` (`GET …/functions/v1/corrigir-email?session_id=cs_…`) **só o e-mail mascarado** da compra (`afo•••@gmail.com`) e mostra "We sent your access to afo•••@gmail.com" + **Not my e-mail? Fix it**; o `session_id` é retirado da barra de endereço;
+2. o botão abre um formulário com o e-mail novo duas vezes (têm de coincidir) e faz `POST { session_id, novo_email, confirmacao }`;
+3. a função valida no Stripe (sessão **paga**, criada há **menos de 24 h**, porta **Direct** pela metadata ou pelo `price_`), recusa uma **segunda correção** da mesma sessão (`subscritores.email_corrigido_sessao` + tabela `correcoes_email`) e um e-mail já usado por outro subscritor; depois, por esta ordem: utilizador de Auth com o e-mail novo (confirmado) → `customer.email` no Stripe → `subscricoes` + `subscritores` + auditoria numa transação (`corrigir_email_subscritor`, migração `0006`; se falhar, Stripe e Auth são revertidos) → magic link por `token_hash` enviado ao e-mail novo pelo Resend → alerta "E-mail corrigido no checkout" em `ALERT_EMAIL` (só hashes);
+4. sem `session_id` (ou inválido) a página mostra só a linha de apoio por WhatsApp.
+
+Respostas: 404 `sessao_nao_encontrada` (não paga, porta Click, sem e-mail ou inexistente: nunca se diz qual), 410 `expirada`, 409 `ja_corrigido`, 422 `emails_diferentes` / `email_invalido` / `mesmo_email` / `email_em_uso`, 503 `ainda_a_registar` (o webhook ainda não registou a compra), 429 `limite` (rate-limit por IP, 20 GET / 5 POST em 10 min, guardado só o hash do IP). Se o Resend falhar, a correção fica feita e a resposta traz `enviado:false`: o cliente pede o link na página de entrada com o e-mail novo (§5). Verify JWT desligado (`config.toml`); CORS só para a origem de `APP_URL` e `localhost`. Regras puras em `validar.ts`, testadas em `validar.test.ts` (`deno test`). Teste real: TESTE.md §8.

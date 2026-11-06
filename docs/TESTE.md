@@ -32,6 +32,11 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | `stripe-webhook`: `compat.test.ts` (8 testes, fixtures acacia e 2026-10-28.endive) verdes com `deno test`; `deno check` limpo em `stripe-webhook`, `reconciliar` e `email-diario` | ✅ 2026-11-06 |
 | `scripts/setup-supabase.ps1` sem erros de sintaxe (parser do PowerShell) | ✅ 2026-11-06 (não executado: só o Afonso, com as chaves reais) |
 | Edge Functions: sintaxe TypeScript verificada com o compilador TypeScript (transpileModule, sem erros); não executadas: sem Deno nem deploy | ✅ |
+| **Auditoria 2026-11-06 (2.ª ronda)** · `index.html` passo 2 "Validate" sem "13 metrics"; frases do e-mail de acesso substituídas pela versão com o WhatsApp (+351 920 414 823) em `index.html` (Access) e `bem-vindo.html`, com `TODO` para voltar ao texto original quando o domínio estiver no Resend; "Problems signing in? WhatsApp …" em `bem-vindo.html` e na página de entrada de `app.html`; `bem-vindo-click.html` → **Manage subscription** abre `billing.stripe.com/p/login/…` (WhatsApp só com `STRIPE_PORTAL_LINK` vazio); `terms.html`/`privacy.html`/`refunds.html` servidas, ligadas no rodapé das 4 páginas, com os marcadores `[A COMPLETAR PELO AFONSO]` visíveis; 0 erros de consola, sem overflow a 375 nas 7 páginas | ✅ 2026-11-06 (Playwright, Chrome) |
+| `bem-vindo.html?session_id=cs_live_…` com `corrigir-email` simulado: pede `GET …/functions/v1/corrigir-email?session_id=…`, mostra "We sent your access to afo•••@gmail.com" + **Not my e-mail? Fix it** → formulário (2 e-mails iguais) → `POST {session_id, novo_email, confirmacao}` → "Done. Your access link is on its way to new•••@…"; e-mails diferentes → erro local; sem `session_id` → só a linha de apoio; o `session_id` sai da barra de endereço | ✅ 2026-11-06 (Playwright, função simulada; a função real só depois do deploy, §8) |
+| `corrigir-email`: `validar.test.ts` (8 testes: sessão inválida/não paga/sem e-mail, > 24 h, porta Click, segunda correção, e-mails diferentes, máscara) verdes com `deno test`; `deno check` limpo | ✅ 2026-11-06 |
+| Segurança do site (automático) alargada a `terms.html`, `privacy.html`, `refunds.html` e às frases retiradas ("13 metrics", "arrives right after you pay", "on its way to the e-mail address") | ✅ 2026-11-06 |
+| Screenshots (1280 e 375) das zonas alteradas | ✅ `docs/screenshots/auditoria-antes/` e `docs/screenshots/auditoria-depois/` |
 
 ## 1. Pagamento Direct → acesso → cancelamento
 
@@ -130,7 +135,7 @@ Pré-requisitos: PR fundido em `main`; `scripts\setup-supabase.ps1` corrido com 
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 7.1 | Site publicado → **Subscribe** → pagar o Direct (**40 €**: 15 € + 25 € de adesão) | Checkout real "ProvenDrop" (nome público); redireciona para `bem-vindo.html` | ⏳ |
+| 7.1 | Site publicado → **Subscribe** → pagar o Direct (**40 €**: 15 € + 25 € de adesão) | Checkout real "ProvenDrop" (nome público); redireciona para `bem-vindo.html?session_id=cs_live_…` (STRIPE.md a); a página mostra "We sent your access to <e-mail mascarado>" e o botão **Not my e-mail? Fix it** | ⏳ |
 | 7.2 | SQL: `select email, origem, estado, user_id is not null as login, boas_vindas_em from public.subscritores` | 1 linha: o e-mail, `direto`, `ativo`, `login = true`, `boas_vindas_em` preenchido; logs do webhook com `checkout.session.completed` / `customer.subscription.created` / `invoice.paid` a 200 (eventos na API 2026-10-28.endive lidos sem aviso de "sem subscrição") | ⏳ |
 | 7.3 | E-mail "Welcome to ProvenDrop: your access" → **Sign in to ProvenDrop** | Abre `app.html` com sessão; Today mostra as coleções do dia; **Download Launch Kit** descarrega o zip | ⏳ |
 | 7.4 | Subscription → **Manage subscription** → portal real → **Cancel subscription** | `customer.subscription.updated` com `cancel_at_period_end`; a área mostra "ends on <data>"; para cortar já: Stripe → cliente → subscrição → Cancelar **imediatamente** → `deleted` → `cancelado` → `app.html` "Subscription cancelled", sem acesso (RLS devolve 0 linhas) | ⏳ |
@@ -138,6 +143,23 @@ Pré-requisitos: PR fundido em `main`; `scripts\setup-supabase.ps1` corrido com 
 | 7.6 | No site, cartão "Are you a Click customer?" → **Subscribe with Click — €15/month** e pagar com **outro** e-mail | Checkout só com "ProvenDrop via Click · 15,00 €/mês", **sem adesão**; redireciona para `bem-vindo-click.html?session_id=cs_live_…`; o botão **Send message on WhatsApp** abre o +351 920 414 823 com a mensagem que leva esse código; SQL: linha `origem = click`, `estado = ativo`, `user_id` null; **nenhum** e-mail de boas-vindas; `app.html` com esse e-mail → "This e-mail has no subscription…". Depois: cancelar imediatamente e reembolsar no Stripe | ⏳ |
 | 7.8 | Reembolso total do 7.1 (com `charge.refunded` ligado no endpoint) | `charge.refunded` → `subscritores.bloqueado_em` preenchido com motivo `reembolso ch_…`; `app.html` → "Access suspended"; alerta "Reembolso total: acesso revogado". Reembolso **parcial** → só alerta, acesso mantido | ⏳ |
 | 7.7 | Depois dos dois reembolsos | `select * from public.subscricoes` mostra as duas linhas `cancelado`; `reconciliar` (06:30 UTC ou `POST …/reconciliar` com `x-cron-secret`) sem divergências | ⏳ |
+
+## 8. Correção de e-mail errado no checkout (`corrigir-email`, desde 2026-11-06)
+
+Pré-requisitos: `setup-supabase.ps1` corrido (migração `0006` + deploy de `corrigir-email`); link Direct a redirecionar com `?session_id={CHECKOUT_SESSION_ID}`. `F` = `https://maljrfgnnhtrjunnwlre.supabase.co/functions/v1/corrigir-email`. Pode fazer-se com a compra do 7.1 (dentro das 24 h) e sem gastar mais dinheiro.
+
+| # | Passo | Esperado | Resultado |
+|---|---|---|---|
+| 8.1 | `curl "$F?session_id=cs_live_inventado123456"` | 404 `{"erro":"sessao_nao_encontrada"}`; o mesmo com `?session_id=<script>` e sem parâmetro | ⏳ |
+| 8.2 | `curl "$F?session_id=<cs_live_ da compra 7.1>"` | 200 `{"email":"afo•••@gmail.com","corrigido":false}` (só o e-mail mascarado; nada mais) | ⏳ |
+| 8.3 | 21 GET seguidos do mesmo IP em 10 min | o 21.º responde 429 `{"erro":"limite"}`; POST a partir do 6.º | ⏳ |
+| 8.4 | Na página `bem-vindo.html?session_id=…` da compra: **Not my e-mail? Fix it** → dois e-mails **diferentes** | A página recusa antes de chamar a função ("The two e-mails don't match."); por `curl -X POST $F -H "content-type: application/json" -d '{"session_id":"…","novo_email":"a@x.pt","confirmacao":"b@x.pt"}'` → 422 `{"erro":"emails_diferentes"}` | ⏳ |
+| 8.5 | Mesmo formulário com um e-mail novo (igual nas duas caixas) | 200 `{"ok":true,"email":"nov•••@…","enviado":true}`; "Done. Your access link is on its way…"; e-mail "Welcome to ProvenDrop: your access" no endereço novo com o magic link (abre `app.html` com sessão); Stripe → cliente com o e-mail novo; SQL: `subscritores.email` e `subscricoes.email` novos, `email_corrigido_em` preenchido, `email_corrigido_sessao = cs_…`; 1 linha em `correcoes_email`; Authentication → Users com o e-mail novo; alerta "E-mail corrigido no checkout" em `ALERT_EMAIL` | ⏳ |
+| 8.6 | Repetir o POST da mesma sessão (segunda correção) | 409 `{"erro":"ja_corrigido"}`; o GET passa a `{"email":"nov•••@…","corrigido":true}` e a página esconde o botão | ⏳ |
+| 8.7 | Sessão com mais de 24 h (no dia seguinte, a mesma `cs_live_`) | 410 `{"erro":"expirada"}`; a página mostra "This purchase is more than 24 hours old…" | ⏳ |
+| 8.8 | `session_id` de uma compra **Click** | 404 `{"erro":"sessao_nao_encontrada"}` (a porta Click não tem login) | ⏳ |
+| 8.9 | E-mail novo que já é de outro subscritor | 422 `{"erro":"email_em_uso"}`; nada muda no Stripe nem na base | ⏳ |
+| 8.10 | `app.html` → link de entrada com o e-mail **antigo** | "If this e-mail has a ProvenDrop subscription…" e **nenhum** e-mail chega (o login já tem o e-mail novo) | ⏳ |
 
 ## 5. Depois do teste
 

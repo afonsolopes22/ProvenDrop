@@ -47,12 +47,12 @@ O que faz, e o que te pede:
 
 1. `supabase link --project-ref maljrfgnnhtrjunnwlre` (pode pedir a palavra-passe da base de dados: Supabase → **Project Settings** → **Database**).
 2. Pede, **sem eco** (`Read-Host -AsSecureString`, nunca mostrados nem gravados no repositório), os três segredos (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`) e depois os identificadores e remetentes (`STRIPE_PRICE_DIRETO`, `STRIPE_PRICE_CLICK`, `STRIPE_PAYMENT_LINK_DIRETO`, `EMAIL_FROM`, `EMAIL_REPLY_TO`, `ALERT_EMAIL`). **Enter = não alterar** esse segredo (A6): `RESEND_API_KEY` ou `EMAIL_FROM` vazios ficam como estão no Supabase. Exceção desde 2026-11-06: Enter em `STRIPE_PRICE_DIRETO` / `STRIPE_PRICE_CLICK` escreve os **preços reais** (STRIPE.md). `EMAIL_FROM`: `ProvenDrop <onboarding@resend.dev>` enquanto não houver domínio verificado, `ProvenDrop <noreply@provendrop.com>` depois. Define `STRIPE_ACCEPT_TEST` a partir do prefixo da chave (`sk_live_` → `0`), gera um `CRON_SECRET` aleatório, lê `HORA_ENVIO` de `config.js`, define `APP_URL` e `MAGIC_LINK_MINUTOS`. Os segredos vão num `.env` temporário só legível por ti (`icacls`), para `supabase secrets set --env-file`, e o ficheiro é sobrescrito e apagado no fim (S8): nada passa pela linha de comandos. Recusa misturas: `sk_live_` com ids/links de teste ou `EMAIL_FROM` de teste, `sk_test_` com links reais em `config.js`; `sk_live_` pede ainda "SIM".
-3. Corre as migrações `0002`–`0005` e actualiza `public.config` (`email_diario_url`, `stripe_webhook_url`, `reconciliar_url`, `cron_secret`) com `supabase db query --linked`. Se falhar, escreve um `.sql` temporário em `%TEMP%`, pede-te para o colar no **SQL Editor** e apaga-o quando carregares Enter.
-4. `supabase functions deploy` de `email-diario` e `reconciliar` e, **no fim**, de `stripe-webhook` (todas com `--no-verify-jwt`), para a função arrancar já com os segredos novos.
+3. Corre as migrações `0002`–`0006` e actualiza `public.config` (`email_diario_url`, `stripe_webhook_url`, `reconciliar_url`, `cron_secret`) com `supabase db query --linked`. Se falhar, escreve um `.sql` temporário em `%TEMP%`, pede-te para o colar no **SQL Editor** e apaga-o quando carregares Enter.
+4. `supabase functions deploy` de `email-diario`, `reconciliar` e `corrigir-email` (correção do e-mail errado no checkout, EMAIL.md §7; usa os mesmos segredos do webhook) e, **no fim**, de `stripe-webhook` (todas com `--no-verify-jwt`), para a função arrancar já com os segredos novos.
 
 Opções: `-SemDeploy` (só segredos e SQL), `-SemSegredos` (só deploy e SQL). Podes voltar a correr quantas vezes quiseres.
 
-Verificar: Supabase → **Edge Functions** mostra as três funções com deploy recente; **Edge Functions → Secrets** lista os nomes (nunca os valores), incluindo `STRIPE_ACCEPT_TEST` e `ALERT_EMAIL`; SQL Editor → `select chave, valor from public.config` mostra os três URLs e um `cron_secret` que não é `MUDAR-ESTE-VALOR`; `select jobname, schedule from cron.job` mostra `provendrop-email-diario` (`0 * * * *`), `provendrop-boas-vindas` (`*/15 * * * *`) e `provendrop-reconciliar` (`30 6 * * *`).
+Verificar: Supabase → **Edge Functions** mostra as quatro funções (`stripe-webhook`, `email-diario`, `reconciliar`, `corrigir-email`) com deploy recente; **Edge Functions → Secrets** lista os nomes (nunca os valores), incluindo `STRIPE_ACCEPT_TEST` e `ALERT_EMAIL`; SQL Editor → `select chave, valor from public.config` mostra os três URLs e um `cron_secret` que não é `MUDAR-ESTE-VALOR`; `select jobname, schedule from cron.job` mostra `provendrop-email-diario` (`0 * * * *`), `provendrop-boas-vindas` (`*/15 * * * *`) e `provendrop-reconciliar` (`30 6 * * *`).
 
 Gate de segredos local (S15), uma vez: `pip install pre-commit` e `pre-commit install` na raiz do repo; o gitleaks passa a correr antes de cada commit. Em CI corre em todos os pushes (`.github/workflows/secret-scan.yml`).
 
@@ -67,7 +67,7 @@ Só valores públicos. Desde 2026-11-06 `config.js` em `main` tem os links **rea
 | `STRIPE_LINK_RETURN` | vazio até existir o link de regresso real | URL impresso pelo `scripts\stripe-teste.ps1` (só mensalidade, para ex-membros) | STRIPE.md |
 | `DAILY_TIME` | `09:00` | decidido em 2026-11-02; tem de bater com `HORA_ENVIO` |
 | `PRICE_MONTHLY` / `PRICE_JOINING` | `15` / `25` | iguais aos preços do Stripe |
-| `CONTACT_EMAIL` | opcional | aparece no rodapé e nas páginas de boas-vindas |
+| `CONTACT_EMAIL` | opcional | aparece no rodapé de todas as páginas (site, área, boas-vindas, termos/privacidade/reembolsos) quando preenchido |
 | `CTR` | vazio até haver campanhas documentadas | README |
 
 Para voltar a testar em modo de teste: copiar `config.local.example.js` para `config.local.js`, preencher com os links de teste do vault e servir o site a partir da raiz do repositório:
