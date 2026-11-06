@@ -150,7 +150,7 @@
       </ol>
       <ol class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="The ProvenDrop path, in four steps">
         <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 1</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Discover</b><span class="mt-1.5 block text-[14px] text-ink-2">Collections already backed by real advertising activity.</span></li>
-        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 2</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Validate</b><span class="mt-1.5 block text-[14px] text-ink-2">13 metrics, six markets, measured again 24 hours later.</span></li>
+        <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 2</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Validate</b><span class="mt-1.5 block text-[14px] text-ink-2">Demand and advertising checked market by market, and again the next day.</span></li>
         <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 3</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Create</b><span class="mt-1.5 block text-[14px] text-ink-2">A creative prompt tailored to each collection, with reference photos.</span></li>
         <li class="card min-w-0 p-6"><span class="text-[12px] font-bold text-brand-dark">Step 4</span><b class="mt-2 block text-[24px] font-extrabold tracking-tight text-ink">Launch</b><span class="mt-1.5 block text-[14px] text-ink-2">Google Ads keywords, titles and landing copy, ready to use.</span></li>
       </ol>
@@ -488,6 +488,9 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
         <li><a class="hover:text-ink" href="#join">Subscribe</a></li>
         <li><a class="hover:text-ink" href="app.html">Member area</a></li>
         <li><a class="hover:text-ink" href="#faq">FAQ</a></li>
+        <li class="mt-2"><a class="hover:text-ink" href="terms.html">Terms of service</a></li>
+        <li><a class="hover:text-ink" href="privacy.html">Privacy policy</a></li>
+        <li><a class="hover:text-ink" href="refunds.html">Refund policy</a></li>
       </ul>
       <div class="md:col-span-5">
         <p class="[&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4" id="footContact" hidden></p>
@@ -507,7 +510,9 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
   var b=document.getElementById("btnSubscribe"), n=document.getElementById("noteSubscribe"), link=s("STRIPE_LINK_DIRECT");
   if(b && /^https:\/\//.test(link)){
     b.href=link; b.removeAttribute("aria-disabled");
-    if(n) n.textContent="Secure card payment by Stripe. Your access e-mail arrives right after you pay.";
+    /* TODO (Afonso): when the sending domain is verified in Resend, go back to
+       "Secure card payment by Stripe. Your access e-mail arrives right after you pay." */
+    if(n) n.textContent="Secure card payment by Stripe. You'll receive your access link by e-mail. If it doesn't arrive within 10 minutes, message us on WhatsApp: +351 920 414 823.";
   }
   /* Click plan buttons ("Are you a Click customer?"): enabled only when STRIPE_LINK_CLICK is configured. */
   var cl=s("STRIPE_LINK_CLICK");
