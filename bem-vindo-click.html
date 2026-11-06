@@ -78,8 +78,12 @@ code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px soli
 .rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
 .note{margin-top:16px;color:var(--muted);font-size:14px}
 footer{margin-top:36px;color:var(--muted);font-size:14px}
+footer nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:14px}
+footer nav a{font-weight:600;text-underline-offset:3px}
+footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
 </style>
-<!-- Stripe customer portal link comes from config.js (STRIPE_PORTAL_LINK). Empty = the button opens WhatsApp. -->
+<!-- "Manage subscription" opens the Stripe customer portal (STRIPE_PORTAL_LINK in config.js); only when that
+     value is empty does the button fall back to WhatsApp. CONTACT_EMAIL (optional) is shown in the footer. -->
 <script src="config.js"></script>
 </head>
 <body>
@@ -136,9 +140,11 @@ footer{margin-top:36px;color:var(--muted);font-size:14px}
   </div>
 
   <footer>
-    <p>Your Click plan is the monthly fee only: no joining fee. You will receive the payment receipt by email. To change niche or cancel your subscription:</p>
-    <a class="btn ghost" id="btnGerir" href="https://wa.me/351920117648?text=I%27d%20like%20to%20manage%20my%20ProvenDrop%20subscription" target="_blank" rel="noopener">Manage subscription</a>
-    <br><a class="ig" href="https://www.instagram.com/provendrop/" target="_blank" rel="noopener" aria-label="ProvenDrop on Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+    <p>Your Click plan is the monthly fee only: no joining fee. You will receive the payment receipt by email. To change your card, see your invoices or cancel your subscription, open the Stripe portal (it asks for the e-mail you paid with and sends you a link). To change niche, message us on WhatsApp.</p>
+    <a class="btn ghost" id="btnGerir" href="#" target="_blank" rel="noopener">Manage subscription</a>
+    <p class="contact" id="contactLine" hidden></p>
+    <nav aria-label="Legal"><a href="terms.html">Terms of service</a><a href="privacy.html">Privacy policy</a><a href="refunds.html">Refund policy</a></nav>
+    <a class="ig" href="https://www.instagram.com/provendrop/" target="_blank" rel="noopener" aria-label="ProvenDrop on Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
   </footer>
 </main>
 <script>
@@ -149,7 +155,12 @@ footer{margin-top:36px;color:var(--muted);font-size:14px}
   if(!/^cs_[A-Za-z0-9_]{8,}$/.test(sid)) sid="";
   var t="Olá! Acabei de comprar o acesso à PR de coleções (ProvenDrop)."+(sid?" Código da compra: "+sid+".":"")+" Quero entrar no grupo.";
   document.getElementById("btnWa").href="https://wa.me/351920414823?text="+encodeURIComponent(t);
-  var p=String((window.PROVENDROP_CONFIG||{}).STRIPE_PORTAL_LINK||"").trim(); if(/^https:\/\//.test(p)){var g=document.getElementById("btnGerir");g.href=p;}
+  /* Manage subscription → Stripe customer portal; WhatsApp only when STRIPE_PORTAL_LINK is empty. */
+  var C=window.PROVENDROP_CONFIG||{}, g=document.getElementById("btnGerir");
+  var p=String(C.STRIPE_PORTAL_LINK||"").trim();
+  g.href=/^https:\/\//.test(p) ? p : "https://wa.me/351920414823?text="+encodeURIComponent("Olá! Quero gerir a minha subscrição ProvenDrop (plano Click).");
+  var mail=String(C.CONTACT_EMAIL||"").trim();
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ var c=document.getElementById("contactLine"); c.innerHTML='Questions? Write to <a href="mailto:'+mail+'">'+mail+'</a>.'; c.hidden=false; }
 })();
 </script>
 </body>

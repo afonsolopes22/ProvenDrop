@@ -16,10 +16,10 @@
        e o ficheiro é sobrescrito e apagado no fim (S8);
     3. recusa misturas de teste e real: chave sk_live_ com links/ids de teste em
        config.js ou nos valores escritos, e vice-versa (A6);
-    4. aplica as migrações 0002–0005 e actualiza public.config (email_diario_url,
+    4. aplica as migrações 0002–0006 e actualiza public.config (email_diario_url,
        stripe_webhook_url, reconciliar_url, cron_secret) com `supabase db query --linked`;
-    5. faz deploy de email-diario e reconciliar e, no fim, volta a fazer deploy do
-       stripe-webhook (todas com --no-verify-jwt), já com os segredos novos.
+    5. faz deploy de email-diario, reconciliar e corrigir-email e, no fim, volta a fazer
+       deploy do stripe-webhook (todas com --no-verify-jwt), já com os segredos novos.
 
   Nada é escrito em ficheiros do repositório.
 
@@ -164,11 +164,11 @@ if (-not $SemSegredos) {
   }
 }
 
-# ── 3. SQL: migrações 0002–0005 + public.config ─────────────────────────
-Passo "Migrações 0002, 0003, 0004, 0005 e public.config"
+# ── 3. SQL: migrações 0002–0006 + public.config ─────────────────────────
+Passo "Migrações 0002, 0003, 0004, 0005, 0006 e public.config"
 $base = "https://$ProjectRef.supabase.co/functions/v1"
 $sql = ""
-foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql","0005_google_e_kits.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
+foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql","0005_google_e_kits.sql","0006_corrigir_email.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
 $sql += "update public.config set valor = '$base/email-diario'   where chave = 'email_diario_url';`n"
 $sql += "update public.config set valor = '$base/stripe-webhook' where chave = 'stripe_webhook_url';`n"
 $sql += "update public.config set valor = '$base/reconciliar'    where chave = 'reconciliar_url';`n"
@@ -191,8 +191,8 @@ try {
 
 # ── 4. deploy das funções (stripe-webhook por último, já com os segredos novos) ──
 if (-not $SemDeploy) {
-  Passo "Deploy das Edge Functions (email-diario, reconciliar)"
-  foreach ($fn in @("email-diario","reconciliar")) {
+  Passo "Deploy das Edge Functions (email-diario, reconciliar, corrigir-email)"
+  foreach ($fn in @("email-diario","reconciliar","corrigir-email")) {
     if ((Supa @("functions","deploy",$fn,"--project-ref",$ProjectRef,"--no-verify-jwt") @("Docker is not running")) -ne 0) { Falhar "deploy de $fn falhou" }
   }
   Passo "Deploy final do stripe-webhook (--no-verify-jwt)"
@@ -200,4 +200,4 @@ if (-not $SemDeploy) {
 }
 
 Passo "Concluído"
-Write-Host "Falta (à mão): eventos charge.dispute.created/charge.refunded no endpoint real do Stripe (docs/STRIPE.md d); SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); 'Allow new users to sign up' desligado; confirmar config.js; depois o teste real de docs/TESTE.md §7."
+Write-Host "Falta (à mão): eventos charge.dispute.created/charge.refunded no endpoint real do Stripe (docs/STRIPE.md d); link Direct a redirecionar para bem-vindo.html?session_id={CHECKOUT_SESSION_ID} (STRIPE.md a); SMTP do Resend em Authentication → Emails (docs/EMAIL.md §5); 'Allow new users to sign up' desligado; confirmar config.js; depois o teste real de docs/TESTE.md §7."

@@ -21,6 +21,9 @@
   const PORTAL = url(C.STRIPE_PORTAL_LINK);
   /* Returning members: only the dedicated monthly-only link (no fallback to the Direct link, which carries the joining fee). */
   const LINK_RETURN = url(C.STRIPE_LINK_RETURN);
+  /* Optional public contact in the footer (CONTACT_EMAIL in config.js; empty = not shown). */
+  { const mail = String(C.CONTACT_EMAIL||"").trim(), fc = $("#footContact");
+    if(fc && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ fc.innerHTML = `<a class="font-semibold hover:text-ink" href="mailto:${esc(mail)}">${esc(mail)}</a>`; fc.hidden = false; } }
   const SIGNED_URL_SECONDS = 120;   /* S7: kit download links are valid for 2 minutes */
   const TOLERANCIA_DIAS = 7;        /* M1: days of access after the first failed payment */
   const fmt = n => n == null || n === "" ? "—" : Math.round(Number(n)).toLocaleString("en-GB");

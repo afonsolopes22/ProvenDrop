@@ -54,6 +54,22 @@ ol.steps b{color:var(--ink);font-weight:600}
 .btn-go{background:var(--green);color:#101310}
 .btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
 .btn[hidden]{display:none}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+/* access box: masked e-mail + "Not my e-mail? Fix it" (bem-vindo.html?session_id=…, docs/EMAIL.md) */
+.access{margin-top:22px;background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:18px 20px}
+.access p{color:var(--ink-2)}
+.access b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.access .btn{margin-top:10px}
+.fix{margin-top:14px;display:grid;gap:10px}.fix[hidden]{display:none}
+.fix label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.field{width:100%;min-height:44px;border:1px solid var(--line-2);border-radius:8px;background:var(--white);padding:8px 12px;font:inherit;font-size:16px;color:var(--ink)}
+.field:focus{outline:none;border-color:var(--green-ink)}
+.msg{margin-top:4px;border-radius:8px;padding:10px 12px;font-size:14.5px;line-height:1.45;background:var(--green-soft);color:var(--green-ink)}
+.msg.erro{background:#FDECEC;color:#9B2C2C}
+.support{margin-top:14px;color:var(--ink-2);font-size:15px}
+.support a{font-weight:600;color:var(--green-ink)}
+footer nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px}
+footer nav a{font-weight:600;text-decoration-thickness:1px;text-underline-offset:3px}
 @media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
 .rules{margin-top:32px;background:var(--watch-soft);border-radius:14px;padding:22px}
 .rules h2{font-size:21px}
@@ -75,12 +91,30 @@ footer p+p{margin-top:8px}
   </a>
   <span class="tag">Subscription active</span>
   <h1>Payment received. <em>Welcome.</em></h1>
-  <p class="lede">Your access is on its way to the e-mail address you paid with. Four steps and you are launching.</p>
+  <!-- TODO (Afonso): when the sending domain is verified in Resend, go back to
+       "Your access is on its way to the e-mail address you paid with. Four steps and you are launching." -->
+  <p class="lede">You'll receive your access link by e-mail. If it doesn't arrive within 10 minutes, message us on WhatsApp: <a href="https://wa.me/351920414823" target="_blank" rel="noopener">+351 920 414 823</a>.</p>
+
+  <!-- With ?session_id=cs_… (the Direct Payment Link redirects here with it) the page asks corrigir-email
+       for the MASKED e-mail of that checkout and offers to fix a typo once. Nothing else is read or stored;
+       the id is removed from the address bar. Without it, only the support line is shown. -->
+  <div class="access" id="accessBox" hidden>
+    <p>We sent your access to <b id="maskEmail"></b>.</p>
+    <button class="btn btn-line" type="button" id="btnFix">Not my e-mail? Fix it</button>
+    <form class="fix" id="fixBox" hidden novalidate>
+      <p>Type the correct e-mail twice. Your access link will be sent there instead, and the receipt e-mail on your card payment will be updated too.</p>
+      <div><label for="novo1">Correct e-mail</label><input class="field" type="email" id="novo1" autocomplete="email" inputmode="email" required></div>
+      <div><label for="novo2">Repeat the e-mail</label><input class="field" type="email" id="novo2" autocomplete="email" inputmode="email" required></div>
+      <div><button class="btn btn-go" type="submit" id="btnFixSend">Send my access to this e-mail</button></div>
+      <div class="msg" id="fixMsg" hidden></div>
+    </form>
+  </div>
+  <p class="support">Problems signing in? WhatsApp <a href="https://wa.me/351920414823" target="_blank" rel="noopener">+351 920 414 823</a></p>
 
   <ol class="steps">
     <li>
       <h2>Open your e-mail</h2>
-      <p>We sent you a link to enter your member area. Check the spam folder too. The link is personal and expires after a while; if it has expired, request a new one on the sign-in page.</p>
+      <p>We sent you a link to enter your member area. Check the spam folder too. The link is personal and expires after a while; if it has expired, request a new one on the sign-in page with the e-mail you paid with.</p>
       <a class="btn btn-go" href="app.html">Go to the sign-in page</a>
     </li>
     <li>
@@ -118,6 +152,7 @@ footer p+p{margin-top:8px}
   <footer>
     <p>No minimum term: cancel whenever you want, in your member area (“Manage subscription”).</p>
     <p id="contactLine" hidden></p>
+    <nav aria-label="Legal"><a href="terms.html">Terms of service</a><a href="privacy.html">Privacy policy</a><a href="refunds.html">Refund policy</a></nav>
     <a class="ig" href="https://www.instagram.com/provendrop/" target="_blank" rel="noopener" aria-label="ProvenDrop on Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
   </footer>
 </main>
@@ -131,6 +166,42 @@ footer p+p{margin-top:8px}
     var c=document.getElementById("contactLine");
     c.innerHTML='Questions? Write to <a href="mailto:'+mail+'">'+mail+'</a>.'; c.hidden=false;
   }
+
+  /* Wrong e-mail at checkout (corrigir-email Edge Function, docs/EMAIL.md):
+     GET  ?session_id=cs_…  → { email: "afo•••@gmail.com" } (masked only)
+     POST { session_id, novo_email } → { ok: true, email: "<masked new>" }; one correction per purchase, within 24 h. */
+  var SB=String(C.SUPABASE_URL||"").trim().replace(/\/+$/,"");
+  var sid=String(new URLSearchParams(location.search).get("session_id")||"").trim();
+  if(!/^cs_[A-Za-z0-9_]{8,}$/.test(sid)) sid="";
+  if(sid){ try{ history.replaceState(null,"",location.pathname); }catch(e){} }
+  if(!sid || !/^https:\/\//.test(SB)) return;
+  var api=SB+"/functions/v1/corrigir-email", box=document.getElementById("accessBox"), form=document.getElementById("fixBox"), m=document.getElementById("fixMsg");
+  function say(t,erro){ m.textContent=t; m.className="msg"+(erro?" erro":""); m.hidden=false; }
+  fetch(api+"?session_id="+encodeURIComponent(sid)).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+    if(!(j && j.email)) return;
+    document.getElementById("maskEmail").textContent=j.email; box.hidden=false;
+    if(j.corrigido){ document.getElementById("btnFix").hidden=true; var p=document.createElement("p"); p.textContent="The e-mail of this purchase was already corrected once. If you still need help, message us on WhatsApp +351 920 414 823."; box.appendChild(p); }
+  }).catch(function(){});
+  document.getElementById("btnFix").addEventListener("click",function(){ form.hidden=false; this.hidden=true; document.getElementById("novo1").focus(); });
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=document.getElementById("novo1").value.trim().toLowerCase(), b=document.getElementById("novo2").value.trim().toLowerCase(), btn=document.getElementById("btnFixSend");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a)) return say("Enter a valid e-mail address.",true);
+    if(a!==b) return say("The two e-mails don't match.",true);
+    btn.disabled=true; say("Sending…");
+    fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:sid,novo_email:a,confirmacao:b})}).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(j){ return {status:r.status,j:j}; });
+    }).then(function(x){
+      if(x.status===200 && x.j.ok){ form.querySelectorAll("input,button").forEach(function(el){ el.disabled=true; }); return say("Done. Your access link is on its way to "+(x.j.email||a)+". Check the spam folder too."); }
+      btn.disabled=false;
+      if(x.status===409) return say("The e-mail of this purchase was already changed once. Message us on WhatsApp +351 920 414 823 and we fix it by hand.",true);
+      if(x.status===410) return say("This purchase is more than 24 hours old. Message us on WhatsApp +351 920 414 823 and we fix it by hand.",true);
+      if(x.status===429) return say("Too many attempts. Please wait a few minutes and try again.",true);
+      if(x.status===422 && x.j.erro==="email_em_uso") return say("That e-mail already has a ProvenDrop subscription. Sign in with it on the member area.",true);
+      if(x.status===503) return say("Your payment is still being registered. Wait a minute and try again.",true);
+      say("Could not change the e-mail right now. Message us on WhatsApp +351 920 414 823.",true);
+    }).catch(function(){ btn.disabled=false; say("Could not change the e-mail right now. Message us on WhatsApp +351 920 414 823.",true); });
+  });
 })();
 </script>
 </body>
