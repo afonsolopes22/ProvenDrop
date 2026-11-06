@@ -149,7 +149,7 @@ Antes de passar a real: recuperação de receita (retentativas e estado final); 
 | C2 | ✅ corrigido | Tabela `subscricoes` (uma linha por `stripe_subscription_id`); `subscritores.origem/estado` derivados por `recalcular_subscritor`; alerta quando o mesmo e-mail tem duas subscrições ativas/em atraso; comissão Click lida de `subscricoes`. |
 | A1/A2 | ✅ corrigido | `stripe_eventos.processado_em` + `tentativas`; nunca apagado; concluído → 200, em curso < 5 min → 503, em curso antigo → reprocessa. |
 | A3 | ✅ corrigido | `reservar_boas_vindas` (atómica), envio só com acesso, marca só após o Resend aceitar, varrimento pg_cron de 15 min (`?varrer_boas_vindas=1`), 5 tentativas → alerta; e-mail de regresso quando cancelado → ativo. |
-| A4 | ✅ corrigido | `charge.dispute.created` → `bloqueado_em` + alerta com prazo; `charge.refunded` → só alerta. Eventos acrescentados ao endpoint pelo `scripts\stripe-teste.ps1` (a correr pelo Afonso). |
+| A4 | ✅ corrigido | `charge.dispute.created` → `bloqueado_em` + alerta com prazo; `charge.refunded` **total** → `bloqueado_em` (motivo `reembolso ch_…`) + alerta (2026-11-06); parcial → só alerta. Eventos acrescentados ao endpoint pelo `scripts\stripe-teste.ps1` (a correr pelo Afonso). |
 | A5 | ⏳ Afonso | Secção 2 do TESTE.md. |
 | A6 | ✅ corrigido | `setup-supabase.ps1`: sem valores de teste por omissão; Enter = não alterar; recusa misturas teste/real (ids, links em `config.js`, `EMAIL_FROM`). |
 | A7 | ✅ corrigido | TESTE.md §5: apagar sempre os dados de teste. |

@@ -6,8 +6,8 @@
 //   checkout.session.completed                 → sincroniza a subscrição da sessão
 //   customer.subscription.created/updated/deleted → sincroniza a subscrição
 //   invoice.paid / invoice.payment_failed      → sincroniza a subscrição da fatura
-//   charge.dispute.created                     → bloqueia o acesso do cliente + alerta (A4)
-//   charge.refunded                            → só alerta (A4)
+//   charge.dispute.created                     → marca o subscritor (bloqueado_em) e revoga o acesso + alerta (A4)
+//   charge.refunded (total)                    → marca o subscritor e revoga o acesso + alerta; parcial → só alerta (A4, 2026-11-06)
 //
 // Modo (S1/M11): com STRIPE_ACCEPT_TEST=1 só entram eventos livemode=false; sem
 // ele só entram livemode=true. Os outros recebem 200 vazio e um aviso no log.
@@ -53,7 +53,8 @@ import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 import {
-  fimDoPeriodo, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat, precosDasLinhas, subscricaoDaInvoice, type Origem,
+  chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
+  prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
 } from "./compat.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
@@ -326,47 +327,58 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
 // ───────────────────────────────────────────────────────────────────────
 // A4 · disputas e reembolsos
 
+/** customer da charge/disputa (nas duas formas, compat.ts); numa disputa sem customer vai-se buscar a charge. */
 async function clienteDaCharge(ch: Stripe.Charge | Stripe.Dispute): Promise<string | null> {
-  if ("customer" in ch && ch.customer) return typeof ch.customer === "string" ? ch.customer : ch.customer.id;
-  const chargeId = "charge" in ch ? (typeof ch.charge === "string" ? ch.charge : ch.charge?.id ?? null) : null;
+  const direto = clienteDe(ch);
+  if (direto) return direto;
+  const chargeId = chargeDe(ch);
   if (!chargeId) return null;
   const c = await stripe.charges.retrieve(chargeId);
-  return typeof c.customer === "string" ? c.customer : c.customer?.id ?? null;
+  return clienteDe(c);
+}
+
+/** Marca (bloqueado_em + motivo) todos os subscritores do cliente que ainda não estejam bloqueados: tem_acesso() passa a false. */
+async function bloquearPorCliente(customer: string | null, motivo: string): Promise<number> {
+  if (!customer) return 0;
+  const subs = await admin.from("subscricoes").select("email").eq("stripe_customer_id", customer);
+  if (subs.error) throw subs.error;
+  let bloqueados = 0;
+  for (const email of [...new Set((subs.data ?? []).map((s) => s.email))]) {
+    const b = await admin.from("subscritores").update({ bloqueado_em: new Date().toISOString(), bloqueado_motivo: motivo })
+      .eq("email", email).is("bloqueado_em", null).select("email");
+    if (b.error) throw b.error;
+    bloqueados += b.data?.length ?? 0;
+  }
+  return bloqueados;
 }
 
 async function aoAbrirDisputa(d: Stripe.Dispute): Promise<Record<string, unknown>> {
   const customer = await clienteDaCharge(d);
-  const prazo = d.evidence_details?.due_by ? new Date(d.evidence_details.due_by * 1000).toISOString().slice(0, 10) : "sem prazo";
-  const valor = `${(d.amount / 100).toFixed(2)} ${d.currency.toUpperCase()}`;
-  let bloqueados = 0;
-  if (customer) {
-    const subs = await admin.from("subscricoes").select("email").eq("stripe_customer_id", customer);
-    const emails = [...new Set((subs.data ?? []).map((s) => s.email))];
-    for (const email of emails) {
-      const b = await admin.from("subscritores").update({ bloqueado_em: new Date().toISOString(), bloqueado_motivo: `disputa ${d.id}` })
-        .eq("email", email).is("bloqueado_em", null).select("email");
-      bloqueados += b.data?.length ?? 0;
-    }
-  }
+  const prazo = prazoDaDisputa(d) ?? "sem prazo";
+  const valor = valorTexto(d.amount, d.currency);
+  const bloqueados = await bloquearPorCliente(customer, motivoBloqueio("disputa", d.id));
   await alertar(`Disputa aberta: ${valor} (responder até ${prazo})`, [
     `Disputa ${d.id}, motivo "${d.reason}", estado ${d.status}.`,
-    `Cliente ${customer ?? "desconhecido"}; acesso bloqueado em ${bloqueados} subscritor(es).`,
+    `Cliente ${customer ?? "desconhecido"}; acesso revogado em ${bloqueados} subscritor(es).`,
     `Prazo para submeter provas: ${prazo}. Stripe → Pagamentos → Disputas.`,
-    "Depois de resolvida: cancelar a subscrição no Stripe e, se for caso disso, desbloquear (update subscritores set bloqueado_em = null …).",
+    "Depois de resolvida: cancelar a subscrição no Stripe e, se for caso disso, desbloquear (update subscritores set bloqueado_em = null, bloqueado_motivo = null …).",
   ]);
   return { disputa: d.id, bloqueados, prazo };
 }
 
+/** Reembolso total → o subscritor fica marcado e sem acesso (como numa disputa); parcial → só alerta. */
 async function aoReembolsar(ch: Stripe.Charge): Promise<Record<string, unknown>> {
   const customer = await clienteDaCharge(ch);
-  const total = ch.amount_refunded >= ch.amount;
-  const valor = `${(ch.amount_refunded / 100).toFixed(2)} ${ch.currency.toUpperCase()}`;
-  await alertar(`Reembolso ${total ? "total" : "parcial"}: ${valor}`, [
-    `Charge ${ch.id}, cliente ${customer ?? "desconhecido"}, reembolsado ${valor} de ${(ch.amount / 100).toFixed(2)}.`,
-    "O acesso NÃO foi cortado automaticamente (pode ser parcial ou de boa vontade).",
-    "Se o reembolso encerra a relação: cancelar a subscrição no Stripe (o webhook corta o acesso) e confirmar que não há nova cobrança.",
+  const total = reembolsoTotal(ch);
+  const valor = valorTexto(ch.amount_refunded, ch.currency);
+  const bloqueados = total ? await bloquearPorCliente(customer, motivoBloqueio("reembolso", ch.id)) : 0;
+  await alertar(`Reembolso ${total ? "total: acesso revogado" : "parcial"}: ${valor}`, [
+    `Charge ${ch.id}, cliente ${customer ?? "desconhecido"}, reembolsado ${valor} de ${valorTexto(ch.amount, ch.currency)}.`,
+    total
+      ? `Acesso revogado em ${bloqueados} subscritor(es) (bloqueado_motivo = "${motivoBloqueio("reembolso", ch.id)}"). Cancelar a subscrição no Stripe para não haver nova cobrança.`
+      : "Reembolso parcial: o acesso NÃO foi cortado (pode ser de boa vontade). Se encerra a relação, cancelar a subscrição no Stripe.",
   ]);
-  return { reembolso: ch.id, total };
+  return { reembolso: ch.id, total, bloqueados };
 }
 
 // ───────────────────────────────────────────────────────────────────────
