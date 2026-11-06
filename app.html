@@ -6,7 +6,10 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#F4F7F6">
 <title>Member area · ProvenDrop</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect width='28' height='28' rx='8' fill='%230D9488'/%3E%3Cpath d='M8 14.5l4 4 8-9' fill='none' stroke='%23FFFFFF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -25,9 +28,9 @@
 <div class="flex min-h-dvh">
   <!-- sidebar (desktop) / bottom tab bar (phones). Hidden entirely while signed out (CSS: body:has(#tabs[hidden])). -->
   <aside class="sticky top-0 flex h-dvh w-64 shrink-0 flex-col border-r border-line bg-white px-4 py-5 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:z-20 max-lg:h-auto max-lg:w-auto max-lg:border-r-0 max-lg:border-t max-lg:px-2 max-lg:py-0 max-lg:pb-[env(safe-area-inset-bottom)]" id="side">
-    <a class="inline-flex items-center gap-2.5 px-2 text-[18px] font-extrabold tracking-tight text-ink no-underline max-lg:hidden" translate="no" href="./">
-      <svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0D9488"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>Proven<span class="text-brand">Drop</span></span>
+    <a class="inline-flex items-center gap-2.5 px-2 text-[18px] font-extrabold tracking-tight no-underline max-lg:hidden" translate="no" href="./">
+      <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0F766E"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#fff" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#fff" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#fff"/><circle cx="44.5" cy="13" r="4" fill="#14B8A6"/></svg>
+      <span><span class="text-[#0B1F1E]">Proven</span><span class="text-brand-dark">Drop</span></span>
     </a>
     <nav class="mt-7 grid gap-1 max-lg:mt-0 max-lg:flex max-lg:justify-around max-lg:gap-0" id="tabs" role="tablist" aria-label="Sections" hidden>
       <p class="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3 max-lg:hidden">General</p>
@@ -46,9 +49,9 @@
   <div class="min-w-0 flex-1">
     <header class="sticky top-0 z-10 border-b border-line bg-white/85 backdrop-blur">
       <div class="mx-auto flex min-h-16 w-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <a class="inline-flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight text-ink no-underline lg:hidden" translate="no" href="./">
-          <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#0D9488"/><path d="M8 14.5l4 4 8-9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Proven<span class="text-brand">Drop</span></span>
+        <a class="inline-flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight no-underline lg:hidden" translate="no" href="./">
+          <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0F766E"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#fff" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#fff" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#fff"/><circle cx="44.5" cy="13" r="4" fill="#14B8A6"/></svg>
+          <span><span class="text-[#0B1F1E]">Proven</span><span class="text-brand-dark">Drop</span></span>
         </a>
         <p class="hidden text-[13px] font-medium text-ink-3 lg:block"><a class="hover:text-ink" href="./">ProvenDrop</a><span class="mx-2">/</span><span class="font-semibold text-ink">Member area</span></p>
         <div class="flex min-w-0 items-center gap-3 text-[13px] font-medium text-ink-2" id="who" hidden><span class="max-w-[28ch] truncate max-md:hidden" id="whoEmail"></span><button class="btn btn-line btn-sm" id="btnSair" type="button">Sign out</button></div>
@@ -121,7 +124,7 @@
         </div>
 
         <div id="tArquivo" role="tabpanel" hidden>
-          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Archive of approved collections</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Every approved collection, where it advertises (Meta, Google or both), and whether the store is still advertising it.</p></div>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Archive of approved collections</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Every approved collection, where it advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
           <div class="card mt-6 p-5 md:p-6">
             <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
@@ -177,7 +180,7 @@
     <h2 class="mt-2 text-[clamp(24px,3vw,32px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="guiaTitulo">Welcome. One minute to get started.</h2>
     <ol class="mt-5 grid gap-3">
       <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">1</span><b class="text-[14px] font-bold text-ink">Open a collection</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
-      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">2</span><b class="text-[14px] font-bold text-ink">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Every collection in the list comes with a kit: reference photographs, 20 creative prompts, 4 UGC videos and the Google Ads material. Collections under observation are labelled: test them with a small budget. Read LEIA-ME first.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">2</span><b class="text-[14px] font-bold text-ink">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Every collection in the list comes with a kit: reference photographs, 20 creative prompts, 4 UGC video prompts (videos included when available) and the Google Ads material. Collections under observation are labelled: test them with a small budget. Read LEIA-ME first.</span></li>
       <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">3</span><b class="text-[14px] font-bold text-ink">Paste the prompts into ChatGPT</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">With the reference photographs attached, you generate the 20 images ready to advertise. Never publish the original photographs.</span></li>
       <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">4</span><b class="text-[14px] font-bold text-ink">Launch Google Ads</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Keywords, negative keywords, Shopping titles and landing-page copy are in the file 3 - Google Ads. Start with the strongest market.</span></li>
     </ol>
