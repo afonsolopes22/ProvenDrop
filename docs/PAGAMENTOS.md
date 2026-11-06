@@ -126,7 +126,7 @@ Reembolso e disputa: `charge.dispute.created` corta o acesso e alerta com o praz
 
 ## Dinheiro
 
-- Adesão de 25 €: só na primeira fatura da subscrição (total 40 €). Repete-se em cada novo checkout (M8).
+- Adesão de 25 €: **só no link Direct**, na primeira fatura da subscrição (total 40 €); repete-se em cada novo checkout Direct (M8). Decisão de 2026-11-06: o link **via Click** cobra só 15 €/mês, **sem adesão** (o produto Adesão não está nesse link). O webhook e a base não distinguem adesão (a origem vem da metadata ou do `price_`), por isso nada mudou no código: o site, `bem-vindo-click.html` e STRIPE.md dizem "No joining fee" para a porta Click.
 - Moeda: só EUR; o código não guarda valores. Confirmar se o Adaptive Pricing está desligado.
 - A validar com o contabilista: Stripe Tax e preços com/sem IVA; faturas; vendas B2C a outros países; recolha de morada e NIF.
 - Por publicar: termos, política de reembolso, privacidade e consentimento do direito de livre resolução. `CONTACT_EMAIL` vazio.

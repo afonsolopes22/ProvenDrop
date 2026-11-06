@@ -90,7 +90,8 @@ Códigos de saída: 0 ok · 3 rede bloqueada · 4 credenciais. Os zips encontrad
 ## Acesso, pagamentos falhados e regresso
 
 - Acesso (`public.tem_acesso`): subscrição **direto**, não bloqueada, `ativo` ou `em_atraso` há menos de **7 dias** (decisão de 2026-11-02). Depois a área fecha e o e-mail diário pára; `invoice.paid` repõe.
-- Quem cancela e volta **não paga a adesão outra vez**: a área mostra o link de regresso (`STRIPE_LINK_RETURN`, só mensalidade) a ex-membros. O site diz que a adesão é cobrada na primeira subscrição.
+- Quem cancela e volta **não paga a adesão outra vez**: a área mostra o link de regresso (`STRIPE_LINK_RETURN`, só mensalidade) a ex-membros, quando esse link existir (em modo real ainda não existe: até lá a área mostra o Subscribe normal). O site diz que a adesão é cobrada na primeira subscrição.
+- **Adesão só no Direct** (decisão de 2026-11-06): quem entra pela Click paga 15 €/mês sem adesão; o link via Click nunca aparece no site.
 - Não há promessa de vagas por nicho/país nem de reembolso (A9): o nicho e os países servem para ordenar as coleções.
 - Disputa → acesso suspenso + alerta; reembolso → só alerta. Alertas vão para `ALERT_EMAIL` (ou `EMAIL_REPLY_TO`).
 
