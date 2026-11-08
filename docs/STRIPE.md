@@ -37,7 +37,8 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 - **Produtos**: só ProvenDrop via Click 15,00 €/mês. **Sem** adesão.
 - **Opções**: e-mail e **telefone** obrigatório (para a Click juntar ao grupo); sem códigos promocionais.
 - **Metadados**: `origem` = `click`.
-- **Depois do pagamento** → `https://provendrop.com/bem-vindo-click.html` com `?session_id={CHECKOUT_SESSION_ID}` (confirmar que o redirecionamento inclui este parâmetro: a página põe o código da compra na mensagem de WhatsApp para o +351 920 414 823).
+- **Recolher o número de telefone** (opções do Payment Link → "Collect customers' phone numbers"): desde 2026-11-08 o webhook guarda o telefone em `subscritores.telefone` e envia-o no e-mail "New Click subscription"; sem esta opção fica "not collected at checkout". **Por ativar à mão.**
+- **Depois do pagamento** → `https://provendrop.com/bem-vindo-click.html` com `?session_id={CHECKOUT_SESSION_ID}` (a página calcula o código `PD-XXXXXX` a partir do `session_id` e abre o WhatsApp da Click ao fim de 3 s com a mensagem em inglês; o webhook guarda o mesmo código) (confirmar que o redirecionamento inclui este parâmetro: a página põe o código da compra na mensagem de WhatsApp para o +351 920 414 823).
 
 Quem paga por este link fica em `subscricoes`/`subscritores` com `origem = click` e o estado da subscrição (para a comissão), **sem login e sem acesso** à área (RLS). Recebe as coleções no grupo de WhatsApp da Click.
 

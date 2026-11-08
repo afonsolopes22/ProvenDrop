@@ -81,8 +81,7 @@
           </div>
           <button class="btn btn-go mt-3 w-full" id="btnLogin" type="submit">Send sign-in link</button>
           <div class="msg" id="msgLogin" hidden></div>
-          <p class="mt-5 text-[13px] leading-relaxed text-ink-2 [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4">Not a member yet? <a href="./#join">Subscribe on the site</a>. Click customer? Your access is through the Click WhatsApp group.</p>
-          <p class="mt-2 text-[13px] leading-relaxed text-ink-2 [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4">Problems signing in? WhatsApp <a href="https://wa.me/351920414823" target="_blank" rel="noopener">+351 920 414 823</a></p>
+          <!-- Only the e-mail field and the button (2026-11-08): help contact lives in the "Need help?" box of the area and in the FAQ. -->
         </form>
       </section>
 
@@ -108,6 +107,8 @@
             <p class="rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink-2 empty:hidden" id="hojeHora"></p>
           </div>
           <div class="msg aviso" id="aviso" hidden></div>
+          <!-- Niches bar: "Your niches: … · Edit" opens the choice right here (app.js renderBarras). -->
+          <div class="mt-4" id="barHoje" data-barra></div>
           <!-- Discreet tip, only while no niche is chosen; closable (remembered in this browser). -->
           <p class="tip" id="hojePrefs" hidden><span>Tip: <a href="#" data-go="prefs">choose your niches in Preferences</a> to see them first.</span><button class="tip-x" type="button" id="hojePrefsFechar" aria-label="Close this tip">✕</button></p>
           <dl class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Today in numbers">
@@ -135,12 +136,15 @@
 
         <div id="tArquivo" role="tabpanel" hidden>
           <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Library</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">All collections we have sent, with their kits. Where each one advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
-          <div class="card mt-6 p-5 md:p-6">
-            <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <!-- Niches bar (same as Today): your niches come first; "Show all" also lists the other niches. -->
+          <div class="mt-4" id="barLib" data-barra></div>
+          <div class="card mt-4 p-5 md:p-6">
+            <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-5">
               <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
               <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPais">Strongest market</label><select class="field" id="fPais"><option value="">All</option></select></div>
               <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPlat">Platform</label><select class="field" id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
               <label class="check min-h-11"><input type="checkbox" id="fAtivas"> Only still advertising</label>
+              <label class="check min-h-11" id="fTodosWrap" title="Also show the collections outside your niches"><input type="checkbox" id="fTodos"> Show all</label>
             </div>
             <div class="mt-5 md:overflow-x-auto" id="arqBox"></div>
           </div>

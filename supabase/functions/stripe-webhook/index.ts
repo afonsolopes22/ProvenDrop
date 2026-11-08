@@ -52,6 +52,7 @@ import { enviarEmail, esc, molde } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
+import { codigoDeCompra } from "../_shared/codigo.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -321,7 +322,32 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
   const subId = typeof s.subscription === "string" ? s.subscription : s.subscription?.id ?? null;
   if (!subId) { console.warn(`sessão ${s.id} sem subscrição: ignorada`); return { ignorado: "sem subscrição" }; }
   // A origem da sessão (metadata do Payment Link) é o sinal mais fiável.
-  return sincronizarSubscricao(subId, await origemDaSessao(s), true);
+  const resultado = await sincronizarSubscricao(subId, await origemDaSessao(s), true);
+  if (resultado.origem === "click") Object.assign(resultado, await registarCompraClick(s));
+  return resultado;
+}
+
+/**
+ * Plano Click (2026-11-08): a pessoa é adicionada ao grupo de WhatsApp à mão. Guarda em
+ * subscritores o código "PD-XXXXXX" (o mesmo que bem-vindo-click.html mostra e põe na
+ * mensagem de WhatsApp), o telefone e o nome do checkout, e envia "New Click subscription"
+ * ao Afonso (ALERT_EMAIL, por alertar()). Se o e-mail falhar (Resend ainda sem domínio),
+ * a linha fica na mesma: consulta-se com
+ *   select email, nome, telefone, codigo_compra from subscritores where origem = 'click'.
+ */
+async function registarCompraClick(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
+  const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
+  if (!email) return { click: "sem e-mail na sessão" };
+  const codigo = await codigoDeCompra(s.id);
+  const telefone = (s.customer_details?.phone ?? "").trim() || null;
+  const nome = (s.customer_details?.name ?? "").trim() || null;
+  const up = await admin.from("subscritores").update({ codigo_compra: codigo, telefone, nome }).eq("email", email);
+  if (up.error) throw up.error;
+  const enviado = await alertar(`New Click subscription · ${codigo}`, [
+    `Name: ${nome ?? "—"}`, `Phone: ${telefone ?? "— (not collected at checkout)"}`, `E-mail: ${email}`, `Purchase code: ${codigo}`,
+    `Checkout session: ${s.id}`, "The customer's WhatsApp message carries the same code: add them to the group once it arrives.",
+  ]);
+  return { click: { codigo, telefone: !!telefone, email_enviado: enviado } };
 }
 
 // ───────────────────────────────────────────────────────────────────────

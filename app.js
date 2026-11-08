@@ -155,7 +155,7 @@
     sub = error ? null : data;
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
-    renderConta(); renderPrefsForm(); renderAvisos();
+    renderConta(); renderPrefsForm(); renderBarras(); renderAvisos();
     if(!sub.guia_visto) abrirGuia(); else mostrarDica();
     carregarHoje();
   }
@@ -304,14 +304,21 @@
     }
     return [...porChave.values()].sort((a, b) => ((b.ainda_a_anunciar === true) - (a.ainda_a_anunciar === true)) || ((Number(b.score) || 0) - (Number(a.score) || 0)) || String(b.enviado_em||"").localeCompare(String(a.enviado_em||"")));
   }
-  ["#fNicho","#fPais","#fPlat","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  ["#fNicho","#fPais","#fPlat","#fAtivas","#fTodos"].forEach(s => $(s).addEventListener("change", renderArquivo));
+  /* Library and your niches (2026-11-08): with niches chosen, only those are listed until "Show all" is ticked; with
+     "Show all" (or no niches) every collection is listed, yours first. */
+  const prefNichos = () => new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
+  const ehPref = r => prefNichos().has(String(r.nicho||"").toLowerCase());
   /* Platform filter: "meta" / "google" = advertises there (alone or with the other); "both" = on both.
      plats() reads plataformas / anuncios_meta / anuncios_google, so a Google-only store is never shown as Meta. */
   const plataformaOk = (r, pl) => !pl || (pl === "both" ? plats(r).length === 2 : plats(r).includes(pl));
   function renderArquivo(){
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
-    const rows = biblioteca().filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
-    if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
+    const temPref = prefNichos().size > 0, todos = !temPref || $("#fTodos").checked;
+    $("#fTodosWrap").hidden = !temPref;
+    const rows = biblioteca().filter(r => (todos || ehPref(r)) && (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true))
+      .sort((a, b) => ehPref(b) - ehPref(a));   /* stable: keeps "still advertising, then score" inside each group */
+    if(!rows.length){ $("#arqBox").innerHTML = `<div class="empty" style="border:0">${temPref && !todos ? "No collections in your niches match these filters. Tick “Show all” to see the other niches." : "No collections match these filters."}</div>`; return; }
     /* Same shape as the daily table so the whole row fits at 1280 without horizontal scroll (2026-11-08): the kit
        under the collection name, platform chips and "still advertising" under the status, market under the niche. */
     $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Score</th><th class="text-right" title="Active ads when sent, on Google, at the last check">Ads</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right" title="Days advertising">Days</th></tr></thead><tbody>${rows.map(r => {
@@ -337,13 +344,39 @@
     const n = new Set(sub?.nichos||[]);
     $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
   }
+  /* Saves the niches (from the Preferences tab or from a bar) and refreshes everything that depends on them. */
+  async function guardarNichos(nichos){
+    const { error } = await sb.from("subscritores").update({ nichos }).eq("user_id", user.id);
+    if(error) return false;
+    sub.nichos = nichos; mostrarDica(); renderPrefsForm(); renderBarras();
+    renderFeed(); if(feedRows.length) renderSemana(feedRows[0].dia); if(verdes) renderArquivo();
+    return true;
+  }
   $("#formPrefs").addEventListener("submit", async e => {
     e.preventDefault();
-    const nichos = [...document.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
-    const { error } = await sb.from("subscritores").update({ nichos }).eq("user_id", user.id);
-    if(error) return msg($("#msgPrefs"), "The preferences could not be saved right now.", "erro");
-    sub.nichos = nichos; mostrarDica();
-    msg($("#msgPrefs"), "Preferences saved."); renderFeed(); if(feedRows.length) renderSemana(feedRows[0].dia);
+    const nichos = [...$("#formPrefs").querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
+    if(!await guardarNichos(nichos)) return msg($("#msgPrefs"), "The preferences could not be saved right now.", "erro");
+    msg($("#msgPrefs"), "Preferences saved.");
+  });
+  /* Niches bar on Today and Library (2026-11-08): "Your niches: … · Edit"; Edit opens the same choice right there. */
+  function renderBarras(){
+    const n = sub?.nichos||[];
+    const lista = n.length ? `<b class="text-ink">${esc(n.map(nicho).join(", "))}</b>` : `<span class="text-ink-3">none chosen — all collections, in the list’s order</span>`;
+    document.querySelectorAll("[data-barra]").forEach(box => {
+      box.innerHTML = `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] text-ink-2"><span class="font-semibold">Your niches:</span> ${lista}<button class="btn btn-line btn-sm ml-auto" type="button" data-pref-edit>Edit</button></div>
+        <form class="card mt-2 p-4 md:p-5" data-pref-form hidden><p class="text-[13px] font-bold text-ink">Your niches (optional) — these come first; the others stay visible.</p><div class="mt-2.5 grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2">${NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.includes(v) ? " checked" : ""}> ${esc(l)}</label>`).join("")}</div><div class="mt-4 flex flex-wrap gap-2"><button class="btn btn-go btn-sm" type="submit">Save</button><button class="btn btn-line btn-sm" type="button" data-pref-cancel>Cancel</button></div><div class="msg" data-pref-msg hidden></div></form>`;
+    });
+  }
+  document.addEventListener("click", e => {
+    const ed = e.target.closest("[data-pref-edit]"), ca = e.target.closest("[data-pref-cancel]");
+    if(ed){ const f = ed.closest("[data-barra]").querySelector("[data-pref-form]"); f.hidden = !f.hidden; if(!f.hidden) f.querySelector("input")?.focus(); }
+    if(ca){ renderBarras(); }
+  });
+  document.addEventListener("submit", async e => {
+    const f = e.target.closest("[data-pref-form]"); if(!f) return;
+    e.preventDefault();
+    const nichos = [...f.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
+    if(!await guardarNichos(nichos)){ const m = f.querySelector("[data-pref-msg]"); msg(m, "The preferences could not be saved right now.", "erro"); }
   });
   /* Discreet tip on Today while no niche is chosen; closing it is remembered in this browser only. */
   const DICA_KEY = "pd_dica_nichos_fechada";
