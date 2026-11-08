@@ -74,7 +74,7 @@ O estado de cada achado depois das correções está na secção **Estado dos ac
 | S4 | ⏳ Afonso | Authentication → desligar "Allow new users to sign up"; Redirect URLs só `app.html`. |
 | S5 | ✅ corrigido | `_shared/auth.ts` (SHA-256 dos dois valores, comparação em tempo constante) nas 3 funções. |
 | S6 | ✅ corrigido | `app.html`: CSP estrita (sem scripts inline; lógica em `app.js`), `integrity` sha384 no `supabase-js@2.49.1`. |
-| S7 | ✅ corrigido | `app.js` só usa `zip_path` (Storage privado); `zip_url` nunca é mostrado; signed URL de 120 s. |
+| S7 | ⚠️ aceite em parte (2026-11-08) | `app.js` usa `zip_path` (Storage privado, signed URL de 120 s) sempre que existe. Por decisão do Afonso, as linhas que **só** têm link externo (`zip_url`, ex.: listas de 1 de novembro e os 7 registos antigos de `verdes`) voltam a mostrar "Download Launch Kit" a abrir esse link em nova aba: esses links do Drive continuam fora da RLS e partilháveis. Mitigação possível: enviar esses zips para o bucket `kits` com `publicar_plataforma.py` (fica `zip_path` e o link externo deixa de ser usado). |
 | S8 | ✅ corrigido | `setup-supabase.ps1`: `.env` temporário com ACL só do utilizador, `--env-file`, sobrescrito e apagado no `finally`; `$args` → `$argumentos`. |
 | S9 | ⏳ Afonso | Confirmar os 3 separadores da folha pública e o texto de `info!nota`. O `index.html` só lê `hoje`, `info` e `arquivo`. |
 | S10 | ✅ corrigido | Migração 0004 gera `cron_secret` aleatório se ainda for `MUDAR-ESTE-VALOR` (e o setup substitui-o sempre). |
