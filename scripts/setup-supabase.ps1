@@ -108,7 +108,7 @@ if (-not $SemSegredos) {
   $valores["STRIPE_PAYMENT_LINK_DIRETO"] = LerValor "STRIPE_PAYMENT_LINK_DIRETO" "plink_… do link Direct deste modo (opcional)"
   $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 'sem domínio verificado: ProvenDrop <onboarding@resend.dev>; com domínio: ProvenDrop <noreply@provendrop.com>'
   $valores["EMAIL_REPLY_TO"]             = LerValor "EMAIL_REPLY_TO"             "onde recebes as respostas dos clientes (opcional)"
-  $valores["ALERT_EMAIL"]                = LerValor "ALERT_EMAIL"                "onde recebes os alertas (duplicados, disputas, reconciliação); vazio = EMAIL_REPLY_TO"
+  $valores["ALERT_EMAIL"]                = LerValor "ALERT_EMAIL"                "onde recebes os alertas (duplicados, disputas, reconciliação) e o 'New Click subscription' de cada compra Click; vazio = EMAIL_REPLY_TO"
 
   # validações de formato
   if ($valores["STRIPE_SECRET_KEY"] -and $valores["STRIPE_SECRET_KEY"] -notmatch '^(sk|rk)_(test|live)_') { Falhar "STRIPE_SECRET_KEY não parece uma chave do Stripe (sk_test_/sk_live_)" }
@@ -117,7 +117,6 @@ if (-not $SemSegredos) {
   if ($valores["STRIPE_PAYMENT_LINK_DIRETO"] -and $valores["STRIPE_PAYMENT_LINK_DIRETO"] -notlike "plink_*") { Falhar "STRIPE_PAYMENT_LINK_DIRETO tem de começar por plink_" }
   if ($valores["RESEND_API_KEY"] -and $valores["RESEND_API_KEY"] -notlike "re_*") { Falhar "RESEND_API_KEY tem de começar por re_" }
   foreach ($k in @("EMAIL_FROM","EMAIL_REPLY_TO","ALERT_EMAIL")) { if ($valores[$k] -and $valores[$k] -notmatch '@') { Falhar "$k não parece um endereço de e-mail" } }
-
   # A6: recusar misturas de teste e real
   $chave = $valores["STRIPE_SECRET_KEY"]
   if ($chave) {
