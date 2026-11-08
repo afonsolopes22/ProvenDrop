@@ -42,7 +42,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
-const APP_URL = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://provendrop.com/app.html";
 const PRICE_DIRETO = Deno.env.get("STRIPE_PRICE_DIRETO") ?? "";
 const PRICE_CLICK = Deno.env.get("STRIPE_PRICE_CLICK") ?? "";
 const MINUTOS = Deno.env.get("MAGIC_LINK_MINUTOS") ?? "60";
@@ -54,14 +54,16 @@ function horaTexto(): string {
 }
 const HORA = horaTexto();
 
-/** CORS: só a origem do site (APP_URL) e localhost. Outras origens não recebem o cabeçalho (o browser bloqueia a leitura). */
+/** CORS: só a origem do site (APP_URL), a origem antiga do GitHub Pages durante a transição para o domínio próprio
+ *  (2026-11-08) e localhost. Outras origens não recebem o cabeçalho (o browser bloqueia a leitura). */
+const ORIGEM_ANTIGA = "https://afonsolopes22.github.io";
 function cors(req: Request): Record<string, string> {
   const origem = req.headers.get("origin") ?? "";
   let ok = false;
   try {
     const o = new URL(origem), app = new URL(APP_URL);
     const local = o.hostname === "localhost" || o.hostname === "127.0.0.1" || o.hostname === "[::1]" || o.hostname.endsWith(".localhost");
-    ok = o.origin === app.origin || local;
+    ok = o.origin === app.origin || o.origin === ORIGEM_ANTIGA || local;
   } catch { ok = false; }
   return ok
     ? { "Access-Control-Allow-Origin": origem, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type", "Access-Control-Max-Age": "600", "Vary": "Origin" }

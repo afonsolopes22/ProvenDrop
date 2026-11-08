@@ -66,7 +66,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
-const APP_URL = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://provendrop.com/app.html";
 const LINK_DIRETO = Deno.env.get("STRIPE_PAYMENT_LINK_DIRETO") ?? "";
 const PRICE_DIRETO = Deno.env.get("STRIPE_PRICE_DIRETO") ?? "";
 const PRICE_CLICK = Deno.env.get("STRIPE_PRICE_CLICK") ?? "";

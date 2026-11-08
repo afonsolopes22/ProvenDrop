@@ -75,7 +75,7 @@ O magic link de boas-vindas vai pelo Resend (API), mas o link que o cliente pede
    </div>
    ```
    (`{{ .RedirectTo }}` é o `app.html` pedido pela página de login; tem de estar nas **Redirect URLs** do ponto 5, senão o Supabase usa o Site URL e o link cai em `index.html`.) O e-mail de boas-vindas e o de regresso já usam este formato, enviados pelo Resend a partir do webhook.
-5. **Authentication** → **URL Configuration**: **Site URL** `https://afonsolopes22.github.io/ProvenDrop/` e, em **Redirect URLs**, `https://afonsolopes22.github.io/ProvenDrop/app.html`.
+5. **Authentication** → **URL Configuration**: **Site URL** `https://provendrop.com/` e, em **Redirect URLs**, `https://provendrop.com/app.html` (desde 2026-11-08, domínio próprio; manter `https://afonsolopes22.github.io/ProvenDrop/**` durante a transição, ver DOMINIO.md).
 6. A validade do link está em **Authentication → Settings → Email OTP expiration** (3600 s por defeito) e tem de ser igual a `MAGIC_LINK_MINUTOS` (60).
 
 ## 6. Enquanto o domínio não está verificado: frases do site
