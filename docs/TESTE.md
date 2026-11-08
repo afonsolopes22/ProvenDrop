@@ -37,6 +37,9 @@ Legenda: ✅ passou · ❌ falhou · ⏳ por executar (depende de contas que ain
 | `corrigir-email`: `validar.test.ts` (8 testes: sessão inválida/não paga/sem e-mail, > 24 h, porta Click, segunda correção, e-mails diferentes, máscara) verdes com `deno test`; `deno check` limpo | ✅ 2026-11-06 |
 | Segurança do site (automático) alargada a `terms.html`, `privacy.html`, `refunds.html` e às frases retiradas ("13 metrics", "arrives right after you pay", "on its way to the e-mail address") | ✅ 2026-11-06 |
 | Screenshots (1280 e 375) das zonas alteradas | ✅ `docs/screenshots/auditoria-antes/` e `docs/screenshots/auditoria-depois/` |
+| Área de membros com Supabase simulado (2026-11-08): Preferences só com nichos (0 caixas de país); dica discreta "Tip: choose your niches…" sem fundo, fecha ao clicar e continua fechada após recarregar; com nichos escolhidos a dica não aparece e a linha do nicho vem primeiro | ✅ 2026-11-08 |
+| Lista: link abre `link_colecao` completo (também sem `https://`), texto "loja/collections/handle"; sem nome interno da nota, só "Analysed 30 Oct"; alcance: 120 000 com tooltip, "Google ads · reach not public" (só Google), "Not public (UK)" (Meta sem alcance UE), nunca "0" | ✅ 2026-11-08 |
+| Library: título e lede novos, 12 colunas, "Download Launch Kit" em cada linha com kit (zip do dia do envio), Platforms a partir de `plataformas`/`anuncios_meta`/`anuncios_google` (só Google → só Google), score "7.3" + "for CH", ordem "ainda a anunciar" → score; "Earlier this week" com as coleções dos 7 dias anteriores (sem a lista do dia, sem repetidas), "Sent 1 Nov" por linha e "See all in Library"; 0 erros de consola; sem overflow a 375 | ✅ `docs/screenshots/membros-antes/` e `docs/screenshots/membros-depois/` |
 
 ## 1. Pagamento Direct → acesso → cancelamento
 
