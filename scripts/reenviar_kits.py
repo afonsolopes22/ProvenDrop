@@ -6,9 +6,11 @@ são regenerados (ex.: fazer_zip.py v4, kits em inglês, 2026-11-08): a área de
 continua a apontar para as mesmas chaves e passa a descarregar a versão nova.
 
 Para cada chave "<dia>/<ficheiro>.zip" procura no vault um zip com o mesmo nome
-(depois de nome_seguro(), igual ao publicar_plataforma.py), em qualquer pasta
-".../zip/" debaixo de --vault (por omissão só em "Criativos"), e faz upload com
-x-upsert: true para a mesma chave. Se houver mais do que um ficheiro com o mesmo
+(comparação sem acentos, apóstrofos, sublinhados nem maiúsculas: a chave foi feita
+com nome_seguro() a partir de um ficheiro que podia já vir sem acentos), em qualquer
+pasta ".../zip/" debaixo de --vault (por omissão só em "Criativos"), e faz upload com
+x-upsert: true para a mesma chave. Linhas com feed_dia.retirada = true não são
+enviadas; com --desde AAAA-MM-DD, zips mais antigos do que essa data também não. Se houver mais do que um ficheiro com o mesmo
 nome, usa o mais recente. Não altera a base de dados.
 
 Só biblioteca padrão (Python 3.9+). Nunca imprime a chave.
@@ -20,10 +22,12 @@ Uso:
 Códigos de saída: 0 ok · 1 erro do servidor · 2 argumentos/ficheiros · 3 rede · 4 credenciais · 5 faltam zips.
 """
 import argparse
+import datetime as dt
 import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -42,6 +46,14 @@ def nome_seguro(nome):
     base = os.path.basename(nome)
     base = re.sub(r"[^\w.\- ()]+", "_", base, flags=re.UNICODE).strip() or "kit.zip"
     return base[:150]
+
+
+def normalizar(nome):
+    """Chave de comparação tolerante: sem acentos, apóstrofos, sublinhados nem maiúsculas
+    ("Sweats à capuche d'automne" e "Sweats a capuche dautomne" são o mesmo kit)."""
+    s = unicodedata.normalize("NFKD", os.path.basename(nome))
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    return re.sub(r"[^a-z0-9]+", "", s.lower().removesuffix(".zip"))
 
 
 def ler_chave(caminho):
@@ -75,8 +87,10 @@ class Cliente:
             falhar(EXIT_REDE, f"{contexto}: sem ligação a {self.url} ({getattr(e, 'reason', e)})")
 
     def chaves(self, tabela):
-        corpo = self._pedido("GET", f"/rest/v1/{tabela}?select=zip_path&zip_path=not.is.null", contexto=f"ler {tabela}")
-        return [r["zip_path"] for r in json.loads(corpo) if r.get("zip_path")]
+        """[(zip_path, retirada)] — verdes não tem a coluna retirada."""
+        cols = "zip_path,retirada" if tabela == "feed_dia" else "zip_path"
+        corpo = self._pedido("GET", f"/rest/v1/{tabela}?select={cols}&zip_path=not.is.null", contexto=f"ler {tabela}")
+        return [(r["zip_path"], bool(r.get("retirada"))) for r in json.loads(corpo) if r.get("zip_path")]
 
     def enviar(self, caminho_local, chave_bucket):
         if self.dry_run:
@@ -88,7 +102,7 @@ class Cliente:
 
 
 def indexar_zips(raiz):
-    """nome_seguro(ficheiro) → caminho do zip mais recente com esse nome, em qualquer pasta 'zip'."""
+    """normalizar(ficheiro) → caminho do zip mais recente com esse nome, em qualquer pasta 'zip'."""
     idx = {}
     for pasta, _dirs, ficheiros in os.walk(raiz):
         if os.path.basename(pasta).lower() != "zip":
@@ -97,7 +111,7 @@ def indexar_zips(raiz):
             if not f.lower().endswith(".zip"):
                 continue
             caminho = os.path.join(pasta, f)
-            k = nome_seguro(f)
+            k = normalizar(f)
             if k not in idx or os.path.getmtime(caminho) > os.path.getmtime(idx[k]):
                 idx[k] = caminho
     return idx
@@ -109,8 +123,15 @@ def main():
     p.add_argument("--key-file", required=True, help="ficheiro com a service role key (1.ª linha), fora do repo e do vault")
     p.add_argument("--vault", required=True, help="raiz do vault (ex.: ...\\Obsidian Vault\\Product Research)")
     p.add_argument("--pasta", default="Criativos", help="subpasta do vault onde procurar (por omissão: Criativos)")
+    p.add_argument("--desde", help="só enviar zips modificados a partir desta data (AAAA-MM-DD); os mais antigos ficam listados como 'antigo'")
     p.add_argument("--dry-run", action="store_true", help="não enviar nada; só mostrar o que faria")
     a = p.parse_args()
+    desde = None
+    if a.desde:
+        try:
+            desde = dt.datetime.strptime(a.desde, "%Y-%m-%d").timestamp()
+        except ValueError:
+            falhar(EXIT_USO, "--desde deve ser AAAA-MM-DD")
 
     if not re.match(r"^https://[a-z0-9-]+\.supabase\.(co|in)/?$", a.url.strip(), re.I):
         falhar(EXIT_USO, "--url deve ser https://<project-ref>.supabase.co")
@@ -119,27 +140,38 @@ def main():
         falhar(EXIT_USO, f"pasta não encontrada: {raiz}")
 
     cli = Cliente(a.url.strip(), ler_chave(a.key_file), a.dry_run)
-    chaves = []
+    chaves, retiradas = [], set()
     for tabela in ("feed_dia", "verdes"):
-        for k in cli.chaves(tabela):
+        for k, retirada in cli.chaves(tabela):
             if k not in chaves:
                 chaves.append(k)
+            if retirada:
+                retiradas.add(k)
     idx = indexar_zips(raiz)
-    print(f"{len(chaves)} chaves no bucket a substituir; {len(idx)} zips distintos no vault ({raiz}).")
+    print(f"{len(chaves)} chaves no bucket; {len(idx)} zips distintos no vault ({raiz}).")
 
-    enviados, faltam = [], []
+    enviados, faltam, saltados = [], [], []
     for chave in chaves:
         nome = chave.split("/", 1)[1] if "/" in chave else chave
-        local = idx.get(nome_seguro(nome))
+        local = idx.get(normalizar(nome))
+        if chave in retiradas:
+            saltados.append(chave)
+            print(f"  RETIRADA (não enviado)  {chave}")
+            continue
         if not local:
             faltam.append(chave)
-            print(f"  FALTA   {chave}")
+            print(f"  FALTA                   {chave}")
+            continue
+        mtime = os.path.getmtime(local)
+        if desde is not None and mtime < desde:
+            saltados.append(chave)
+            print(f"  ANTIGO (não enviado)    {chave}  ←  {os.path.relpath(local, a.vault)}  ({dt.datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M})")
             continue
         cli.enviar(local, chave)
         enviados.append(chave)
-        print(f"  {'[dry-run] ' if a.dry_run else ''}OK      {chave}  ←  {os.path.relpath(local, a.vault)}  ({os.path.getsize(local)} bytes)")
+        print(f"  {'[dry-run] ' if a.dry_run else ''}OK                      {chave}  ←  {os.path.relpath(local, a.vault)}  ({os.path.getsize(local)} bytes, {dt.datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M})")
 
-    print(f"\nSubstituídos: {len(enviados)}. Não encontrados no vault: {len(faltam)}.")
+    print(f"\n{'[dry-run] ' if a.dry_run else ''}Substituídos: {len(enviados)}. Saltados (retirada/antigo): {len(saltados)}. Não encontrados no vault: {len(faltam)}.")
     return EXIT_FALTAM if faltam else EXIT_OK
 
 
