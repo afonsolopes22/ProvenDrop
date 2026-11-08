@@ -80,8 +80,15 @@
     google: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20.5 12H12"/><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/></svg>',
   };
   const chips = (r, cls) => `<ul class="plats flex flex-wrap gap-1${cls ? " " + cls : ""}" aria-label="Advertising platforms">${plats(r).map(p => `<li class="plat ${p}">${ICON[p]}${p === "meta" ? "Meta" : "Google"}</li>`).join("")}</ul>`;
-  /* S7: a kit is only offered through the private bucket (zip_path); external zip links are never shown. */
-  const temKit = r => !!r.zip_path;
+  /* A kit comes from the private bucket (zip_path, signed URL) or, for rows that only carry an external link
+     (zip_url, e.g. the lists of 1 November 2026), from that link in a new tab (asked 2026-11-08; S7 accepted
+     the trade-off). "Kit being prepared" only when there is neither. */
+  const kitExterno = r => url(r.zip_url);
+  const temKit = r => !!r.zip_path || !!kitExterno(r);
+  /* The external link is a real <a> styled as the button (.dt a would recolour and underline it: overridden). */
+  const botaoKit = (r, texto) => r.zip_path
+    ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">${texto}</button>`
+    : kitExterno(r) ? `<a class="btn btn-go btn-sm whitespace-normal text-left !text-white !no-underline" href="${esc(kitExterno(r))}" target="_blank" rel="noopener noreferrer" title="Opens the kit link in a new tab">${texto}</a>` : "";
   /* Days advertising: counted up to today when data_inicio exists; otherwise the value measured at analysis. */
   const diasAgora = r => { const d = parse(r.data_inicio); if(!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
   const dias = r => { const n = diasAgora(r); return n != null ? fmt(n) : `${fmt(r.dias_ativo)}<small class="at">at analysis</small>`; };
@@ -108,13 +115,18 @@
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
      consumed here, by verifyOtp, so an e-mail scanner that opens the URL does not burn them. */
+  const LINK_GASTO = "This sign-in link has expired or was already used. Enter your e-mail to get a new one.";
+  function linkGasto(){ show("vLogin"); msg($("#msgLogin"), LINK_GASTO, "erro"); $("#email").focus(); }
   async function entrarPorTokenHash(){
-    const q = new URLSearchParams(location.search);
+    const q = new URLSearchParams(location.search), h = new URLSearchParams(location.hash.replace(/^#/, ""));
+    /* A link already used or expired (Supabase redirects with ?error=access_denied&error_code=otp_expired, in the
+       query or in the fragment): say so and offer a new one. The URL is cleaned either way. */
+    if(/^(access_denied|otp_expired)$/.test(q.get("error") || q.get("error_code") || h.get("error") || h.get("error_code") || "")){ history.replaceState(null, "", location.pathname); linkGasto(); return false; }
     const th = q.get("token_hash"), tipo = q.get("type");
     if(!th) return false;
     history.replaceState(null, "", location.pathname);
     const { error } = await sb.auth.verifyOtp({ token_hash: th, type: tipo === "recovery" ? "recovery" : "magiclink" });
-    if(error){ show("vLogin"); msg($("#msgLogin"), "This sign-in link is no longer valid. Request a new one below.", "erro"); }
+    if(error) linkGasto();
     return !error;
   }
 
@@ -240,7 +252,7 @@
   function cartao(r, opts){
     const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
+    const kit = temKit(r) ? botaoKit(r, `Download Launch Kit${ok ? "" : " (under observation)"}`)
                           : `<span class="nota text-[12px] font-medium text-white/50">Kit being prepared</span>`;
     const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
     return `<tr class="${pref ? "pref-first" : ""}">
@@ -287,7 +299,7 @@
     for(const r of feedTodos){ if(!visivel(r)) continue; const k = chave(r); if(!porChave.has(k)) porChave.set(k, Object.assign({}, r, { enviado_em: r.dia })); }
     for(const v of verdes||[]){
       const k = chave(v), f = porChave.get(k); if(retiradas.has(k)) continue;
-      if(f) Object.assign(f, { estado: "aprovada", data_aprovacao: v.data_aprovacao, ainda_a_anunciar: v.ainda_a_anunciar, anuncios_ultima_verificacao: v.anuncios_ultima_verificacao, ultima_verificacao: v.ultima_verificacao, scores_mercado: v.scores_mercado ?? f.scores_mercado, zip_path: f.zip_path || v.zip_path || null });
+      if(f) Object.assign(f, { estado: "aprovada", data_aprovacao: v.data_aprovacao, ainda_a_anunciar: v.ainda_a_anunciar, anuncios_ultima_verificacao: v.anuncios_ultima_verificacao, ultima_verificacao: v.ultima_verificacao, scores_mercado: v.scores_mercado ?? f.scores_mercado, zip_path: f.zip_path || v.zip_path || null, zip_url: f.zip_url || v.zip_url || null });
       else porChave.set(k, Object.assign({}, v, { estado: v.estado || "aprovada", enviado_em: v.data_aprovacao }));
     }
     return [...porChave.values()].sort((a, b) => ((b.ainda_a_anunciar === true) - (a.ainda_a_anunciar === true)) || ((Number(b.score) || 0) - (Number(a.score) || 0)) || String(b.enviado_em||"").localeCompare(String(a.enviado_em||"")));
@@ -304,7 +316,7 @@
        under the collection name, platform chips and "still advertising" under the status, market under the niche. */
     $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Score</th><th class="text-right" title="Active ads when sent, on Google, at the last check">Ads</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right" title="Days advertising">Days</th></tr></thead><tbody>${rows.map(r => {
       const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
-      const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>` : `<span class="sub">No kit for this one</span>`;
+      const kit = temKit(r) ? botaoKit(r, "Download Launch Kit") : `<span class="sub">No kit for this one</span>`;
       const ainda = r.ainda_a_anunciar === true ? `<span class="sub mt-2 font-semibold !text-ok">Still advertising</span>` : r.ainda_a_anunciar === false ? `<span class="sub mt-2">No longer advertising</span>` : "";
       return `<tr>
         <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>

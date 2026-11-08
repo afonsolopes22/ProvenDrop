@@ -57,9 +57,24 @@ O magic link de boas-vindas vai pelo Resend (API), mas o link que o cliente pede
 1. Supabase → **Authentication** → **Emails** → **SMTP Settings** → **Enable Custom SMTP**.
 2. **Sender email**: o mesmo endereço de `EMAIL_FROM` (`noreply@provendrop.com`; em teste, `onboarding@resend.dev`); **Sender name**: `ProvenDrop`.
 3. **Host**: `smtp.resend.com`; **Port**: `465`; **Username**: `resend`; **Password**: a API key do Resend (podes criar uma segunda chave só para isto).
-4. **Authentication** → **Emails** → **Templates** → **Magic Link**: assunto `Your ProvenDrop sign-in link`, corpo em inglês com o link **por token_hash** (S12: não é consumido por scanners de e-mail; a área corre `verifyOtp` quando a página abre):
-   `<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=magiclink">Sign in to ProvenDrop</a>`
-   (`{{ .RedirectTo }}` é o `app.html` pedido pela página de login.) O e-mail de boas-vindas e o de regresso já usam este formato, enviados pelo Resend a partir do webhook.
+4. **Authentication** → **Emails** → **Templates** → **Magic Link**: assunto `Your ProvenDrop sign-in link`, corpo em inglês com o link **por token_hash** (S12: não é consumido por scanners de e-mail; a área corre `verifyOtp` quando a página abre). Em 2026-11-08 o projeto ainda tinha o modelo por omissão (`{{ .ConfirmationURL }}`, link `…/auth/v1/verify?token=pkce_…`): esse link só funciona no browser que o pediu (PKCE) e, gasto, manda para `app.html?error=access_denied&error_code=otp_expired` (a página mostra "This sign-in link has expired or was already used…"). **Colar exatamente isto** (o editor do Supabase aceita HTML):
+
+   Assunto:
+   ```
+   Your ProvenDrop sign-in link
+   ```
+   Corpo:
+   ```html
+   <div style="font-family:Manrope,Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#0E1A17;line-height:1.5">
+     <p style="margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#5B6B66">ProvenDrop · Member area</p>
+     <h1 style="margin:0 0 16px;font-size:22px">Sign in to ProvenDrop</h1>
+     <p style="margin:0 0 20px">Click the button below to open your personal area with today's collections.</p>
+     <p style="margin:0 0 24px"><a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=magiclink" style="display:inline-block;background:#0D9488;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px">Open my ProvenDrop area</a></p>
+     <p style="margin:0 0 8px;font-size:13px;color:#5B6B66">This link expires in 60 minutes and can only be used once. It works in any browser.</p>
+     <p style="margin:0;font-size:13px;color:#5B6B66">If you didn't request this e-mail, you can ignore it.</p>
+   </div>
+   ```
+   (`{{ .RedirectTo }}` é o `app.html` pedido pela página de login; tem de estar nas **Redirect URLs** do ponto 5, senão o Supabase usa o Site URL e o link cai em `index.html`.) O e-mail de boas-vindas e o de regresso já usam este formato, enviados pelo Resend a partir do webhook.
 5. **Authentication** → **URL Configuration**: **Site URL** `https://afonsolopes22.github.io/ProvenDrop/` e, em **Redirect URLs**, `https://afonsolopes22.github.io/ProvenDrop/app.html`.
 6. A validade do link está em **Authentication → Settings → Email OTP expiration** (3600 s por defeito) e tem de ser igual a `MAGIC_LINK_MINUTOS` (60).
 
