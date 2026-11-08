@@ -55,7 +55,7 @@ export function esc(v: unknown): string {
 
 /** Base pública do site (pasta de APP_URL), para o logo dos e-mails (PNG: os clientes de e-mail não mostram SVG). */
 function baseSite(): string {
-  const app = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
+  const app = Deno.env.get("APP_URL") ?? "https://provendrop.com/app.html";
   return app.replace(/[^/]*$/, "");
 }
 

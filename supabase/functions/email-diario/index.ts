@@ -25,7 +25,7 @@ import { semSegredos } from "../_shared/log.ts";
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
-const APP_URL = Deno.env.get("APP_URL") ?? "https://afonsolopes22.github.io/ProvenDrop/app.html";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://provendrop.com/app.html";
 const HORA_ENVIO = Number.parseInt((Deno.env.get("HORA_ENVIO") ?? "-1").split(":")[0], 10);
 const TOLERANCIA_DIAS = 7; // M1: em atraso há menos de 7 dias ainda recebe
 

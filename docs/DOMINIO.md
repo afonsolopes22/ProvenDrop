@@ -1,8 +1,8 @@
 # Domínio próprio: provendrop.com
 
-Domínio previsto: **provendrop.com** (ainda não comprado em 2026-11-02). Até lá o site vive em `https://afonsolopes22.github.io/ProvenDrop/` e o e-mail sai pelo modo de teste do Resend. Esta página reúne tudo o que muda quando o domínio existir: os registos DNS para o GitHub Pages e para o Resend, e os sítios onde o URL do site está escrito.
+**Estado (2026-11-08): domínio comprado na Cloudflare; DNS criados (só DNS, sem proxy): 4 `A` para `185.199.108-111.153` e `CNAME www → afonsolopes22.github.io`; ficheiro `CNAME` com `provendrop.com` na raiz do repositório; todos os endereços no código passaram a `https://provendrop.com/…`.** Falta o que está em "Passos à mão" abaixo. O e-mail ainda sai pelo modo de teste do Resend (secção 3).
 
-**O ficheiro `CNAME` só se cria quando o domínio estiver comprado e os DNS apontados** (secção 2). Criá-lo antes parte o site: o GitHub Pages passa a servir só pelo domínio e este ainda não resolve.
+Esta página reúne os registos DNS para o GitHub Pages e para o Resend e os sítios onde o URL do site está escrito.
 
 ## 1. Comprar o domínio
 
@@ -26,25 +26,16 @@ No painel de DNS de `provendrop.com`:
 
 (Valores da documentação do GitHub "Managing a custom domain for your GitHub Pages site"; confirmar lá se mudaram.)
 
-Depois, por esta ordem:
+### Passos à mão (por esta ordem, com os valores a colar)
 
-1. Esperar a propagação (minutos a 24 h): `nslookup provendrop.com` tem de devolver os quatro `185.199.x.153`.
-2. Repositório → **Settings → Pages → Custom domain**: escrever `provendrop.com` → **Save**. O GitHub cria o commit com o ficheiro `CNAME` (conteúdo: `provendrop.com`, uma linha) no ramo publicado. Se preferires, crias tu o ficheiro na raiz com esse conteúdo exacto.
-3. Esperar o **DNS check successful** e marcar **Enforce HTTPS** (o certificado demora alguns minutos a emitir).
-4. Testar `https://provendrop.com/`, `https://provendrop.com/app.html` e `https://www.provendrop.com/` (deve redireccionar).
+1. **Propagação**: `nslookup provendrop.com` tem de devolver os quatro `185.199.x.153` (já devolvia a 2026-11-08).
+2. **GitHub → repositório → Settings → Pages → Custom domain**: `provendrop.com` → **Save**. O ficheiro `CNAME` já está no ramo (o merge do PR do domínio é o que o publica); o GitHub só o valida. Esperar **DNS check successful**; quando aparecer, marcar **Enforce HTTPS** (o certificado Let's Encrypt demora de minutos a 1 h; se a caixa estiver cinzenta, voltar mais tarde).
+3. **Supabase → Edge Functions → Secrets**: `APP_URL` = `https://provendrop.com/app.html` (é o único segredo com o endereço; `scripts\setup-supabase.ps1` já escreve este valor se o voltares a correr). As funções `stripe-webhook`, `email-diario` e `corrigir-email` leem-no no arranque: depois de mudar o segredo, voltar a fazer deploy das três (`supabase functions deploy <nome> --no-verify-jwt`) ou correr o `setup-supabase.ps1`.
+4. **Supabase → Authentication → URL Configuration**: **Site URL** `https://provendrop.com/`; **Redirect URLs**: acrescentar `https://provendrop.com/**` e manter `https://afonsolopes22.github.io/ProvenDrop/**` e `http://127.0.0.1:8000/**` durante a transição (apagar o github.io quando o domínio estiver a servir com HTTPS há uns dias).
+5. **Stripe → Payment Links**: Direct → **Depois do pagamento** → `https://provendrop.com/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}`; via Click → `https://provendrop.com/bem-vindo-click.html?session_id={CHECKOUT_SESSION_ID}`. **Portal do cliente → Business information → Default redirect link**: `https://provendrop.com/app.html`. (Os links de pagamento em `config.js` continuam vazios até ao teste com o cupão TESTE100.)
+6. Testar `https://provendrop.com/`, `https://provendrop.com/app.html` (pedir um link de entrada: o e-mail tem de trazer `https://provendrop.com/app.html?token_hash=…`) e `https://www.provendrop.com/` (deve redireccionar para a raiz).
 
-### O que muda no código e nos serviços quando o domínio estiver activo
-
-| Onde | De | Para |
-|---|---|---|
-| Stripe → Payment Link Direct → **Depois do pagamento** | `…github.io/ProvenDrop/bem-vindo.html` | `https://provendrop.com/bem-vindo.html` |
-| Stripe → Payment Link via Click → **Depois do pagamento** | `…/bem-vindo-click.html` | `https://provendrop.com/bem-vindo-click.html` |
-| Stripe → Portal do cliente → link de regresso | `…/app.html` | `https://provendrop.com/app.html` |
-| Supabase → Authentication → URL Configuration → **Site URL** e **Redirect URLs** | `…github.io/ProvenDrop/` e `…/app.html` | `https://provendrop.com/` e `https://provendrop.com/app.html` (manter os antigos durante a transição) |
-| Segredo `APP_URL` (via `scripts\setup-supabase.ps1`, só esse valor) | `…/app.html` | `https://provendrop.com/app.html` |
-| `scripts/setup-supabase.ps1` e `supabase/.env.example` | `APP_URL` do GitHub Pages | o novo URL |
-
-O GitHub Pages redirecciona `afonsolopes22.github.io/ProvenDrop/…` para o domínio, por isso links antigos continuam a funcionar.
+O GitHub Pages redirecciona `afonsolopes22.github.io/ProvenDrop/…` para o domínio, por isso links antigos (e-mails já enviados) continuam a funcionar. Nota sobre `corrigir-email`: o CORS aceita a origem de `APP_URL` e, durante a transição, também `https://afonsolopes22.github.io`.
 
 ## 3. DNS para o Resend (envio de e-mail)
 

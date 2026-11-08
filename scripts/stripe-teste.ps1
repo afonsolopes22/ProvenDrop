@@ -15,7 +15,7 @@
 param(
   [string]$PriceDireto = "price_1UX9ThJMAlqVy4dKYnrmwGb3",   # ProvenDrop Direct, 15 €/mês (teste)
   [string]$Webhook     = "we_1UX9VNJMAlqVy4dKeelqzvJL",       # endpoint de teste
-  [string]$Redirect    = "https://afonsolopes22.github.io/ProvenDrop/bem-vindo.html"
+  [string]$Redirect    = "https://provendrop.com/bem-vindo.html"
 )
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

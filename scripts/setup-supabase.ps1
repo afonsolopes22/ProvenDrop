@@ -144,7 +144,7 @@ if (-not $SemSegredos) {
   [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
   $cronSecret = ($bytes | ForEach-Object { $_.ToString("x2") }) -join ""
   $valores["CRON_SECRET"] = $cronSecret
-  $valores["APP_URL"] = "https://afonsolopes22.github.io/ProvenDrop/app.html"
+  $valores["APP_URL"] = "https://provendrop.com/app.html"
   $valores["MAGIC_LINK_MINUTOS"] = "60"
   if ($horaEnvio -ne "") { $valores["HORA_ENVIO"] = "$horaEnvio" }
 

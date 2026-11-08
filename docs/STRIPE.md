@@ -29,7 +29,7 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 - **Produtos**: ProvenDrop Direct 15,00 €/mês **+** Adesão ProvenDrop 25,00 € (o Stripe junta um preço único a uma subscrição: no 1.º pagamento cobra 40 €, depois 15 €/mês).
 - **Opções**: recolhe o e-mail (sempre); códigos promocionais: ver no painel (M6: cupões com limite de utilizações e duração `once`).
 - **Metadados** (Metadata): `origem` = `direto`. (Se o campo faltar, o webhook reconhece pelo `price_` de `STRIPE_PRICE_DIRETO`.)
-- **Depois do pagamento** → **Redirecionar** (não "mostrar página de confirmação") para `https://afonsolopes22.github.io/ProvenDrop/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (mudar para o domínio próprio quando existir, DOMINIO.md). Desde 2026-11-06 o `session_id` é obrigatório: é com ele que a página mostra o e-mail mascarado da compra e permite corrigi-lo uma vez, nas 24 h seguintes (função `corrigir-email`, EMAIL.md §7). Na compra de teste de 06/11 o link redirecionava para a página inicial: corrigir.
+- **Depois do pagamento** → **Redirecionar** (não "mostrar página de confirmação") para `https://provendrop.com/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (domínio próprio desde 2026-11-08, DOMINIO.md; antes era `…afonsolopes22.github.io/ProvenDrop/…`). Desde 2026-11-06 o `session_id` é obrigatório: é com ele que a página mostra o e-mail mascarado da compra e permite corrigi-lo uma vez, nas 24 h seguintes (função `corrigir-email`, EMAIL.md §7). Na compra de teste de 06/11 o link redirecionava para a página inicial: corrigir.
 
 ## b) Payment Link via Click: confirmar
 
@@ -37,7 +37,7 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 - **Produtos**: só ProvenDrop via Click 15,00 €/mês. **Sem** adesão.
 - **Opções**: e-mail e **telefone** obrigatório (para a Click juntar ao grupo); sem códigos promocionais.
 - **Metadados**: `origem` = `click`.
-- **Depois do pagamento** → `https://afonsolopes22.github.io/ProvenDrop/bem-vindo-click.html` com `?session_id={CHECKOUT_SESSION_ID}` (confirmar que o redirecionamento inclui este parâmetro: a página põe o código da compra na mensagem de WhatsApp para o +351 920 414 823).
+- **Depois do pagamento** → `https://provendrop.com/bem-vindo-click.html` com `?session_id={CHECKOUT_SESSION_ID}` (confirmar que o redirecionamento inclui este parâmetro: a página põe o código da compra na mensagem de WhatsApp para o +351 920 414 823).
 
 Quem paga por este link fica em `subscricoes`/`subscritores` com `origem = click` e o estado da subscrição (para a comissão), **sem login e sem acesso** à área (RLS). Recebe as coleções no grupo de WhatsApp da Click.
 
@@ -109,7 +109,7 @@ Em modo real o Checkout, o portal, os recibos e as faturas mostram o **Nome púb
 - [ ] Criar o Payment Link **Direct de regresso** em modo real (só o preço mensal Direct; metadata `origem=direto`, `tipo=regresso`; → `bem-vindo.html`; sem códigos) e pôr o URL em `config.js` → `STRIPE_LINK_RETURN`. O `scripts\stripe-teste.ps1` só trabalha em modo de teste. Até existir, o site não promete "só mensalidade" a quem volta (frase e cartão "Coming back later?" retirados a 2026-11-06).
 - [ ] Galeria de 4 exemplos de criativos no Launch Kit: só com imagens sem qualquer marca.
 - [ ] Teste real (TESTE.md §7): pagar o Direct (40 €), ver a linha, entrar por magic link, descarregar o kit, cancelar no portal, perder o acesso, reembolsar; pelo link Click confirmar `origem = click`, sem acesso e sem adesão.
-- [ ] Termos / privacidade / reembolsos: páginas publicadas a 2026-11-06 (`terms.html`, `privacy.html`, `refunds.html`, ligadas no rodapé de todas as páginas) **com marcadores `[A COMPLETAR PELO AFONSO]`** (nome legal, NIF, morada, IVA, região do Supabase, prazos, regra dos 14 dias). Depois de preenchidos: links em **Dados públicos** (`https://afonsolopes22.github.io/ProvenDrop/terms.html`, `…/privacy.html`, `…/refunds.html`) e "Exigir que os clientes aceitem os termos de serviço" nos 2 links.
+- [ ] Termos / privacidade / reembolsos: páginas publicadas a 2026-11-06 (`terms.html`, `privacy.html`, `refunds.html`, ligadas no rodapé de todas as páginas) **com marcadores `[A COMPLETAR PELO AFONSO]`** (nome legal, NIF, morada, IVA, região do Supabase, prazos, regra dos 14 dias). Depois de preenchidos: links em **Dados públicos** (`https://provendrop.com/terms.html`, `…/privacy.html`, `…/refunds.html`) e "Exigir que os clientes aceitem os termos de serviço" nos 2 links.
 - [ ] Quando houver domínio: redirecionamentos dos 2 links e do portal, `APP_URL`, Redirect URLs do Supabase (DOMINIO.md).
 
 ## Histórico: modo de teste (2026-11-02 → 2026-11-06)
