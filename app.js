@@ -115,13 +115,18 @@
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
      consumed here, by verifyOtp, so an e-mail scanner that opens the URL does not burn them. */
+  const LINK_GASTO = "This sign-in link has expired or was already used. Enter your e-mail to get a new one.";
+  function linkGasto(){ show("vLogin"); msg($("#msgLogin"), LINK_GASTO, "erro"); $("#email").focus(); }
   async function entrarPorTokenHash(){
-    const q = new URLSearchParams(location.search);
+    const q = new URLSearchParams(location.search), h = new URLSearchParams(location.hash.replace(/^#/, ""));
+    /* A link already used or expired (Supabase redirects with ?error=access_denied&error_code=otp_expired, in the
+       query or in the fragment): say so and offer a new one. The URL is cleaned either way. */
+    if(/^(access_denied|otp_expired)$/.test(q.get("error") || q.get("error_code") || h.get("error") || h.get("error_code") || "")){ history.replaceState(null, "", location.pathname); linkGasto(); return false; }
     const th = q.get("token_hash"), tipo = q.get("type");
     if(!th) return false;
     history.replaceState(null, "", location.pathname);
     const { error } = await sb.auth.verifyOtp({ token_hash: th, type: tipo === "recovery" ? "recovery" : "magiclink" });
-    if(error){ show("vLogin"); msg($("#msgLogin"), "This sign-in link is no longer valid. Request a new one below.", "erro"); }
+    if(error) linkGasto();
     return !error;
   }
 
