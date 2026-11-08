@@ -299,22 +299,21 @@
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
     const rows = biblioteca().filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
     if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+    /* Same shape as the daily table so the whole row fits at 1280 without horizontal scroll (2026-11-08): the kit
+       under the collection name, platform chips and "still advertising" under the status, market under the niche. */
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Score</th><th class="text-right" title="Active ads when sent, on Google, at the last check">Ads</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right" title="Days advertising">Days</th></tr></thead><tbody>${rows.map(r => {
       const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
-      const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>` : "—";
+      const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>` : `<span class="sub">No kit for this one</span>`;
+      const ainda = r.ainda_a_anunciar === true ? `<span class="sub mt-2 font-semibold !text-ok">Still advertising</span>` : r.ainda_a_anunciar === false ? `<span class="sub mt-2">No longer advertising</span>` : "";
       return `<tr>
-        <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaCurto(r.data_aprovacao))}</span>` : ""}</span></td>
-        <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span></td>
-        <td data-l="Collection"><span class="block min-w-[14ch] max-w-[260px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}</span></td>
-        <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
-        <td data-l="Market"><span>${esc(pais(mk) || "—")}</span></td>
+        <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>
+        <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ainda}${chips(r, "mt-2")}</span></td>
+        <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}<span class="mt-2.5 block">${kit}</span></span></td>
+        <td data-l="Niche"><span class="block min-w-[112px]"><b class="font-semibold">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap"><b class="font-extrabold">${score(r.score)}</b>${sc.mk ? `<span class="sub" title="${sc.proprio ? "Score for" : "Approved for"} ${esc(pais(sc.mk))}, the strongest market">${sc.proprio ? `${sc.valor} in ${esc(sc.mk)}` : `for ${esc(sc.mk)}`}</span>` : ""}</span></td>
-        <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} when sent</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
-        <td data-l="Platforms"><span>${chips(r)}</span></td>
+        <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} when sent</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub whitespace-nowrap">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaMes(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Meta reach"><span>${reach(r)}</span></td>
         <td class="n md:text-right" data-l="Days advertising"><span>${dias(r)}</span></td>
-        <td data-l="Still advertising"><span>${r.ainda_a_anunciar === true ? "Yes" : r.ainda_a_anunciar === false ? "No" : "—"}</span></td>
-        <td data-l="Kit"><span>${kit}</span></td>
       </tr>`; }).join("")}</tbody></table>`;
   }
 
