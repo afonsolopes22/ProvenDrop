@@ -165,7 +165,7 @@ Pré-requisitos: `setup-supabase.ps1` corrido (migração `0006` + deploy de `co
 
 | # | Passo | Esperado | Resultado |
 |---|---|---|---|
-| 8.1 | `curl "$F?session_id=cs_live_inventado123456"` | 404 `{"erro":"sessao_nao_encontrada"}`; o mesmo com `?session_id=<script>` e sem parâmetro | ⏳ |
+| 8.1 | `curl "$F?session_id=cs_live_inventado123456"` | 404 `{"erro":"sessao_nao_encontrada"}`; o mesmo com `?session_id=<script>` e sem parâmetro | ✅ 2026-11-08 (função publicada pela 1.ª vez nesse dia, v1; migração `0006` aplicada em produção com autorização do Afonso; antes dela a sessão inventada dava 500) |
 | 8.2 | `curl "$F?session_id=<cs_live_ da compra 7.1>"` | 200 `{"email":"afo•••@gmail.com","corrigido":false}` (só o e-mail mascarado; nada mais) | ⏳ |
 | 8.3 | 21 GET seguidos do mesmo IP em 10 min | o 21.º responde 429 `{"erro":"limite"}`; POST a partir do 6.º | ⏳ |
 | 8.4 | Na página `bem-vindo.html?session_id=…` da compra: **Not my e-mail? Fix it** → dois e-mails **diferentes** | A página recusa antes de chamar a função ("The two e-mails don't match."); por `curl -X POST $F -H "content-type: application/json" -d '{"session_id":"…","novo_email":"a@x.pt","confirmacao":"b@x.pt"}'` → 422 `{"erro":"emails_diferentes"}` | ⏳ |
