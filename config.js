@@ -18,15 +18,21 @@ window.PROVENDROP_CONFIG = {
      LIVE link since 2026-11-06 (account activated; docs/STRIPE.md): monthly fee
      + joining fee, metadata origem=direto, redirects to bem-vindo.html after
      payment. Empty = Subscribe button disabled.
-     Test links (test mode) go to config.local.js, loaded only on localhost. */
-  STRIPE_LINK_DIRECT: "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00",
+     Test links (test mode) go to config.local.js, loaded only on localhost.
+     TEMPORARILY EMPTY (2026-11-06): the Stripe webhook is not configured yet,
+     so real payments would not reach Supabase. Re-enable after running
+     scripts/setup-supabase.ps1 and testing with the TESTE100 coupon:
+     "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00" */
+  STRIPE_LINK_DIRECT: "",
 
   /* Stripe Payment Link of the CLICK plan (monthly fee only, no joining fee;
      metadata origem=click; redirects to bem-vindo-click.html?session_id=…, where
      the WhatsApp button carries the purchase code). Shown on the site, to
      everyone, in the "Are you a Click customer?" cards ("Subscribe with Click").
-     Empty = those buttons disabled, like Subscribe. */
-  STRIPE_LINK_CLICK: "https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01",
+     Empty = those buttons disabled, like Subscribe.
+     TEMPORARILY EMPTY (2026-11-06), same reason as STRIPE_LINK_DIRECT:
+     "https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01" */
+  STRIPE_LINK_CLICK: "",
 
   /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee),
      shown in the member area to former members. No live link exists yet
