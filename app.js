@@ -36,14 +36,39 @@
      (rows published before 2026-11-02 only have anuncios_ativos, which were Meta). Google ads = anuncios_google. */
   const googleAds = r => r.anuncios_google != null ? r.anuncios_google : 0;
   const metaAds = r => r.anuncios_meta != null ? r.anuncios_meta : (r.anuncios_ativos != null ? Math.max(0, Number(r.anuncios_ativos) - (r.anuncios_google != null ? Number(r.anuncios_google) : 0)) : null);
-  /* Reach comes from Meta's ad data: without Meta ads there is no reach to show ("No Meta data", never a false 0).
-     Ads only in the UK/US/CH are outside the EU data: the number is shown as "UK" reach etc., never as EU reach. */
+  /* Reach comes from Meta's EU ad data. Rules (2026-11-08), Today and Library alike: the number only when
+     alcance_eu > 0, never a false "0". Google-only store → "Google ads · reach not public". Meta ads without
+     EU reach (ads only in the UK/US/CH) → "Not public (UK)" after the strongest market. */
   const adCountries = r => (Array.isArray(r.paises_ads) && r.paises_ads.length ? r.paises_ads : [r.mercado_destaque]).map(c => String(c||"").toUpperCase()).filter(Boolean);
+  const MK_CURTO = { GB: "UK", US: "US", CH: "CH" };
+  const REACH_TIP = 'title="Reach is only published for Meta ads in the EU."';
   const reach = r => {
-    if(!(Number(metaAds(r)) > 0) || r.alcance_eu == null || r.alcance_eu === "") return `<span class="sub !text-inherit">No Meta data</span>`;
-    const cs = adCountries(r), naoUE = cs.length && cs.every(c => !EU.has(c));
-    return `${fmt(r.alcance_eu)}${naoUE ? `<span class="sub">${cs.length === 1 ? esc(pais(cs[0])) : "outside the EU"}</span>` : ""}`;
+    const m = Number(metaAds(r)) || 0, g = Number(googleAds(r)) || 0, a = r.alcance_eu == null || r.alcance_eu === "" ? null : Number(r.alcance_eu);
+    if(a > 0) return `<span ${REACH_TIP}>${fmt(a)}</span>`;
+    const nota = t => `<span class="sub !text-inherit" ${REACH_TIP}>${t}</span>`;
+    if(m === 0 && g > 0) return nota("Google ads · reach not public");
+    if(m > 0){
+      const cs = adCountries(r), mk = String(r.mercado_destaque||"").toUpperCase();
+      const fora = MK_CURTO[mk] || (cs.length && cs.every(c => !EU.has(c)) ? (MK_CURTO[cs[0]] || cs[0]) : "");
+      return nota(`Not public${fora ? ` (${esc(fora)})` : ""}`);
+    }
+    return nota("No Meta data");
   };
+  /* Collection link: always the full collection URL (link_colecao, with or without "https://"), opened in a new
+     tab; the visible text is the host plus the path ("store.it/collections/handle"), shortened. Never the store home. */
+  const ligacao = r => {
+    let v = String(r.link_colecao||"").trim(); if(!v) return null;
+    if(!/^https?:\/\//i.test(v)) v = "https://" + v;
+    let u; try { u = new URL(v); } catch { return null; }
+    if(!/^https?:$/.test(u.protocol) || !u.hostname.includes(".")) return null;
+    const p = u.pathname.replace(/\/+$/, ""); let t = u.hostname.replace(/^www\./, "") + (p && p !== "/" ? p : "");
+    if(t.length > 46) t = t.slice(0, 44) + "…";
+    return { href: u.href, texto: t };
+  };
+  const diaMes = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""; };
+  /* The routine's internal note name ("2026-10-30 — Niche — Collection (store)") is never shown; only its date, as "Analysed 30 Oct". */
+  const analisado = r => { const m = String(r.nota||"").match(/^\s*(\d{4}-\d{2}-\d{2})/); return m ? diaMes(m[1]) : ""; };
+  const chave = r => `${String(r.loja||"").trim().toLowerCase()}|${String(r.colecao||"").trim().toLowerCase()}`;
   const plats = r => {
     const p = (Array.isArray(r.plataformas) ? r.plataformas : []).map(s => String(s).toLowerCase()).filter(s => s === "meta" || s === "google");
     if(p.length) return [...new Set(p)];
@@ -74,7 +99,7 @@
   /* S12: PKCE instead of implicit (no tokens in the URL fragment). */
   const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { flowType: "pkce", detectSessionInUrl: true } });
 
-  let user = null, sub = null, feedRows = [], verdes = null;
+  let user = null, sub = null, feedRows = [], feedTodos = [], verdes = null;
 
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
@@ -115,7 +140,7 @@
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
     renderConta(); renderPrefsForm(); renderAvisos();
-    if(!sub.guia_visto) abrirGuia(); else if(!(sub.nichos||[]).length) $("#hojePrefs").hidden = false;
+    if(!sub.guia_visto) abrirGuia(); else mostrarDica();
     carregarHoje();
   }
 
@@ -154,47 +179,66 @@
   async function carregarHoje(){
     const feed = $("#feed");
     feed.innerHTML = '<div class="empty">Loading…</div>';
-    const ult = await sb.from("feed_dia").select("dia").order("dia", { ascending: false }).limit(1).maybeSingle();
-    if(ult.error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
-    if(!ult.data){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
-    const d = ult.data.dia;
-    const { data, error } = await sb.from("feed_dia").select("*").eq("dia", d).order("ordem");
+    /* One query serves the latest list, "Earlier this week" and the Library: every sending, newest first
+       (PostgREST returns at most 1000 rows, i.e. the most recent ones; enough for many months of lists). */
+    const { data, error } = await sb.from("feed_dia").select("*").order("dia", { ascending: false }).order("ordem");
     if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
-    feedRows = data || [];
+    feedTodos = data || [];
+    if(!feedTodos.length){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
+    const d = feedTodos[0].dia;
+    feedRows = feedTodos.filter(r => r.dia === d);
     const hoje = new Date().toISOString().slice(0,10);
     $("#hojeTitulo").textContent = d === hoje ? "Today’s collections" : "Collections for " + dia(d);
     $("#hojeSub").textContent = d === hoje ? dia(d) : "There is no list for today yet; this is the most recent one.";
     $("#hojeHora").textContent = HORA ? "New collections every day at " + HORA : "";
-    renderFeed();
+    renderFeed(); renderSemana(d);
+    if(verdes) renderArquivo();
   }
 
+  /* Preferred niches first (the stored countries are no longer used to order or filter anything, 2026-11-08). */
+  const porPreferencia = rows => { const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase())); return rows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem)); };
+  /* High-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
+  const tabela = (rows, opts) => `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Meta ads">Meta</th><th class="text-right" title="Google ads">Google</th><th class="text-right">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(r => cartao(r, opts)).join("")}</tbody></table>`;
+
   function renderFeed(){
-    const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
-    const rows = feedRows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem));
-    /* Today is a high-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
-    $("#feed").innerHTML = rows.length ? `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Meta ads">Meta</th><th class="text-right" title="Google ads">Google</th><th class="text-right">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(cartao).join("")}</tbody></table>` : '<div class="empty">No collections on this day.</div>';
+    const rows = porPreferencia(feedRows);
+    $("#feed").innerHTML = rows.length ? tabela(rows) : '<div class="empty">No collections on this day.</div>';
     /* KPI strip above the table (counts only; nothing else is computed here) */
     const kpi = (id, v) => { const el = $(id); if(el) el.textContent = String(v); };
     kpi("#kpiTotal", rows.length); kpi("#kpiOk", rows.filter(aprovada).length); kpi("#kpiWatch", rows.filter(r => !aprovada(r)).length); kpi("#kpiKits", rows.filter(temKit).length);
   }
 
+  /* "Earlier this week": the collections sent in the 7 days before the list shown, one row per store+collection
+     (the newest sending wins), same row format and kit as the daily list. Hidden when there are none. */
+  function renderSemana(d){
+    const sec = $("#semana"), lim = parse(d); if(!lim){ sec.hidden = true; return; }
+    const ini = new Date(lim.getTime() - 7 * 864e5), vistos = new Set(feedRows.map(chave)), rows = [];
+    for(const r of feedTodos){ if(r.dia >= d) continue; const dd = parse(r.dia); if(!dd || dd < ini) break; const k = chave(r); if(vistos.has(k)) continue; vistos.add(k); rows.push(r); }
+    sec.hidden = !rows.length; if(!rows.length) return;
+    $("#semanaSub").textContent = rows.length + (rows.length === 1 ? " collection" : " collections") + " from the previous 7 days, each with its kit.";
+    $("#semanaBox").innerHTML = tabela(porPreferencia(rows), { dia: true });
+  }
+
   /* Six-market strip; a strongest market outside the six (NL/AT/CH/HU) is added as a seventh cell so it is never lost. */
   function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); const cols = MARKETS.concat(mk && !MARKETS.includes(mk) ? [mk] : []); return `<ul class="strip" aria-label="Markets"${cols.length > 6 ? ` style="grid-template-columns:repeat(${cols.length},minmax(0,1fr))"` : ""}>${cols.map(c => `<li${ok.has(c) ? ' class="ok"' : ''} title="${esc(pais(c))}">${esc(c)}</li>`).join("")}</ul>`; }
-  /* Score: when the verdict is 🟢 for one market ("🟢 ANUNCIAR (CH)"), show that market next to the score (the routine's per-market score when the row carries one, else the collection score). */
+  /* Score of the strongest market, shown next to the global score so it is clear why a collection is approved
+     ("7.3 in CH"): the market named in a 🟢 verdict, else mercado_destaque; the routine's per-market score when
+     the row carries one (scores_mercado), else the collection score. */
   const mercadoDoVeredito = r => { const m = String(r.veredito||"").match(/🟢[^()]*\(([A-Z]{2})\)/); return m ? m[1] : ""; };
-  const scoreMercado = r => { const mk = mercadoDoVeredito(r); const porMk = mk && r.scores_mercado && typeof r.scores_mercado === "object" ? r.scores_mercado[mk] : null; return { valor: score(porMk != null ? porMk : r.score), mk }; };
+  const scoreMercado = r => { const mk = mercadoDoVeredito(r) || String(r.mercado_destaque||"").toUpperCase(); const porMk = mk && r.scores_mercado && typeof r.scores_mercado === "object" ? r.scores_mercado[mk] : null; return { valor: score(porMk != null ? porMk : r.score), mk, proprio: porMk != null }; };
 
   /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02.
-     One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css). */
-  function cartao(r){
-    const ok = aprovada(r), link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase();
+     One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css).
+     opts.dia adds the sending day under the status ("Earlier this week"). */
+  function cartao(r, opts){
+    const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
     const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit${ok ? "" : " (under observation)"}</button>`
                           : `<span class="nota text-[12px] font-medium text-white/50">Kit being prepared</span>`;
     const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
     return `<tr class="${pref ? "pref-first" : ""}">
-      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${chips(r, "mt-2")}</td>
-      <td data-l="Collection"><div class="min-w-[160px] max-w-[240px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 text-[12px]">${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(r.loja || link.replace(/^https?:\/\//,""))}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${r.nota ? `<p class="nota sub mt-1.5">${esc(r.nota)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
+      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${opts?.dia ? `<span class="sub mt-2">Sent ${esc(diaMes(r.dia))}</span>` : ""}${chips(r, "mt-2")}</td>
+      <td data-l="Collection"><div class="min-w-[160px] max-w-[240px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
       <td data-l="Niche"><div class="min-w-[124px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
       <td class="n md:text-right" data-l="Meta ads">${fmt(metaAds(r))}</td>
       <td class="n md:text-right" data-l="Google ads">${fmt(googleAds(r))}</td>
@@ -215,34 +259,51 @@
     const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
   });
 
-  /* ── archive ────────────────────────────────────────────────────── */
+  /* ── library (was "Archive" until 2026-11-08) ───────────────────── */
   async function carregarArquivo(){
     const box = $("#arqBox"); box.innerHTML = '<div class="empty">Loading…</div>';
     const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
-    if(error){ box.innerHTML = '<div class="empty">The archive could not be loaded right now.</div>'; return; }
+    if(error){ box.innerHTML = '<div class="empty">The library could not be loaded right now.</div>'; return; }
     verdes = data || [];
-    const nichos = [...new Set(verdes.map(r => r.nicho).filter(Boolean))], paises = [...new Set(verdes.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))];
+    const rows = biblioteca();
+    const nichos = [...new Set(rows.map(r => r.nicho).filter(Boolean))], paises = [...new Set(rows.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))].sort();
     $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
     $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(pais(p))}</option>`).join("");
     renderArquivo();
   }
+  /* Library rows: every collection we have sent (feed_dia, one row per store+collection, the newest sending wins),
+     carrying the kit of the day it was sent, enriched with the tracking data of the approved archive (verdes: approval
+     date, still advertising, last check). Approved collections never in a daily list (before the platform) come from
+     verdes alone, without a kit. Order: still advertising first, then score. */
+  function biblioteca(){
+    const porChave = new Map();
+    for(const r of feedTodos){ const k = chave(r); if(!porChave.has(k)) porChave.set(k, Object.assign({}, r, { enviado_em: r.dia })); }
+    for(const v of verdes||[]){
+      const k = chave(v), f = porChave.get(k);
+      if(f) Object.assign(f, { estado: "aprovada", data_aprovacao: v.data_aprovacao, ainda_a_anunciar: v.ainda_a_anunciar, anuncios_ultima_verificacao: v.anuncios_ultima_verificacao, ultima_verificacao: v.ultima_verificacao, scores_mercado: v.scores_mercado ?? f.scores_mercado, zip_path: f.zip_path || v.zip_path || null });
+      else porChave.set(k, Object.assign({}, v, { estado: v.estado || "aprovada", enviado_em: v.data_aprovacao }));
+    }
+    return [...porChave.values()].sort((a, b) => ((b.ainda_a_anunciar === true) - (a.ainda_a_anunciar === true)) || ((Number(b.score) || 0) - (Number(a.score) || 0)) || String(b.enviado_em||"").localeCompare(String(a.enviado_em||"")));
+  }
   ["#fNicho","#fPais","#fPlat","#fAtivas"].forEach(s => $(s).addEventListener("change", renderArquivo));
-  /* Platform filter: "meta" / "google" = advertises there (alone or with the other); "both" = on both. */
+  /* Platform filter: "meta" / "google" = advertises there (alone or with the other); "both" = on both.
+     plats() reads plataformas / anuncios_meta / anuncios_google, so a Google-only store is never shown as Meta. */
   const plataformaOk = (r, pl) => !pl || (pl === "both" ? plats(r).length === 2 : plats(r).includes(pl));
   function renderArquivo(){
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
-    const rows = (verdes||[]).filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
+    const rows = biblioteca().filter(r => (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
     if(!rows.length){ $("#arqBox").innerHTML = '<div class="empty" style="border:0">No collections match these filters.</div>'; return; }
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Approved</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right">Meta reach</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
-      const link = url(r.link_colecao), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
-      const kit = temKit(r) ? `<button class="btn btn-line btn-sm" type="button" data-zip="${esc(r.zip_path)}">Kit</button>` : "—";
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection</th><th>Niche</th><th>Market</th><th class="text-right">Score</th><th class="text-right">Ads</th><th>Platforms</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right">Days advertising</th><th>Still advertising</th><th>Kit</th></tr></thead><tbody>${rows.map(r => {
+      const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
+      const kit = temKit(r) ? `<button class="btn btn-go btn-sm whitespace-normal text-left" type="button" data-zip="${esc(r.zip_path)}">Download Launch Kit</button>` : "—";
       return `<tr>
-        <td class="n whitespace-nowrap" data-l="Approved"><span>${esc(diaCurto(r.data_aprovacao) || "—")}</span></td>
-        <td data-l="Collection"><span class="block min-w-[14ch]">${link ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(link)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}<span class="sub">${esc(r.loja||"")}</span></span></td>
+        <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaCurto(r.data_aprovacao))}</span>` : ""}</span></td>
+        <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span></td>
+        <td data-l="Collection"><span class="block min-w-[14ch] max-w-[260px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}</span></td>
         <td data-l="Niche"><span>${esc(nicho(r.nicho))}</span></td>
         <td data-l="Market"><span>${esc(pais(mk) || "—")}</span></td>
-        <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap">${sc.valor}${sc.mk ? ` <span class="rounded bg-brand-soft px-1.5 py-0.5 text-[11px] font-bold text-brand-dark" title="Approved for ${esc(pais(sc.mk))}">${esc(sc.mk)}</span>` : ""}</span></td>
-        <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} at approval</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
+        <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap"><b class="font-extrabold">${score(r.score)}</b>${sc.mk ? `<span class="sub" title="${sc.proprio ? "Score for" : "Approved for"} ${esc(pais(sc.mk))}, the strongest market">${sc.proprio ? `${sc.valor} in ${esc(sc.mk)}` : `for ${esc(sc.mk)}`}</span>` : ""}</span></td>
+        <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} when sent</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaCurto(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
         <td data-l="Platforms"><span>${chips(r)}</span></td>
         <td class="n md:text-right" data-l="Meta reach"><span>${reach(r)}</span></td>
         <td class="n md:text-right" data-l="Days advertising"><span>${dias(r)}</span></td>
@@ -252,20 +313,25 @@
   }
 
   /* ── preferences ────────────────────────────────────────────────── */
+  /* Niches only, and optional (2026-11-08). "Countries you sell in" was removed: subscritores.paises stays in the
+     database untouched but is neither shown nor used. */
   function renderPrefsForm(){
-    const n = new Set(sub?.nichos||[]), p = new Set(sub?.paises||[]);
+    const n = new Set(sub?.nichos||[]);
     $("#prefNichos").innerHTML = NICHOS.map(([v,l]) => `<label class="check"><input type="checkbox" name="nicho" value="${esc(v)}"${n.has(v) ? " checked" : ""}> ${esc(l)}</label>`).join("");
-    $("#prefPaises").innerHTML = MARKETS.map(c => `<label class="check"><input type="checkbox" name="pais" value="${c}"${p.has(c) ? " checked" : ""}> ${pais(c)}</label>`).join("");
   }
   $("#formPrefs").addEventListener("submit", async e => {
     e.preventDefault();
     const nichos = [...document.querySelectorAll('input[name="nicho"]:checked')].map(i => i.value);
-    const paises = [...document.querySelectorAll('input[name="pais"]:checked')].map(i => i.value);
-    const { error } = await sb.from("subscritores").update({ nichos, paises }).eq("user_id", user.id);
+    const { error } = await sb.from("subscritores").update({ nichos }).eq("user_id", user.id);
     if(error) return msg($("#msgPrefs"), "The preferences could not be saved right now.", "erro");
-    sub.nichos = nichos; sub.paises = paises; $("#hojePrefs").hidden = nichos.length > 0;
-    msg($("#msgPrefs"), "Preferences saved."); renderFeed();
+    sub.nichos = nichos; mostrarDica();
+    msg($("#msgPrefs"), "Preferences saved."); renderFeed(); if(feedRows.length) renderSemana(feedRows[0].dia);
   });
+  /* Discreet tip on Today while no niche is chosen; closing it is remembered in this browser only. */
+  const DICA_KEY = "pd_dica_nichos_fechada";
+  const dicaFechada = () => { try { return localStorage.getItem(DICA_KEY) === "1"; } catch { return false; } };
+  function mostrarDica(){ $("#hojePrefs").hidden = !!(sub?.nichos||[]).length || dicaFechada(); }
+  $("#hojePrefsFechar").addEventListener("click", () => { try { localStorage.setItem(DICA_KEY, "1"); } catch { /* private mode */ } $("#hojePrefs").hidden = true; });
 
   /* ── subscription ───────────────────────────────────────────────── */
   function renderConta(){
@@ -282,7 +348,7 @@
   async function fecharGuia(tab){
     $("#guia").hidden = true;
     if(sub && !sub.guia_visto){ sub.guia_visto = true; await sb.from("subscritores").update({ guia_visto: true }).eq("user_id", user.id); }
-    if(!(sub?.nichos||[]).length && tab !== "prefs") $("#hojePrefs").hidden = false;
+    if(tab !== "prefs") mostrarDica();
     go(tab);
   }
   $("#guiaOk").addEventListener("click", () => fecharGuia("prefs"));

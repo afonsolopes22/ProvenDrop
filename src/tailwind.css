@@ -77,6 +77,11 @@
   .msg.erro { @apply bg-bad-soft text-bad; }
   .msg.aviso { @apply bg-watch-soft text-watch; }
   .msg a { @apply font-semibold underline underline-offset-4; }
+  /* discreet tip (Today, while no niche is chosen): plain text, no coloured background, closable */
+  .tip { @apply mt-3 flex items-start justify-between gap-3 text-[13px] leading-snug text-ink-3; }
+  .tip[hidden] { display: none; }
+  .tip a { @apply font-semibold text-brand-dark underline underline-offset-4; }
+  .tip-x { @apply grid size-7 shrink-0 cursor-pointer place-items-center rounded-full text-[12px] text-ink-3 hover:bg-white hover:text-ink; }
   .empty { @apply rounded-xl border border-dashed border-line-2 px-5 py-10 text-center text-[14px] text-ink-2; }
   .card-deep .empty { @apply border-white/15 text-white/60; }
 
