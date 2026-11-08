@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Volta a enviar para o bucket privado "kits" (Supabase Storage) os zips já publicados,
 mantendo as mesmas chaves (feed_dia.zip_path e verdes.zip_path). Serve quando os kits
 são regenerados (ex.: fazer_zip.py v4, kits em inglês, 2026-11-08): a área de membros
