@@ -99,7 +99,11 @@
   /* S12: PKCE instead of implicit (no tokens in the URL fragment). */
   const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { flowType: "pkce", detectSessionInUrl: true } });
 
-  let user = null, sub = null, feedRows = [], feedTodos = [], verdes = null;
+  let user = null, sub = null, feedRows = [], feedTodos = [], verdes = null, retiradas = new Set();
+  /* Collections withdrawn after being sent (0007: feed_dia.retirada = true; the store was excluded, the verdict
+     dropped, the link died). Never shown and no kit offered. A store+collection whose newest sending is withdrawn
+     disappears everywhere: Today, Earlier this week, the Library and its verdes entry. */
+  const visivel = r => r.retirada !== true && !retiradas.has(chave(r));
 
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
@@ -184,9 +188,10 @@
     const { data, error } = await sb.from("feed_dia").select("*").order("dia", { ascending: false }).order("ordem");
     if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
     feedTodos = data || [];
+    retiradas = new Set(); { const vistas = new Set(); for(const r of feedTodos){ const k = chave(r); if(vistas.has(k)) continue; vistas.add(k); if(r.retirada === true) retiradas.add(k); } }
     if(!feedTodos.length){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
     const d = feedTodos[0].dia;
-    feedRows = feedTodos.filter(r => r.dia === d);
+    feedRows = feedTodos.filter(r => r.dia === d && visivel(r));
     const hoje = new Date().toISOString().slice(0,10);
     $("#hojeTitulo").textContent = d === hoje ? "Today’s collections" : "Collections for " + dia(d);
     $("#hojeSub").textContent = d === hoje ? dia(d) : "There is no list for today yet; this is the most recent one.";
@@ -213,7 +218,7 @@
   function renderSemana(d){
     const sec = $("#semana"), lim = parse(d); if(!lim){ sec.hidden = true; return; }
     const ini = new Date(lim.getTime() - 7 * 864e5), vistos = new Set(feedRows.map(chave)), rows = [];
-    for(const r of feedTodos){ if(r.dia >= d) continue; const dd = parse(r.dia); if(!dd || dd < ini) break; const k = chave(r); if(vistos.has(k)) continue; vistos.add(k); rows.push(r); }
+    for(const r of feedTodos){ if(r.dia >= d) continue; const dd = parse(r.dia); if(!dd || dd < ini) break; if(!visivel(r)) continue; const k = chave(r); if(vistos.has(k)) continue; vistos.add(k); rows.push(r); }
     sec.hidden = !rows.length; if(!rows.length) return;
     $("#semanaSub").textContent = rows.length + (rows.length === 1 ? " collection" : " collections") + " from the previous 7 days, each with its kit.";
     $("#semanaBox").innerHTML = tabela(porPreferencia(rows), { dia: true });
@@ -274,12 +279,13 @@
   /* Library rows: every collection we have sent (feed_dia, one row per store+collection, the newest sending wins),
      carrying the kit of the day it was sent, enriched with the tracking data of the approved archive (verdes: approval
      date, still advertising, last check). Approved collections never in a daily list (before the platform) come from
-     verdes alone, without a kit. Order: still advertising first, then score. */
+     verdes alone, without a kit. Withdrawn collections (retirada) are left out, verdes entry included.
+     Order: still advertising first, then score. */
   function biblioteca(){
     const porChave = new Map();
-    for(const r of feedTodos){ const k = chave(r); if(!porChave.has(k)) porChave.set(k, Object.assign({}, r, { enviado_em: r.dia })); }
+    for(const r of feedTodos){ if(!visivel(r)) continue; const k = chave(r); if(!porChave.has(k)) porChave.set(k, Object.assign({}, r, { enviado_em: r.dia })); }
     for(const v of verdes||[]){
-      const k = chave(v), f = porChave.get(k);
+      const k = chave(v), f = porChave.get(k); if(retiradas.has(k)) continue;
       if(f) Object.assign(f, { estado: "aprovada", data_aprovacao: v.data_aprovacao, ainda_a_anunciar: v.ainda_a_anunciar, anuncios_ultima_verificacao: v.anuncios_ultima_verificacao, ultima_verificacao: v.ultima_verificacao, scores_mercado: v.scores_mercado ?? f.scores_mercado, zip_path: f.zip_path || v.zip_path || null });
       else porChave.set(k, Object.assign({}, v, { estado: v.estado || "aprovada", enviado_em: v.data_aprovacao }));
     }
