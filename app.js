@@ -203,7 +203,9 @@
   /* Preferred niches first (the stored countries are no longer used to order or filter anything, 2026-11-08). */
   const porPreferencia = rows => { const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase())); return rows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem)); };
   /* High-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
-  const tabela = (rows, opts) => `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Meta ads">Meta</th><th class="text-right" title="Google ads">Google</th><th class="text-right">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(r => cartao(r, opts)).join("")}</tbody></table>`;
+  /* Meta and Google ads share one "Ads" column (two lines) so the row still fits at 1280 with real data
+     (seven-cell market strip, "Advertiser: …"), 2026-11-08. */
+  const tabela = (rows, opts) => `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Active ads: Meta and Google">Ads</th><th class="text-right" title="Days advertising">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(r => cartao(r, opts)).join("")}</tbody></table>`;
 
   function renderFeed(){
     const rows = porPreferencia(feedRows);
@@ -243,13 +245,12 @@
     const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
     return `<tr class="${pref ? "pref-first" : ""}">
       <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${opts?.dia ? `<span class="sub mt-2">Sent ${esc(diaMes(r.dia))}</span>` : ""}${chips(r, "mt-2")}</td>
-      <td data-l="Collection"><div class="min-w-[160px] max-w-[240px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
-      <td data-l="Niche"><div class="min-w-[124px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
-      <td class="n md:text-right" data-l="Meta ads">${fmt(metaAds(r))}</td>
-      <td class="n md:text-right" data-l="Google ads">${fmt(googleAds(r))}</td>
+      <td data-l="Collection"><div class="min-w-[160px] max-w-[220px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
+      <td data-l="Niche"><div class="min-w-[112px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
+      <td class="n md:text-right" data-l="Ads"><span class="block whitespace-nowrap"><span class="block">${fmt(metaAds(r))} <span class="text-[12px] font-medium text-white/60">Meta</span></span><span class="block">${fmt(googleAds(r))} <span class="text-[12px] font-medium text-white/60">Google</span></span></span></td>
       <td class="n md:text-right" data-l="Days">${dias(r)}</td>
       <td class="n md:text-right" data-l="Meta reach">${reach(r)}</td>
-      <td data-l="Markets"><div class="min-w-[132px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand: ${esc(r.trends_validados)} of 6 markets` : "Demand: no data"}</span></div></td>
+      <td data-l="Markets"><div class="min-w-[120px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand: ${esc(r.trends_validados)} of 6 markets` : "Demand: no data"}</span></div></td>
       <td class="n md:text-right" data-l="Score"><span class="text-[22px] font-extrabold leading-none tracking-tight text-white">${score(r.score)}</span><span class="sub">/ 10</span></td>
     </tr>`;
   }
