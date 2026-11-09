@@ -93,9 +93,11 @@
   const diasAgora = r => { const d = parse(r.data_inicio); if(!d) return null; const n = Math.floor((Date.now() - d.getTime()) / 864e5); return n >= 0 ? n : null; };
   const dias = r => { const n = diasAgora(r); return n != null ? fmt(n) : `${fmt(r.dias_ativo)}<small class="at">at analysis</small>`; };
 
-  /* Mirror of public.tem_acesso(): direct, not blocked, active or overdue for less than 7 days. */
+  /* Mirror of public.tem_acesso() (0009): not blocked, active or overdue for less than 7 days, and either a direct
+     subscription or a Click one that Click has confirmed (estado_click = 'validado'; 'pendente'/'recusado' wait outside). */
   const diasAtraso = s => s?.em_atraso_desde ? Math.floor((Date.now() - new Date(s.em_atraso_desde).getTime()) / 864e5) : null;
-  const temAcesso = s => !!s && s.origem === "direto" && !s.bloqueado_em && (s.estado === "ativo" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
+  const ehClick = s => s?.origem === "click";
+  const temAcesso = s => !!s && !s.bloqueado_em && (s.origem === "direto" || (ehClick(s) && s.estado_click === "validado")) && (s.estado === "ativo" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
 
   const views = ["vConfig","vLogin","vSemAcesso","vApp"];
   function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
@@ -111,6 +113,18 @@
      dropped, the link died). Never shown and no kit offered. A store+collection whose newest sending is withdrawn
      disappears everywhere: Today, Earlier this week, the Library and its verdes entry. */
   const visivel = r => r.retirada !== true && !retiradas.has(chave(r));
+
+  /* ── short links /c/<id> (R7) ───────────────────────────────────── */
+  /* provendrop.com/c/<id> (WhatsApp message) → 404.html → app.html?c=<id>. The id (feed_dia.id_curto, six characters
+     without 0/O/1/I) is read here once, kept in sessionStorage so it survives the sign-in round trip (and also goes
+     into the magic-link redirect), and removed from the URL at once; abrirColecao() consumes it after the feed loads. */
+  const C_RE = /^[A-HJ-NP-Z2-9]{6}$/, C_KEY = "pd_c";
+  let cPedido = null;
+  { const q = new URLSearchParams(location.search), c = String(q.get("c") || "").trim().toUpperCase();
+    if(C_RE.test(c)){ cPedido = c; try { sessionStorage.setItem(C_KEY, c); } catch { /* private mode */ } }
+    else { try { const s = sessionStorage.getItem(C_KEY); if(C_RE.test(s || "")) cPedido = s; } catch { /* private mode */ } }
+    if(q.has("c")){ q.delete("c"); const qs = q.toString(); history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash); } }
+  const esquecerC = () => { cPedido = null; try { sessionStorage.removeItem(C_KEY); } catch { /* private mode */ } };
 
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
@@ -135,7 +149,8 @@
     const email = $("#email").value.trim().toLowerCase(), m = $("#msgLogin"), b = $("#btnLogin");
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg(m, "Enter a valid e-mail address.", "erro");
     b.disabled = true; msg(m, "Sending…");
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false } });
+    /* A pending /c/<id> rides along in the redirect so the magic link comes back to that collection. */
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname + (cPedido ? "?c=" + cPedido : ""), shouldCreateUser: false } });
     b.disabled = false;
     /* S11: neutral answer, whether or not the e-mail has an account. */
     if(error && !/signup|not allowed|not found|user/i.test(error.message)) return msg(m, "The link could not be sent right now. Please try again in a minute.", "erro");
@@ -143,10 +158,13 @@
   });
   $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.hash = ""; location.reload(); });
 
+  /* Both paths may fire for the same session (INITIAL_SESSION and getSession); the area is entered once per user
+     (2026-11-09: a second entrar() re-rendered the tables and lost the /c/<id> highlight). */
+  const mesmoUser = session => !!session?.user?.id && session.user.id === user?.id;
   sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
-  entrarPorTokenHash().then(ok => { if(!ok) sb.auth.getSession().then(({ data }) => entrar(data.session)); });
+  entrarPorTokenHash().then(ok => { if(!ok) sb.auth.getSession().then(({ data }) => { if(!mesmoUser(data.session)) entrar(data.session); }); });
 
-  const CAMPOS = "email,origem,estado,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em";
+  const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em";
   async function entrar(session){
     user = session?.user || null;
     if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
@@ -155,23 +173,40 @@
     sub = error ? null : data;
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
-    renderConta(); renderPrefsForm(); renderBarras(); renderAvisos();
-    if(!sub.guia_visto) abrirGuia(); else mostrarDica();
-    carregarHoje();
+    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick();
+    /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
+    if(!sub.guia_visto && !cPedido) abrirGuia(); else mostrarDica();
+    carregarHoje().then(ok => { if(ok) abrirColecao(); });
   }
 
   function semAcesso(){
-    const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal"), r = $("#semRegresso"), s = $("#semSubscrever");
-    r.hidden = true; s.hidden = false;
+    const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal"), r = $("#semRegresso"), s = $("#semSubscrever"), pl = $("#semPlataforma");
+    r.hidden = true; s.hidden = false; pl.hidden = true;
+    let portal = !!PORTAL && !!sub;
     if(!sub){ t.textContent = "No active subscription"; p.textContent = "This e-mail has an account but is not linked to an active ProvenDrop subscription. If you have just paid, wait a minute and reload the page."; }
     else if(sub.bloqueado_em){ t.textContent = "Access suspended"; p.textContent = "Your access was suspended because of a payment dispute. Reply to any ProvenDrop e-mail and we sort it out with you."; s.hidden = true; }
+    /* Click plan (0009): Click still has to confirm the person is a client; a refusal was refunded and cancelled by us. */
+    else if(ehClick(sub) && sub.estado_click === "recusado"){ t.textContent = "Your Click plan was not confirmed"; p.textContent = "Click could not confirm you as a client, so your payment was refunded in full and the subscription cancelled. You can still join ProvenDrop directly."; s.hidden = true; pl.hidden = false; portal = false; }
+    else if(ehClick(sub) && sub.estado_click === "pendente" && (sub.estado === "ativo" || sub.estado === "em_atraso")){ t.textContent = "Your Click access is being confirmed"; p.textContent = "Usually the same day. You'll get an e-mail as soon as Click confirms you're a client."; s.hidden = true; }
     else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
     else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
     else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
-    else { t.textContent = "No access to the member area"; p.textContent = "Click customers receive the collections in the Click WhatsApp group, not in this area."; }
-    g.hidden = !PORTAL || !sub; if(PORTAL) g.href = PORTAL;
+    else { t.textContent = "No access to the member area"; p.textContent = "This account is not linked to an active ProvenDrop subscription right now. If you have just paid, wait a minute and reload the page."; }
+    g.hidden = !portal; if(PORTAL) g.href = PORTAL;
     show("vSemAcesso");
   }
+
+  /* Which plan this member is on (design §5): under the Today title and in Subscription. */
+  const PLANO = { click: "Plan: ProvenDrop × Click — member area + daily list in the Click WhatsApp group", direto: "Plan: ProvenDrop Platform — member area + daily e-mail" };
+  const planoTexto = () => ehClick(sub) ? PLANO.click : PLANO.direto;
+  function renderPlano(){ $("#plano").textContent = planoTexto(); }
+
+  /* First visit of a Click member: a closable box saying the area has everything the WhatsApp group has, and more.
+     Closing it is remembered in this browser only (localStorage, like the niches tip). */
+  const CAIXA_CLICK_KEY = "pd_caixa_click_fechada";
+  const caixaClickFechada = () => { try { return localStorage.getItem(CAIXA_CLICK_KEY) === "1"; } catch { return false; } };
+  function renderCaixaClick(){ $("#caixaClick").hidden = !ehClick(sub) || caixaClickFechada(); }
+  $("#caixaClickFechar").addEventListener("click", () => { try { localStorage.setItem(CAIXA_CLICK_KEY, "1"); } catch { /* private mode */ } $("#caixaClick").hidden = true; });
 
   /* Banners inside the area: overdue payment (days left) and scheduled end (B4). */
   function renderAvisos(){
@@ -192,16 +227,17 @@
   document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
 
   /* ── today ──────────────────────────────────────────────────────── */
+  /* Resolves true when the feed was loaded (even if empty), false when the query failed. */
   async function carregarHoje(){
     const feed = $("#feed");
     feed.innerHTML = '<div class="empty">Loading…</div>';
     /* One query serves the latest list, "Earlier this week" and the Library: every sending, newest first
        (PostgREST returns at most 1000 rows, i.e. the most recent ones; enough for many months of lists). */
     const { data, error } = await sb.from("feed_dia").select("*").order("dia", { ascending: false }).order("ordem");
-    if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return; }
+    if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return false; }
     feedTodos = data || [];
     retiradas = new Set(); { const vistas = new Set(); for(const r of feedTodos){ const k = chave(r); if(vistas.has(k)) continue; vistas.add(k); if(r.retirada === true) retiradas.add(k); } }
-    if(!feedTodos.length){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return; }
+    if(!feedTodos.length){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return true; }
     const d = feedTodos[0].dia;
     feedRows = feedTodos.filter(r => r.dia === d && visivel(r));
     const hoje = new Date().toISOString().slice(0,10);
@@ -210,6 +246,31 @@
     $("#hojeHora").textContent = HORA ? "New collections every day at " + HORA : "";
     renderFeed(); renderSemana(d);
     if(verdes) renderArquivo();
+    return true;
+  }
+
+  /* Row attribute for /c/<id>: lets abrirColecao() find the row of a collection in any of the three tables. */
+  const attrC = r => C_RE.test(String(r.id_curto || "")) ? ` data-c="${esc(r.id_curto)}"` : "";
+  /* Opens the collection a /c/<id> link asked for (R7), once the feed is in: the newest sending with that id_curto
+     that is still visible (not withdrawn). Today when it sits in the day's list or in "Earlier this week", else the
+     Library ("Show all" is ticked if the niche filter would hide it). Unknown id or withdrawn only → Library with a
+     notice. The id is forgotten either way. */
+  async function abrirColecao(){
+    const c = cPedido; if(!c) return; esquecerC();
+    const linha = feedTodos.find(r => String(r.id_curto || "").toUpperCase() === c && visivel(r));
+    const sel = `tr[data-c="${c}"]`;
+    if(!linha){ go("arquivo"); msg($("#msgArquivo"), "This collection is no longer available."); return; }
+    let tr = $("#tHoje " + sel);
+    if(tr) go("hoje");
+    else {
+      go("arquivo");
+      if(!verdes) await carregarArquivo();
+      tr = $("#arqBox " + sel);
+      if(!tr && !$("#fTodosWrap").hidden && !$("#fTodos").checked){ $("#fTodos").checked = true; renderArquivo(); tr = $("#arqBox " + sel); }
+      if(!tr) return;
+    }
+    tr.classList.add("hit");
+    requestAnimationFrame(() => tr.scrollIntoView({ block: "center", behavior: "instant" }));
   }
 
   /* Preferred niches first (the stored countries are no longer used to order or filter anything, 2026-11-08). */
@@ -255,7 +316,7 @@
     const kit = temKit(r) ? botaoKit(r, `Download Launch Kit${ok ? "" : " (under observation)"}`)
                           : `<span class="nota text-[12px] font-medium text-white/50">Kit being prepared</span>`;
     const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
-    return `<tr class="${pref ? "pref-first" : ""}">
+    return `<tr class="${pref ? "pref-first" : ""}"${attrC(r)}>
       <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${opts?.dia ? `<span class="sub mt-2">Sent ${esc(diaMes(r.dia))}</span>` : ""}${chips(r, "mt-2")}</td>
       <td data-l="Collection"><div class="min-w-[160px] max-w-[220px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
       <td data-l="Niche"><div class="min-w-[112px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
@@ -278,16 +339,22 @@
   });
 
   /* ── library (was "Archive" until 2026-11-08) ───────────────────── */
-  async function carregarArquivo(){
-    const box = $("#arqBox"); box.innerHTML = '<div class="empty">Loading…</div>';
-    const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
-    if(error){ box.innerHTML = '<div class="empty">The library could not be loaded right now.</div>'; return; }
-    verdes = data || [];
-    const rows = biblioteca();
-    const nichos = [...new Set(rows.map(r => r.nicho).filter(Boolean))], paises = [...new Set(rows.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))].sort();
-    $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
-    $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(pais(p))}</option>`).join("");
-    renderArquivo();
+  /* One load at a time (go("arquivo") and abrirColecao() may both ask for it); a failed load can be retried. */
+  let arquivoACarregar = null;
+  function carregarArquivo(){
+    if(arquivoACarregar) return arquivoACarregar;
+    arquivoACarregar = (async () => {
+      const box = $("#arqBox"); box.innerHTML = '<div class="empty">Loading…</div>';
+      const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
+      if(error){ box.innerHTML = '<div class="empty">The library could not be loaded right now.</div>'; return; }
+      verdes = data || [];
+      const rows = biblioteca();
+      const nichos = [...new Set(rows.map(r => r.nicho).filter(Boolean))], paises = [...new Set(rows.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))].sort();
+      $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
+      $("#fPais").innerHTML = '<option value="">All</option>' + paises.map(p => `<option value="${esc(p)}">${esc(pais(p))}</option>`).join("");
+      renderArquivo();
+    })().finally(() => { arquivoACarregar = null; });
+    return arquivoACarregar;
   }
   /* Library rows: every collection we have sent (feed_dia, one row per store+collection, the newest sending wins),
      carrying the kit of the day it was sent, enriched with the tracking data of the approved archive (verdes: approval
@@ -325,7 +392,7 @@
       const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
       const kit = temKit(r) ? botaoKit(r, "Download Launch Kit") : `<span class="sub">No kit for this one</span>`;
       const ainda = r.ainda_a_anunciar === true ? `<span class="sub mt-2 font-semibold !text-ok">Still advertising</span>` : r.ainda_a_anunciar === false ? `<span class="sub mt-2">No longer advertising</span>` : "";
-      return `<tr>
+      return `<tr${attrC(r)}>
         <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>
         <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ainda}${chips(r, "mt-2")}</span></td>
         <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}<span class="mt-2.5 block">${kit}</span></span></td>
@@ -391,7 +458,10 @@
     $("#contaEstado").textContent = estado;
     $("#contaDesde").textContent = dia(sub.criado_em) || "—";
     const g = $("#contaPortal"); g.hidden = !PORTAL; if(PORTAL) g.href = PORTAL;
+    $("#contaPlano").textContent = planoTexto();
     $("#contaNota").textContent = PORTAL ? "In “Manage subscription” you change your card, see your invoices and cancel. It asks for your e-mail and sends you a link to the portal." : "To change your card or cancel, reply to the welcome e-mail.";
+    /* Click plan: the group is Click's; cancelling here ends both. */
+    $("#contaClick").hidden = !ehClick(sub);
   }
 
   /* ── guide ──────────────────────────────────────────────────────── */

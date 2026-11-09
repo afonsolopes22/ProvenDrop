@@ -95,6 +95,8 @@
             <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
             <a class="btn btn-go" id="semRegresso" href="#" target="_blank" rel="noopener" hidden>Subscribe again (monthly fee only)</a>
             <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
+            <!-- Click plan refused (0009): points to the plan anyone can take. -->
+            <a class="btn btn-go" id="semPlataforma" href="./#join" hidden>See the ProvenDrop Platform plan</a>
           </div>
         </div>
       </section>
@@ -106,7 +108,11 @@
             <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="hojeTitulo">Today’s collections</h1><p class="mt-1 text-[14px] text-ink-2" id="hojeSub"></p></div>
             <p class="rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink-2 empty:hidden" id="hojeHora"></p>
           </div>
+          <!-- Which plan (app.js renderPlano): "Plan: ProvenDrop × Click — …" or "Plan: ProvenDrop Platform — …". -->
+          <p class="mt-3 inline-flex max-w-full items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-[12px] font-semibold leading-snug text-brand-dark empty:hidden" id="plano"></p>
           <div class="msg aviso" id="aviso" hidden></div>
+          <!-- First visit of a Click member (app.js renderCaixaClick): closable, remembered in this browser. -->
+          <div class="msg" id="caixaClick" hidden><div class="flex items-start justify-between gap-3"><span>Everything you get on WhatsApp is here too — plus all past collections, the launch kits and filters.</span><button class="tip-x !text-brand-dark hover:!bg-white/70" type="button" id="caixaClickFechar" aria-label="Close this message">✕</button></div></div>
           <!-- Niches bar: "Your niches: … · Edit" opens the choice right here (app.js renderBarras). -->
           <div class="mt-4" id="barHoje" data-barra></div>
           <!-- Discreet tip, only while no niche is chosen; closable (remembered in this browser). -->
@@ -136,6 +142,8 @@
 
         <div id="tArquivo" role="tabpanel" hidden>
           <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Library</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">All collections we have sent, with their kits. Where each one advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
+          <!-- Notice for a /c/<id> link whose collection is unknown or withdrawn (app.js abrirColecao). -->
+          <div class="msg" id="msgArquivo" hidden></div>
           <!-- Niches bar (same as Today): your niches come first; "Show all" also lists the other niches. -->
           <div class="mt-4" id="barLib" data-barra></div>
           <div class="card mt-4 p-5 md:p-6">
@@ -171,11 +179,14 @@
               <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Member since</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaDesde"></dd></div>
             </dl>
             <div class="card mt-3 p-5 md:p-6">
+              <p class="mb-4 text-[14px] font-semibold text-ink" id="contaPlano"></p>
               <div class="flex flex-wrap gap-2.5">
                 <a class="btn btn-go" id="contaPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
                 <button class="btn btn-line" type="button" id="btnGuia">See the 1-minute guide</button>
               </div>
               <p class="mt-4 text-[13px] leading-relaxed text-ink-2" id="contaNota"></p>
+              <!-- Click plan only (app.js renderConta). -->
+              <p class="mt-2 text-[13px] leading-relaxed text-ink-2" id="contaClick" hidden>The WhatsApp group is managed by Click. Your access ends when you cancel.</p>
             </div>
           </div>
         </div>
