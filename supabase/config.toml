@@ -16,3 +16,12 @@ verify_jwt = false
 # Chamada pelo browser (bem-vindo.html) sem sessão: valida a sessão de checkout no Stripe e tem rate-limit por IP.
 [functions.corrigir-email]
 verify_jwt = false
+
+# Chamada por admin.html com o JWT do utilizador: a função valida-o ela própria e só aceita ADMIN_EMAIL.
+[functions.admin-click]
+verify_jwt = false
+
+# Chamada pelo browser (bem-vindo-click.html) sem sessão: devolve só a loja indicada no checkout Click
+# (para a mensagem de WhatsApp), a partir do ?session_id=, validado no Stripe; nunca e-mail, nome ou telefone.
+[functions.loja-click]
+verify_jwt = false
