@@ -18,14 +18,22 @@
 //
 // Acesso: subscritores.origem/estado são derivados de subscricoes pela função
 // SQL recalcular_subscritor (a melhor direto manda; um evento click nunca
-// retira acesso a uma direto — C2/S3). tem_acesso() = direto, não bloqueado,
-// ativo ou em_atraso há menos de 7 dias (M1).
+// retira acesso a uma direto — C2/S3). tem_acesso() (0009) = não bloqueado,
+// e (direto, ou click com estado_click = 'validado'), e ativo ou em_atraso há
+// menos de 7 dias (M1).
 //
-// Boas-vindas (A3): só com acesso, com reserva atómica (reservar_boas_vindas),
-// magic link por token_hash (não é consumido por scanners de e-mail), marcadas
-// só depois de o Resend aceitar. Varrimento ?varrer_boas_vindas=1 (pg_cron,
-// 15 em 15 min) repete as que faltam, até 5 tentativas, depois alerta.
-// E-mail de regresso quando cancelado → ativo.
+// Plano Click (0008/0009): cada checkout Click grava codigo_compra, telefone,
+// nome, loja e estado_click = 'pendente' (só se ainda for null: uma renovação
+// ou um evento repetido nunca volta a pôr pendente quem já está validado ou
+// recusado) e alerta o Afonso ("New Click subscription"). A validação é feita
+// em admin.html (admin-click). Quando uma subscrição Click passa a cancelado,
+// alerta "Click subscription cancelled" para a Click tirar a pessoa do grupo.
+//
+// Boas-vindas (A3): só com acesso (direto ou Click validado), com reserva
+// atómica (reservar_boas_vindas), magic link por token_hash (não é consumido
+// por scanners de e-mail), marcadas só depois de o Resend aceitar. Varrimento
+// ?varrer_boas_vindas=1 (pg_cron, 15 em 15 min) repete as que faltam, até 5
+// tentativas, depois alerta. E-mail de regresso quando cancelado → ativo.
 //
 // Modos manuais (x-cron-secret, comparação em tempo constante — S5):
 //   POST …?reenviar_boas_vindas=<email>   reenvia a quem tem acesso (B3)
@@ -53,6 +61,7 @@ import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 import { codigoDeCompra } from "../_shared/codigo.ts";
+import { lojaDaSessao } from "../_shared/loja.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -87,21 +96,25 @@ function horaTexto(): string {
 const HORA = horaTexto();
 
 type Estado = "ativo" | "em_atraso" | "incompleto" | "cancelado";
+type EstadoClick = "pendente" | "validado" | "recusado";
 
 interface Subscritor {
   email: string; origem: Origem; estado: Estado; user_id: string | null;
   boas_vindas_em: string | null; boas_vindas_tentativas: number; regresso_em: string | null;
   bloqueado_em: string | null; em_atraso_desde: string | null; acesso_fim: string | null;
+  estado_click: EstadoClick | null; loja: string | null;
 }
-const CAMPOS = "email,origem,estado,user_id,boas_vindas_em,boas_vindas_tentativas,regresso_em,bloqueado_em,em_atraso_desde,acesso_fim";
+const CAMPOS = "email,origem,estado,user_id,boas_vindas_em,boas_vindas_tentativas,regresso_em,bloqueado_em,em_atraso_desde,acesso_fim,estado_click,loja";
 
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 const erroInterno = (status = 500) => json({ erro: "erro interno" }, status);
 
-/** Espelho de public.tem_acesso(). */
+/** Espelho de public.tem_acesso() (0009): não bloqueado; direto, ou click validado pela Click; ativo ou em atraso < 7 dias. */
 function temAcesso(s: Subscritor | null | undefined): boolean {
-  if (!s || s.origem !== "direto" || s.bloqueado_em) return false;
+  if (!s || s.bloqueado_em) return false;
+  const porta = s.origem === "direto" || (s.origem === "click" && s.estado_click === "validado");
+  if (!porta) return false;
   if (s.estado === "ativo") return true;
   if (s.estado === "em_atraso" && s.em_atraso_desde) {
     return Date.now() - new Date(s.em_atraso_desde).getTime() < TOLERANCIA_DIAS * 864e5;
@@ -249,7 +262,7 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
   const cliente = typeof sub.customer === "string" ? null : sub.customer;
   const emailStripe = cliente && !cliente.deleted ? (cliente.email ?? "").trim().toLowerCase() : "";
 
-  const existente = await admin.from("subscricoes").select("email,origem,em_atraso_desde").eq("stripe_subscription_id", sub.id).maybeSingle();
+  const existente = await admin.from("subscricoes").select("email,origem,estado,em_atraso_desde").eq("stripe_subscription_id", sub.id).maybeSingle();
   if (existente.error) throw existente.error;
 
   const email = emailStripe || existente.data?.email || "";
@@ -299,22 +312,41 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
     }
   }
 
-  if (depois.origem !== "direto") return resultado;
+  // Subscrição Click que passa a cancelado (customer.subscription.deleted ou qualquer sincronização
+  // que a encontre cancelada): o Afonso avisa a Click para tirar a pessoa do grupo. Direto: nada.
+  if (origem === "click" && estado === "cancelado" && existente.data?.estado !== "cancelado") {
+    resultado.alerta_cancelamento_click = await alertarCancelamentoClick(email);
+  }
 
-  if (temAcesso(depois)) {
-    // Login só para quem tem acesso (M3: incomplete não cria utilizador nem recebe e-mail).
-    if (!depois.user_id) {
-      const uidAuth = await garantirUtilizador(email, null);
-      if (uidAuth) { await admin.from("subscritores").update({ user_id: uidAuth }).eq("email", email); depois.user_id = uidAuth; }
-    }
-    if (!depois.boas_vindas_em) {
-      resultado.boas_vindas = await tentarBoasVindas(email, "boas_vindas") ? "enviadas" : "por_enviar";
-    } else if (antes.data && antes.data.estado === "cancelado" && depois.estado === "ativo") {
-      // Regresso: já tinha sido membro, voltou a pagar.
-      resultado.regresso = await tentarBoasVindas(email, "regresso") ? "enviado" : "por_enviar";
-    }
+  // Sem acesso (Click pendente/recusado, incompleto, cancelado, bloqueado): nem login nem e-mail.
+  // M3: incomplete não cria utilizador nem recebe e-mail. Um Click validado que (re)ativa passa daqui.
+  if (!temAcesso(depois)) return resultado;
+
+  if (!depois.user_id) {
+    const uidAuth = await garantirUtilizador(email, null);
+    if (uidAuth) { await admin.from("subscritores").update({ user_id: uidAuth }).eq("email", email); depois.user_id = uidAuth; }
+  }
+  if (!depois.boas_vindas_em) {
+    resultado.boas_vindas = await tentarBoasVindas(email, "boas_vindas") ? "enviadas" : "por_enviar";
+  } else if (antes.data && antes.data.estado === "cancelado" && depois.estado === "ativo") {
+    // Regresso: já tinha sido membro, voltou a pagar.
+    resultado.regresso = await tentarBoasVindas(email, "regresso") ? "enviado" : "por_enviar";
   }
   return resultado;
+}
+
+/**
+ * Alerta "Click subscription cancelled · <codigo>" ao ALERT_EMAIL (nunca à Click): com o que a
+ * Click precisa para encontrar a pessoa no grupo. Devolve true se o e-mail foi aceite.
+ */
+async function alertarCancelamentoClick(email: string): Promise<boolean> {
+  const q = await admin.from("subscritores").select("nome,telefone,loja,codigo_compra").eq("email", email).maybeSingle();
+  if (q.error) throw q.error;
+  const s = (q.data ?? {}) as { nome?: string | null; telefone?: string | null; loja?: string | null; codigo_compra?: string | null };
+  return await alertar(`Click subscription cancelled · ${s.codigo_compra ?? "—"}`, [
+    `Name: ${s.nome ?? "—"}`, `Phone: ${s.telefone ?? "—"}`, `Store: ${s.loja ?? "—"}`, `E-mail: ${email}`,
+    "Tell Click to remove them from the WhatsApp group.",
+  ]);
 }
 
 async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
@@ -328,12 +360,15 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
 }
 
 /**
- * Plano Click (2026-11-08): a pessoa é adicionada ao grupo de WhatsApp à mão. Guarda em
- * subscritores o código "PD-XXXXXX" (o mesmo que bem-vindo-click.html mostra e põe na
- * mensagem de WhatsApp), o telefone e o nome do checkout, e envia "New Click subscription"
- * ao Afonso (ALERT_EMAIL, por alertar()). Se o e-mail falhar (Resend ainda sem domínio),
- * a linha fica na mesma: consulta-se com
- *   select email, nome, telefone, codigo_compra from subscritores where origem = 'click'.
+ * Plano Click (2026-11-08): a Click confirma que a pessoa é cliente e põe-na no grupo de
+ * WhatsApp; o Afonso valida ou recusa em admin.html. Guarda em subscritores o código
+ * "PD-XXXXXX" (o mesmo que bem-vindo-click.html mostra e põe na mensagem de WhatsApp), o
+ * telefone, o nome e a loja do checkout, e estado_click = 'pendente' SÓ se a linha ainda
+ * não tiver estado_click (quem já está validado ou recusado nunca volta a pendente por um
+ * evento repetido ou um novo checkout). Envia "New Click subscription" ao Afonso
+ * (ALERT_EMAIL, por alertar()). Se o e-mail falhar (Resend ainda sem domínio), a linha
+ * fica na mesma: consulta-se com
+ *   select email, nome, telefone, loja, codigo_compra, estado_click from subscritores where origem = 'click'.
  */
 async function registarCompraClick(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
   const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
@@ -341,13 +376,19 @@ async function registarCompraClick(s: Stripe.Checkout.Session): Promise<Record<s
   const codigo = await codigoDeCompra(s.id);
   const telefone = (s.customer_details?.phone ?? "").trim() || null;
   const nome = (s.customer_details?.name ?? "").trim() || null;
-  const up = await admin.from("subscritores").update({ codigo_compra: codigo, telefone, nome }).eq("email", email);
+  const loja = lojaDaSessao(s);
+  const up = await admin.from("subscritores").update({ codigo_compra: codigo, telefone, nome, loja }).eq("email", email);
   if (up.error) throw up.error;
+  // Condição na própria escrita (is null): nunca repõe 'pendente' em quem já está validado/recusado.
+  const pend = await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", email).is("estado_click", null).select("email");
+  if (pend.error) throw pend.error;
+  const pendente = (pend.data?.length ?? 0) > 0;
   const enviado = await alertar(`New Click subscription · ${codigo}`, [
-    `Name: ${nome ?? "—"}`, `Phone: ${telefone ?? "— (not collected at checkout)"}`, `E-mail: ${email}`, `Purchase code: ${codigo}`,
-    `Checkout session: ${s.id}`, "The customer's WhatsApp message carries the same code: add them to the group once it arrives.",
+    `Name: ${nome ?? "—"}`, `Phone: ${telefone ?? "— (not collected at checkout)"}`, `E-mail: ${email}`, `Store: ${loja ?? "—"}`,
+    `Purchase code: ${codigo}`, `Checkout session: ${s.id}`,
+    `Confirm the payment, then tell Click: "${codigo} paid". Validate or reject at provendrop.com/admin.html.`,
   ]);
-  return { click: { codigo, telefone: !!telefone, email_enviado: enviado } };
+  return { click: { codigo, telefone: !!telefone, loja: !!loja, pendente, email_enviado: enviado } };
 }
 
 // ───────────────────────────────────────────────────────────────────────
@@ -475,33 +516,41 @@ async function tentarBoasVindas(email: string, tipo: "boas_vindas" | "regresso")
   }
 }
 
-/** pg_cron (15 em 15 min) e modo manual: repete as boas-vindas que faltam. */
+/**
+ * pg_cron (15 em 15 min) e modo manual: repete as boas-vindas que faltam a quem tem acesso
+ * (direto, ou Click validado). O SQL filtra o que PostgREST filtra (sem envio, não bloqueado,
+ * ativo/em atraso, tentativa antiga); a regra completa de acesso (origem + estado_click +
+ * tolerância de 7 dias) aplica-se em memória com temAcesso, o espelho de tem_acesso().
+ */
 async function varrerBoasVindas(): Promise<Record<string, unknown>> {
   const limite = new Date(Date.now() - RESERVA_MIN * 60e3).toISOString();
-  const q = await admin.from("subscritores").select("email,boas_vindas_tentativas")
-    .eq("origem", "direto").is("boas_vindas_em", null).is("bloqueado_em", null)
+  const q = await admin.from("subscritores").select(CAMPOS)
+    .is("boas_vindas_em", null).is("bloqueado_em", null)
     .in("estado", ["ativo", "em_atraso"])
     .lte("boas_vindas_tentativas", MAX_TENTATIVAS)
     .or(`boas_vindas_tentativa_em.is.null,boas_vindas_tentativa_em.lt.${limite}`)
-    .limit(50);
+    .limit(100);
   if (q.error) throw q.error;
+  const candidatos = ((q.data ?? []) as Subscritor[]).filter(temAcesso).slice(0, 50);
   let enviadas = 0, falhadas = 0, esgotadas = 0;
-  for (const s of q.data ?? []) {
+  for (const s of candidatos) {
     if ((s.boas_vindas_tentativas ?? 0) >= MAX_TENTATIVAS) { esgotadas++; continue; }
     (await tentarBoasVindas(s.email, "boas_vindas")) ? enviadas++ : falhadas++;
   }
-  return { ok: true, candidatos: q.data?.length ?? 0, enviadas, falhadas, esgotadas };
+  return { ok: true, candidatos: candidatos.length, enviadas, falhadas, esgotadas };
 }
 
-/** B3: só reenvia a quem tem acesso; mensagem própria para os outros estados. */
+/** B3: só reenvia a quem tem acesso (direto, ou Click validado); 409 com o motivo para os outros. */
 async function reenviarBoasVindas(email: string): Promise<Response> {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ erro: "e-mail inválido" }, 400);
   const q = await admin.from("subscritores").select(CAMPOS).eq("email", email).maybeSingle();
   if (q.error) throw q.error;
   if (!q.data) return json({ erro: "subscritor não encontrado" }, 404);
   const s = q.data as Subscritor;
-  if (s.origem !== "direto") return json({ erro: "subscritor da porta click: não tem área nem boas-vindas" }, 409);
-  if (!temAcesso(s)) return json({ erro: `sem acesso (estado ${s.estado}${s.bloqueado_em ? ", bloqueado" : ""}): nada a reenviar` }, 409);
+  if (!temAcesso(s)) {
+    const click = s.origem === "click" ? `, click ${s.estado_click ?? "sem estado_click"}` : "";
+    return json({ erro: `sem acesso (estado ${s.estado}${click}${s.bloqueado_em ? ", bloqueado" : ""}): nada a reenviar` }, 409);
+  }
   // Reenvio forçado: limpa a reserva e a marca para a reserva voltar a passar.
   const limpar = await admin.from("subscritores").update({ boas_vindas_em: null, boas_vindas_tentativa_em: null }).eq("email", email);
   if (limpar.error) throw limpar.error;
@@ -510,7 +559,7 @@ async function reenviarBoasVindas(email: string): Promise<Response> {
 }
 
 // ───────────────────────────────────────────────────────────────────────
-// E-mails (só porta "direto")
+// E-mails (quem tem acesso: direto, ou Click validado)
 
 async function enviarBoasVindas(email: string, link: string) {
   const texto =
