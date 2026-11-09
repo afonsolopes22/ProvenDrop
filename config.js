@@ -28,11 +28,12 @@ window.PROVENDROP_CONFIG = {
   /* Stripe Payment Link of the CLICK plan (monthly fee only, no joining fee;
      metadata origem=click; redirects to bem-vindo-click.html?session_id=…, where
      the WhatsApp button carries the purchase code). Shown on the site, to
-     everyone, in the "Are you a Click customer?" cards ("Subscribe with Click").
-     Empty = those buttons disabled, like Subscribe.
-     TEMPORARILY EMPTY (2026-11-06), same reason as STRIPE_LINK_DIRECT:
-     "https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01" */
-  STRIPE_LINK_CLICK: "",
+     everyone, in the "ProvenDrop × Click" plan card and in the "Click Dynamics
+     client?" box ("Subscribe — ProvenDrop × Click"). Empty = those buttons
+     disabled, like Subscribe.
+     ACTIVE since 2026-11-08 by decision of the Click plan
+     (docs/superpowers/plans/2026-11-08-click-plan.md, task R6). */
+  STRIPE_LINK_CLICK: "https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01",
 
   /* Stripe Payment Link for RETURNING members (monthly fee only, no joining fee),
      shown in the member area to former members. No live link exists yet

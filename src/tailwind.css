@@ -8,9 +8,12 @@
 @source "../index.html";
 @source "../app.html";
 @source "../app.js";
+@source "../admin.html";
+@source "../admin.js";
 @source "../terms.html";
 @source "../privacy.html";
 @source "../refunds.html";
+@source "../404.html";
 
 @theme {
   --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -124,6 +127,10 @@
   .dt-dark .sub { @apply text-white/50; }
   .dt-dark a { @apply text-emerald-300 decoration-emerald-300/30 hover:decoration-emerald-300; }
   .dt .pref-first > td:first-child { @apply border-l-[3px] border-l-brand pl-3; }
+  /* row opened from a /c/<id> link (app.js abrirColecao): teal ring on the row */
+  .dt tr.hit { @apply rounded-xl outline-2 outline-offset-2 outline-brand; }
+  .dt tr.hit > td { @apply bg-brand-soft; }
+  .dt-dark tr.hit > td { @apply bg-brand/20; }
   @media (max-width: 767px) {
     .dt thead { @apply sr-only; }
     .dt, .dt tbody, .dt tr, .dt td { @apply block w-full; }
