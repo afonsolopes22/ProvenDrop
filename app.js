@@ -6,10 +6,11 @@
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const url = v => /^https?:\/\//i.test(String(v||"")) ? String(v) : "";
-  const MARKETS = ["IT","ES","FR","DE","GB","US"];
-  /* The six markets plus the countries also tracked by the routine (NL/AT/CH/HU): always shown by name, never "No data". */
-  const PAIS = {IT:"Italy",ES:"Spain",FR:"France",DE:"Germany",GB:"United Kingdom",US:"United States",NL:"Netherlands",AT:"Austria",CH:"Switzerland",HU:"Hungary"};
-  const EU = new Set(["IT","ES","FR","DE","NL","AT","HU"]);   /* countries covered by Meta's EU ad data (GB/US/CH are not) */
+  /* Markets strip (2026-11-08): eight markets, in this order. */
+  const MARKETS = ["US","CA","GB","DE","DK","FR","IT","ES"];
+  /* The eight markets plus the countries also tracked by the routine (NL/AT/CH/HU): always shown by name, never "No data". */
+  const PAIS = {US:"United States",CA:"Canada",GB:"United Kingdom",DE:"Germany",DK:"Denmark",FR:"France",IT:"Italy",ES:"Spain",NL:"Netherlands",AT:"Austria",CH:"Switzerland",HU:"Hungary"};
+  const EU = new Set(["IT","ES","FR","DE","DK","NL","AT","HU"]);   /* countries covered by Meta's EU ad data (US/CA/GB/CH are not) */
   const pais = c => { const k = String(c||"").trim().toUpperCase(); return k ? (PAIS[k] || k) : ""; };
   /* Niche values are stored as the Portuguese labels used by the research routine.
      Selectable niches (preferences): three since 2026-11-04 (jewellery left). Labels keep jewellery for older rows in the archive. */
@@ -40,7 +41,7 @@
      alcance_eu > 0, never a false "0". Google-only store → "Google ads · reach not public". Meta ads without
      EU reach (ads only in the UK/US/CH) → "Not public (UK)" after the strongest market. */
   const adCountries = r => (Array.isArray(r.paises_ads) && r.paises_ads.length ? r.paises_ads : [r.mercado_destaque]).map(c => String(c||"").toUpperCase()).filter(Boolean);
-  const MK_CURTO = { GB: "UK", US: "US", CH: "CH" };
+  const MK_CURTO = { GB: "UK", US: "US", CA: "CA", CH: "CH" };
   const REACH_TIP = 'title="Reach is only published for Meta ads in the EU."';
   const reach = r => {
     const m = Number(metaAds(r)) || 0, g = Number(googleAds(r)) || 0, a = r.alcance_eu == null || r.alcance_eu === "" ? null : Number(r.alcance_eu);
@@ -299,7 +300,7 @@
     $("#semanaBox").innerHTML = tabela(porPreferencia(rows), { dia: true });
   }
 
-  /* Six-market strip; a strongest market outside the six (NL/AT/CH/HU) is added as a seventh cell so it is never lost. */
+  /* Eight-market strip; a strongest market outside the eight (NL/AT/CH/HU) is added as a ninth cell so it is never lost. */
   function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); const cols = MARKETS.concat(mk && !MARKETS.includes(mk) ? [mk] : []); return `<ul class="strip" aria-label="Markets"${cols.length > 6 ? ` style="grid-template-columns:repeat(${cols.length},minmax(0,1fr))"` : ""}>${cols.map(c => `<li${ok.has(c) ? ' class="ok"' : ''} title="${esc(pais(c))}">${esc(c)}</li>`).join("")}</ul>`; }
   /* Score of the strongest market, shown next to the global score so it is clear why a collection is approved
      ("7.3 in CH"): the market named in a 🟢 verdict, else mercado_destaque; the routine's per-market score when
