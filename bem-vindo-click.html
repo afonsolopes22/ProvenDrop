@@ -49,6 +49,7 @@ h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02e
 h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.05}
 h1 em{font-style:normal;color:var(--go)}
 .lead{color:var(--muted);font-size:18px;margin:14px 0 0;max-width:56ch}
+.lead+.lead{margin-top:8px}
 .brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin-bottom:28px}
 .brand svg{display:block}.brand b{color:#0B1F1E;font-weight:800}.brand i{color:#0F766E;font-style:normal;font-weight:800}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .brand b{color:#fff}:root:not([data-theme="light"]) .brand i{color:#5EEAD4}}
@@ -82,25 +83,28 @@ footer nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:14px}
 footer nav a{font-weight:600;text-underline-offset:3px}
 footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
 </style>
-<!-- "Manage subscription" opens the Stripe customer portal (STRIPE_PORTAL_LINK in config.js); only when that
-     value is empty does the button fall back to WhatsApp. CONTACT_EMAIL (optional) is shown in the footer. -->
+<!-- config.js: SUPABASE_URL (the loja-click Edge Function that returns the store name typed at checkout),
+     STRIPE_PORTAL_LINK ("Manage subscription" opens the Stripe customer portal; only when that value is empty
+     does the button fall back to WhatsApp) and CONTACT_EMAIL (optional, shown in the footer). -->
 <script src="config.js"></script>
 </head>
 <body>
 <main class="wrap">
   <a class="brand" translate="no" href="./"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#0F766E"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#fff" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#fff" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#fff"/><circle cx="44.5" cy="13" r="4" fill="#14B8A6"/></svg><span><b>Proven</b><i>Drop</i></span></a>
   <h1>Payment confirmed. <em>Welcome.</em></h1>
-  <p class="lead">Your purchase code is <b class="num" id="codigo">PD-······</b>. WhatsApp opens in a moment with your message ready; we add you to the Click bot group the same day.</p>
+  <p class="lead">Your purchase code is <b class="num" id="codigo">PD-······</b>. WhatsApp opens in a moment with your message ready.</p>
+  <p class="lead">You'll get access to your member area as soon as Click confirms you're a client (usually the same day).</p>
   <p class="pt" id="waAuto" aria-live="polite">Opening WhatsApp in 3 seconds…</p>
-  <span class="fee">No joining fee · <span lang="pt">Sem taxa de adesão</span></span>
+  <span class="fee">No joining fee</span>
   <!-- Pre-filled WhatsApp message with the short purchase code derived from the Stripe checkout session id read
-       from ?session_id=… (SHA-256 → 6 characters, the same calculation as the webhook; nothing else is read, stored or requested). -->
+       from ?session_id=… (SHA-256 → 6 characters, the same calculation as the webhook) and the store name typed at
+       checkout (loja-click Edge Function, 2.5 s budget). Nothing else is read, stored or requested. -->
   <a class="btn btn-wa" id="btnWa" href="https://wa.me/351920414823" target="_blank" rel="noopener"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.3 4.4c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.3s1 2.7 1.2 2.9c.1.2 2 3.1 4.9 4.3 2.4 1 2.9.8 3.4.7.5 0 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-1c-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.4.1-.6l.4-.5.3-.5v-.5l-.9-2.2c-.2-.5-.5-.5-.7-.5h-.6Z"/></svg><span>Open WhatsApp<small>If it did not open by itself</small></span></a>
 
   <ol class="steps">
     <li>
       <h2>Send the purchase message</h2>
-      <p>WhatsApp opens to <span class="num">+351 920 414 823</span> with a message that already carries your purchase code <b class="num js-codigo">PD-······</b>. Just send it: we match it with your payment and add you to the group the same day. Keep the code in case you need to write to us later.</p>
+      <p>WhatsApp opens to <span class="num">+351 920 414 823</span> with a message that already carries your purchase code <b class="num js-codigo">PD-······</b> and your store name. Just send it: we match it with your payment, and Click confirms you're a client and adds you to the group. Keep the code in case you need to write to us later.</p>
     </li>
     <li>
       <h2>Save the assistant’s number</h2>
@@ -116,7 +120,7 @@ footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
         <li><code>/pr ES</code> · <code>IT</code> · <code>FR</code> · <code>DE</code> · <code>GB</code> · <code>US</code> one country only</li>
         <li><code>/pr ajuda</code> the list of commands</li>
       </ul>
-      <p class="note">The assistant replies in Portuguese; the kit documents are in English. The commands above are typed exactly as shown.</p>
+      <p class="note">The commands above are typed exactly as shown.</p>
     </li>
     <li>
       <h2>Launch a collection in 1–2 days</h2>
@@ -142,7 +146,7 @@ footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
   </div>
 
   <footer>
-    <p>Your Click plan is the monthly fee only: no joining fee. You will receive the payment receipt by email. To change your card, see your invoices or cancel your subscription, open the Stripe portal (it asks for the e-mail you paid with and sends you a link). To change niche, message us on WhatsApp.</p>
+    <p>Your Click plan is the monthly fee only: no joining fee. You will receive the payment receipt by email. To change your card, see your invoices or cancel your subscription, open the Stripe portal (it asks for the e-mail you paid with and sends you a link).</p>
     <a class="btn ghost" id="btnGerir" href="#" target="_blank" rel="noopener">Manage subscription</a>
     <p class="contact" id="contactLine" hidden></p>
     <nav aria-label="Legal"><a href="terms.html">Terms of service</a><a href="privacy.html">Privacy policy</a><a href="refunds.html">Refund policy</a></nav>
@@ -153,28 +157,48 @@ footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
 (function(){
   /* Purchase code: the Stripe Payment Link redirects here with ?session_id=cs_live_…; the id becomes a short code
      "PD-XXXXXX" (SHA-256 → first 6 bytes → one character each, alphabet without 0/O/1/I), the SAME calculation the
-     stripe-webhook stores in subscritores.codigo_compra (supabase/functions/_shared/codigo.ts). Nothing else is read,
-     stored or requested. WhatsApp opens by itself after 3 s; the button stays for when the phone blocks that. */
-  var WA="https://wa.me/351920414823", A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+     stripe-webhook stores in subscritores.codigo_compra (supabase/functions/_shared/codigo.ts).
+     Store name: the loja-click Edge Function (SUPABASE_URL in config.js) returns { loja } for that session id, and
+     only that (never e-mail, name or phone). The request has 2.5 s: WhatsApp opens by itself after 3 s with
+     whatever is ready by then (the "Store:" part is left out if the answer is late). The button stays for when the
+     phone blocks the automatic opening, and keeps following the latest message. */
+  var WA="https://wa.me/351920414823", A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789", LOJA_MS=2500;
+  var C=window.PROVENDROP_CONFIG||{};
+  var SB=String(C.SUPABASE_URL||"").trim().replace(/\/+$/,"");
   var sid=String(new URLSearchParams(location.search).get("session_id")||"").trim();
   if(!/^cs_[A-Za-z0-9_]{8,}$/.test(sid)) sid="";
   var btn=document.getElementById("btnWa"), auto=document.getElementById("waAuto");
-  function mensagem(codigo){ return "Hi! I've just paid for the ProvenDrop Click plan."+(codigo?" Purchase code: "+codigo+".":"")+" I'd like access to the WhatsApp bot."; }
+  var estado={codigo:"",loja:""};
+  /* Exact wording agreed with Click; "Store: <name>." is included only when the store name arrived in time. */
+  function mensagem(codigo, loja){
+    return "Hi! I've just paid for the ProvenDrop Click plan."+(codigo?" Purchase code: "+codigo+".":"")+(loja?" Store: "+loja+".":"")+" I'd like access to the WhatsApp bot.";
+  }
+  function urlWa(){ return WA+"?text="+encodeURIComponent(mensagem(estado.codigo, estado.loja)); }
+  function atualizar(){ btn.href=urlWa(); }
   function mostrar(codigo){
-    var url=WA+"?text="+encodeURIComponent(mensagem(codigo));
-    btn.href=url;
+    estado.codigo=codigo; atualizar();
     document.querySelectorAll("#codigo,.js-codigo").forEach(function(e){ e.textContent=codigo||"—"; });
     if(!codigo){ auto.textContent="We could not read your purchase code from this page. Open WhatsApp and tell us the e-mail you paid with."; return; }
     var n=3; auto.textContent="Opening WhatsApp in "+n+" seconds…";
-    var timer=setInterval(function(){ n--; if(n>0){ auto.textContent="Opening WhatsApp in "+n+(n===1?" second…":" seconds…"); return; } clearInterval(timer); auto.textContent="If WhatsApp did not open, use the button below."; location.assign(url); },1000);
+    var timer=setInterval(function(){ n--; if(n>0){ auto.textContent="Opening WhatsApp in "+n+(n===1?" second…":" seconds…"); return; } clearInterval(timer); auto.textContent="If WhatsApp did not open, use the button below."; location.assign(urlWa()); },1000);
   }
   function codigoDe(id){
     if(!(window.crypto&&crypto.subtle&&window.TextEncoder)) return Promise.resolve("");
     return crypto.subtle.digest("SHA-256", new TextEncoder().encode(id)).then(function(buf){ var h=new Uint8Array(buf), s=""; for(var i=0;i<6;i++) s+=A[h[i]%32]; return "PD-"+s; }).catch(function(){ return ""; });
   }
+  function pedirLoja(){
+    if(!sid || !/^https:\/\//.test(SB) || !window.fetch || !window.AbortController) return;
+    var ac=new AbortController(), t=setTimeout(function(){ ac.abort(); }, LOJA_MS);
+    fetch(SB+"/functions/v1/loja-click?session_id="+encodeURIComponent(sid),{signal:ac.signal})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(j){ var l=(j&&typeof j.loja==="string")?j.loja.replace(/\s+/g," ").trim().slice(0,80):""; if(l){ estado.loja=l; atualizar(); } })
+      .catch(function(){})
+      .then(function(){ clearTimeout(t); });
+  }
+  pedirLoja();
   if(sid){ codigoDe(sid).then(mostrar); } else { mostrar(""); }
   /* Manage subscription → Stripe customer portal; WhatsApp only when STRIPE_PORTAL_LINK is empty. */
-  var C=window.PROVENDROP_CONFIG||{}, g=document.getElementById("btnGerir");
+  var g=document.getElementById("btnGerir");
   var p=String(C.STRIPE_PORTAL_LINK||"").trim();
   g.href=/^https:\/\//.test(p) ? p : WA+"?text="+encodeURIComponent("Hi! I'd like to manage my ProvenDrop Click subscription.");
   var mail=String(C.CONTACT_EMAIL||"").trim();

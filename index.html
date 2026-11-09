@@ -357,11 +357,11 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
           <div class="mt-8 flex gap-5 rounded-2xl border border-line bg-white/60 p-5">
             <picture class="shrink-0"><source type="image/webp" srcset="assets/click-logo-128.webp 1x, assets/click-logo-256.webp 2x"><img class="size-16 rounded-2xl bg-neutral-950 p-1.5" src="assets/click-logo-128.png" srcset="assets/click-logo-128.png 1x, assets/click-logo-256.png 2x" width="64" height="64" alt="Click Dynamics" loading="lazy" decoding="async"></picture>
             <div class="min-w-0 flex-1">
-              <span class="mb-1 block text-[12px] font-bold uppercase tracking-[0.14em] text-ink-3">Click Dynamics customers</span>
-              <h3 class="text-[20px] font-bold tracking-tight text-ink">Are you a Click customer?</h3>
-              <p class="mt-1.5 text-[14px] text-ink-2">Subscribe here with the Click plan: €15/month, no joining fee. After payment you’ll be taken to WhatsApp to join the Click group.</p>
+              <span class="mb-1 block text-[12px] font-bold uppercase tracking-[0.14em] text-ink-3">Click Dynamics clients</span>
+              <h3 class="text-[20px] font-bold tracking-tight text-ink">Click Dynamics client?</h3>
+              <p class="mt-1.5 text-[14px] text-ink-2">Your plan is €<span data-fill="price-monthly">15</span>/month with no joining fee and includes this member area.</p>
               <!-- Click plan: Stripe Payment Link from config.js (STRIPE_LINK_CLICK). Empty = disabled, like Subscribe. -->
-              <a class="btn btn-line js-click-link mt-4 w-full" aria-disabled="true">Subscribe with Click — €15/month</a>
+              <a class="btn btn-line js-click-link mt-4 w-full" aria-disabled="true">Subscribe — ProvenDrop × Click</a>
             </div>
           </div>
         </div>
@@ -398,23 +398,25 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
     <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
         <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Access</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Two plans, the same collections</h2></div>
-        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">Choose how you want to receive them: in a WhatsApp group with the Click bot, or in your own member area on this website. No minimum term in either.</p>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">Both plans include your own member area on this website. Click Dynamics clients also get the daily list in the Click WhatsApp group, with no joining fee. No minimum term in either.</p>
       </div>
       <!-- Two plans side by side (design approved 2026-11-08). Buttons come from config.js: STRIPE_LINK_CLICK and
            STRIPE_LINK_DIRECT; empty = disabled ("not open yet"). Prices from PRICE_MONTHLY / PRICE_JOINING. -->
       <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
         <article class="card relative flex min-w-0 flex-col gap-5 overflow-hidden p-6 md:p-8" aria-labelledby="planClick">
           <span class="absolute inset-x-0 top-0 h-1.5 bg-neutral-900" aria-hidden="true"></span>
-          <div class="flex items-center gap-3"><picture class="shrink-0"><source type="image/webp" srcset="assets/click-logo-128.webp 1x, assets/click-logo-256.webp 2x"><img class="size-10 rounded-xl bg-neutral-950 p-1" src="assets/click-logo-128.png" srcset="assets/click-logo-128.png 1x, assets/click-logo-256.png 2x" width="40" height="40" alt="Click Dynamics" loading="lazy" decoding="async"></picture><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-2">Click — WhatsApp bot</p></div>
-          <h3 class="text-[clamp(22px,2.4vw,28px)] font-extrabold leading-[1.15] tracking-tight text-ink" id="planClick">You receive the collections in a WhatsApp group</h3>
+          <div class="flex items-center gap-3"><picture class="shrink-0"><source type="image/webp" srcset="assets/click-logo-128.webp 1x, assets/click-logo-256.webp 2x"><img class="size-10 rounded-xl bg-neutral-950 p-1" src="assets/click-logo-128.png" srcset="assets/click-logo-128.png 1x, assets/click-logo-256.png 2x" width="40" height="40" alt="Click Dynamics" loading="lazy" decoding="async"></picture><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-ink-2">Member area + WhatsApp group</p></div>
+          <h3 class="text-[clamp(22px,2.4vw,28px)] font-extrabold leading-[1.15] tracking-tight text-ink" id="planClick">ProvenDrop × Click — for Click Dynamics clients</h3>
           <ul class="grid gap-2.5 border-t border-line pt-5 text-[15px] text-ink">
-            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>The day’s list in the group, every day at <span data-fill="hour">[HOUR]</span></span></li>
-            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Launch Kits as ZIP files in the bot’s message</span></li>
-            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Past collections with the <code class="rounded bg-page px-1.5 py-0.5 font-mono text-[13px]">/pr</code> commands</span></li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Everything in the Platform plan: member area, Library, kits, preferences</span></li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Plus the daily list in the Click WhatsApp group</span></li>
+            <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Only for Click Dynamics clients (Click confirms you after purchase)</span></li>
             <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span>Cancel whenever you want</li>
           </ul>
-          <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-5"><span class="text-[clamp(40px,4vw,52px)] font-extrabold leading-[0.9] tracking-tight tabular-nums text-ink">€<span data-fill="price-monthly">15</span></span><small class="text-[14px] font-semibold text-ink-2">/ month</small><span class="basis-full text-[14px] font-medium text-ink-2">No joining fee</span></div>
-          <a class="btn btn-line js-click-link w-full" id="btnClick" aria-disabled="true">Subscribe — WhatsApp bot</a>
+          <!-- Price reads "€15/month · no joining fee" (PRICE_MONTHLY from config.js). -->
+          <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-5"><span class="text-[clamp(40px,4vw,52px)] font-extrabold leading-[0.9] tracking-tight tabular-nums text-ink">€<span data-fill="price-monthly">15</span></span><small class="text-[14px] font-semibold text-ink-2">/month · no joining fee</small></div>
+          <a class="btn btn-line js-click-link w-full" id="btnClick" aria-disabled="true">Subscribe — ProvenDrop × Click</a>
+          <p class="text-[14px] font-medium text-ink-2">After purchase, Click confirms you’re a client and adds you to the WhatsApp group.</p>
           <p class="text-[13px] text-ink-2" id="noteClick">Subscriptions are not open on this page yet.</p>
         </article>
         <article class="card relative flex min-w-0 flex-col gap-5 overflow-hidden p-6 md:p-8" aria-labelledby="planName">
@@ -427,8 +429,10 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
             <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Library of every collection sent, with filters</span></li>
             <li class="grid grid-cols-[18px_minmax(0,1fr)] gap-3"><span class="mt-0.5 grid size-[18px] place-items-center rounded-full bg-ok-soft text-ok"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7.5 3.2 3.2L12 3.5"/></svg></span><span>Niche preferences: what matters to you comes first</span></li>
           </ul>
-          <!-- Price: first month = PRICE_JOINING + PRICE_MONTHLY (filled from config.js), then PRICE_MONTHLY per month. -->
-          <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-5"><span class="text-[clamp(40px,4vw,52px)] font-extrabold leading-[0.9] tracking-tight tabular-nums text-ink">€<span data-fill="price-first">40</span></span><small class="text-[14px] font-semibold text-ink-2">first month</small><span class="basis-full text-[14px] font-medium text-ink-2" id="feeLine">€<span data-fill="price-joining">25</span> joining fee + €<span data-fill="price-monthly">15</span> first month, then <b class="font-bold text-ink">€<span data-fill="price-monthly">15</span>/month</b></span></div>
+          <!-- Price reads "€40 first month, then €15/month": first month = PRICE_JOINING + PRICE_MONTHLY (filled from config.js).
+               #feeLine explains the split and is hidden by the script when PRICE_JOINING is 0. -->
+          <div class="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-5"><span class="text-[clamp(40px,4vw,52px)] font-extrabold leading-[0.9] tracking-tight tabular-nums text-ink">€<span data-fill="price-first">40</span></span> <small class="text-[14px] font-semibold text-ink-2">first month, then €<span data-fill="price-monthly">15</span>/month</small></div>
+          <p class="text-[13px] text-ink-2" id="feeLine">The first month includes the €<span data-fill="price-joining">25</span> joining fee plus the first €<span data-fill="price-monthly">15</span> month.</p>
           <a class="btn btn-go w-full" id="btnSubscribe" aria-disabled="true">Subscribe — Platform</a>
           <p class="text-[13px] text-ink-2" id="noteSubscribe">Subscriptions are not open on this page yet.</p>
           <p class="text-[13px] text-ink-2 [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4" id="noteContact" hidden></p>
@@ -437,13 +441,14 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
       <!-- Comparison -->
       <div class="card mt-6 overflow-hidden">
         <table class="dt w-full text-[14px]" aria-label="Plan comparison">
-          <thead><tr><th class="pl-5">&nbsp;</th><th>Click — WhatsApp bot</th><th>ProvenDrop — Platform</th></tr></thead>
+          <thead><tr><th class="pl-5">&nbsp;</th><th>ProvenDrop × Click</th><th>ProvenDrop — Platform</th></tr></thead>
           <tbody>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">How you receive it</th><td data-l="Click"><span>WhatsApp group, every day at <span data-fill="hour">[HOUR]</span></span></td><td data-l="Platform"><span>Member area on the website + daily e-mail</span></td></tr>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Launch Kits</th><td data-l="Click"><span>ZIP in the bot’s message</span></td><td data-l="Platform"><span>Download button on every collection</span></td></tr>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Past collections</th><td data-l="Click"><span><code class="rounded bg-page px-1.5 py-0.5 font-mono text-[13px]">/pr</code> commands in the group</span></td><td data-l="Platform"><span>Library with filters (niche, market, platform, still advertising)</span></td></tr>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Niches</th><td data-l="Click"><span>Ask the bot for one niche at a time</span></td><td data-l="Platform"><span>Your niches first, in the area and in the e-mail</span></td></tr>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Price</th><td data-l="Click"><span>€<span data-fill="price-monthly">15</span>/month, no joining fee</span></td><td data-l="Platform"><span>€<span data-fill="price-first">40</span> first month (joining fee + first month), then €<span data-fill="price-monthly">15</span>/month</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Who it’s for</th><td data-l="Click"><span>Click Dynamics clients (Click confirms you)</span></td><td data-l="Platform"><span>Anyone</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">How you receive it</th><td data-l="Click"><span>Member area + daily list in the Click WhatsApp group</span></td><td data-l="Platform"><span>Member area on the website + daily e-mail</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Launch Kits</th><td data-l="Click"><span>Download button on every collection (+ ZIP in the group)</span></td><td data-l="Platform"><span>Download button on every collection</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Past collections</th><td data-l="Click"><span>Library with filters</span></td><td data-l="Platform"><span>Library with filters (niche, market, platform, still advertising)</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Niches</th><td data-l="Click"><span>Your niches first</span></td><td data-l="Platform"><span>Your niches first, in the area and in the e-mail</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Price</th><td data-l="Click"><span>€<span data-fill="price-monthly">15</span>/month, no joining fee (Click clients only)</span></td><td data-l="Platform"><span>€<span data-fill="price-first">40</span> first month (joining fee + first month), then €<span data-fill="price-monthly">15</span>/month</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -540,7 +545,7 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
        "Secure card payment by Stripe. Your access e-mail arrives right after you pay." */
     if(n) n.textContent="Secure card payment by Stripe. You'll receive your access link by e-mail. If it doesn't arrive within 10 minutes, message us on WhatsApp: +351 920 414 823.";
   }
-  /* Click plan buttons (plan card + "Are you a Click customer?"): enabled only when STRIPE_LINK_CLICK is configured. */
+  /* Click plan buttons (plan card + "Click Dynamics client?" box): enabled only when STRIPE_LINK_CLICK is configured. */
   var cl=s("STRIPE_LINK_CLICK"), nc=document.getElementById("noteClick");
   if(/^https:\/\//.test(cl)){
     document.querySelectorAll(".js-click-link").forEach(function(e){ e.href=cl; e.removeAttribute("aria-disabled"); });
