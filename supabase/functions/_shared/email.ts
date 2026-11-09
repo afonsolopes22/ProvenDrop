@@ -76,3 +76,37 @@ export function molde(titulo: string, corpoHtml: string, botao?: { texto: string
   ${rodape ? `<p style="font-size:13px;color:#5B6B66;line-height:1.5;margin-top:32px;border-top:1px solid #E2E8E6;padding-top:16px">${rodape}</p>` : ""}
 </div></body></html>`;
 }
+
+// ── Moldes do plano Click (admin-click, 2026-11-08) ─────────────────────────
+// Devolvem assunto, HTML e texto; o destinatário é posto por quem envia.
+
+/**
+ * Boas-vindas a um cliente Click que a Click acabou de confirmar: o mesmo molde e o mesmo
+ * botão de entrada por token_hash das boas-vindas do webhook, com o remate adaptado (a lista
+ * diária chega no grupo de WhatsApp da Click; a área tem tudo isso e mais).
+ */
+export function moldeBoasVindasClick(link: string, minutos: string): Omit<Mensagem, "to"> {
+  const text =
+    `Hi! Click confirmed you as a client and your access is active.\n\n` +
+    `Sign in to your member area with this link (it is personal and valid for ${minutos} minutes):\n${link}\n\n` +
+    `Everything you get in the Click WhatsApp group is here too, plus all past collections, the launch kits and filters.\n\n` +
+    `Any question, reply to this e-mail.`;
+  const html = molde(
+    "Your access is active",
+    `<p>Hi! Click confirmed you as a client and your access is active.</p>
+     <p>Sign in to your member area with this button (the link is personal and valid for ${esc(minutos)} minutes):</p>`,
+    { texto: "Sign in to ProvenDrop", url: link },
+    `Everything you get in the Click WhatsApp group is here too, plus all past collections, the launch kits and filters. Any question, reply to this e-mail.`,
+  );
+  return { subject: "Welcome to ProvenDrop: your access", html, text };
+}
+
+/**
+ * Cliente Click recusado (a Click não o confirmou como cliente): reembolso total feito,
+ * subscrição cancelada; convite para o plano Platform. `texto` é a frase exata do plano
+ * (acoes.ts), `url` o site.
+ */
+export function moldeRecusaClick(assunto: string, texto: string, url: string): Omit<Mensagem, "to"> {
+  const html = molde(assunto, `<p>${esc(texto)}</p>`, { texto: "See the ProvenDrop Platform plan", url });
+  return { subject: assunto, html, text: `${texto}\n\n${url}` };
+}

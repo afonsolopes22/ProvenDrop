@@ -16,9 +16,9 @@
        e o ficheiro é sobrescrito e apagado no fim (S8);
     3. recusa misturas de teste e real: chave sk_live_ com links/ids de teste em
        config.js ou nos valores escritos, e vice-versa (A6);
-    4. aplica as migrações 0002–0007 e actualiza public.config (email_diario_url,
+    4. aplica as migrações 0002–0009 e actualiza public.config (email_diario_url,
        stripe_webhook_url, reconciliar_url, cron_secret) com `supabase db query --linked`;
-    5. faz deploy de email-diario, reconciliar e corrigir-email e, no fim, volta a fazer
+    5. faz deploy de email-diario, reconciliar, corrigir-email, loja-click e admin-click e, no fim, volta a fazer
        deploy do stripe-webhook (todas com --no-verify-jwt), já com os segredos novos.
 
   Nada é escrito em ficheiros do repositório.
@@ -109,6 +109,7 @@ if (-not $SemSegredos) {
   $valores["EMAIL_FROM"]                 = LerValor "EMAIL_FROM"                 'sem domínio verificado: ProvenDrop <onboarding@resend.dev>; com domínio: ProvenDrop <noreply@provendrop.com>'
   $valores["EMAIL_REPLY_TO"]             = LerValor "EMAIL_REPLY_TO"             "onde recebes as respostas dos clientes (opcional)"
   $valores["ALERT_EMAIL"]                = LerValor "ALERT_EMAIL"                "onde recebes os alertas (duplicados, disputas, reconciliação) e o 'New Click subscription' de cada compra Click; vazio = EMAIL_REPLY_TO"
+  $valores["ADMIN_EMAIL"]                = LerValor "ADMIN_EMAIL"                "o teu e-mail de login em admin.html (validar ou recusar compras Click); só este e-mail é aceite pela função admin-click"
 
   # validações de formato
   if ($valores["STRIPE_SECRET_KEY"] -and $valores["STRIPE_SECRET_KEY"] -notmatch '^(sk|rk)_(test|live)_') { Falhar "STRIPE_SECRET_KEY não parece uma chave do Stripe (sk_test_/sk_live_)" }
@@ -116,7 +117,7 @@ if (-not $SemSegredos) {
   foreach ($k in @("STRIPE_PRICE_DIRETO","STRIPE_PRICE_CLICK")) { if ($valores[$k] -and $valores[$k] -notlike "price_*") { Falhar "$k tem de começar por price_" } }
   if ($valores["STRIPE_PAYMENT_LINK_DIRETO"] -and $valores["STRIPE_PAYMENT_LINK_DIRETO"] -notlike "plink_*") { Falhar "STRIPE_PAYMENT_LINK_DIRETO tem de começar por plink_" }
   if ($valores["RESEND_API_KEY"] -and $valores["RESEND_API_KEY"] -notlike "re_*") { Falhar "RESEND_API_KEY tem de começar por re_" }
-  foreach ($k in @("EMAIL_FROM","EMAIL_REPLY_TO","ALERT_EMAIL")) { if ($valores[$k] -and $valores[$k] -notmatch '@') { Falhar "$k não parece um endereço de e-mail" } }
+  foreach ($k in @("EMAIL_FROM","EMAIL_REPLY_TO","ALERT_EMAIL","ADMIN_EMAIL")) { if ($valores[$k] -and $valores[$k] -notmatch '@') { Falhar "$k não parece um endereço de e-mail" } }
   # A6: recusar misturas de teste e real
   $chave = $valores["STRIPE_SECRET_KEY"]
   if ($chave) {
@@ -163,11 +164,11 @@ if (-not $SemSegredos) {
   }
 }
 
-# ── 3. SQL: migrações 0002–0007 + public.config ─────────────────────────
-Passo "Migrações 0002, 0003, 0004, 0005, 0006, 0007 e public.config"
+# ── 3. SQL: migrações 0002–0009 + public.config ─────────────────────────
+Passo "Migrações 0002 a 0009 e public.config"
 $base = "https://$ProjectRef.supabase.co/functions/v1"
 $sql = ""
-foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql","0005_google_e_kits.sql","0006_corrigir_email.sql","0007_retiradas.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
+foreach ($m in @("0002_kits_datas.sql","0003_boas_vindas.sql","0004_subscricoes.sql","0005_google_e_kits.sql","0006_corrigir_email.sql","0007_retiradas.sql","0008_click_codigo.sql","0009_click_plataforma.sql")) { $sql += (Get-Content "supabase\migrations\$m" -Raw) + "`n" }
 $sql += "update public.config set valor = '$base/email-diario'   where chave = 'email_diario_url';`n"
 $sql += "update public.config set valor = '$base/stripe-webhook' where chave = 'stripe_webhook_url';`n"
 $sql += "update public.config set valor = '$base/reconciliar'    where chave = 'reconciliar_url';`n"
@@ -190,8 +191,8 @@ try {
 
 # ── 4. deploy das funções (stripe-webhook por último, já com os segredos novos) ──
 if (-not $SemDeploy) {
-  Passo "Deploy das Edge Functions (email-diario, reconciliar, corrigir-email)"
-  foreach ($fn in @("email-diario","reconciliar","corrigir-email")) {
+  Passo "Deploy das Edge Functions (email-diario, reconciliar, corrigir-email, loja-click, admin-click)"
+  foreach ($fn in @("email-diario","reconciliar","corrigir-email","loja-click","admin-click")) {
     if ((Supa @("functions","deploy",$fn,"--project-ref",$ProjectRef,"--no-verify-jwt") @("Docker is not running")) -ne 0) { Falhar "deploy de $fn falhou" }
   }
   Passo "Deploy final do stripe-webhook (--no-verify-jwt)"
