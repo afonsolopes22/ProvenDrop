@@ -25,8 +25,10 @@
 // Plano Click (0008/0009): cada checkout Click grava codigo_compra, telefone,
 // nome, loja e estado_click = 'pendente' (só se ainda for null: uma renovação
 // ou um evento repetido nunca volta a pôr pendente quem já está validado ou
-// recusado) e alerta o Afonso ("New Click subscription"). A validação é feita
-// em admin.html (admin-click). Quando uma subscrição Click passa a cancelado,
+// recusado) e alerta o Afonso ("New Click subscription"). Um checkout NOVO de quem
+// tinha sido recusado volta a 'pendente'. O cliente pendente fica com login (sem
+// acesso a dados) para ver "being confirmed". A validação é feita em admin.html
+// (admin-click). Quando uma subscrição Click passa a cancelado,
 // alerta "Click subscription cancelled" para a Click tirar a pessoa do grupo.
 //
 // Boas-vindas (A3): só com acesso (direto ou Click validado), com reserva
@@ -56,12 +58,13 @@
 
 import Stripe from "npm:stripe@17.7.0";
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
-import { enviarEmail, esc, molde } from "../_shared/email.ts";
+import { enviarEmail, esc, molde, moldeBoasVindasClick } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 import { codigoDeCompra } from "../_shared/codigo.ts";
 import { lojaDaSessao } from "../_shared/loja.ts";
+import { reabreRecusado } from "./click.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -353,8 +356,12 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
   if (s.payment_status !== "paid" && s.payment_status !== "no_payment_required") return { ignorado: `payment_status=${s.payment_status}` };
   const subId = typeof s.subscription === "string" ? s.subscription : s.subscription?.id ?? null;
   if (!subId) { console.warn(`sessão ${s.id} sem subscrição: ignorada`); return { ignorado: "sem subscrição" }; }
+  // Compra nova paga de quem só estava bloqueado por um reembolso total (ex.: Click recusado e
+  // reembolsado que agora compra o plano Platform): o bloqueio sai antes de derivar o acesso.
+  const desbloqueado = await desbloquearReembolso((s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase());
   // A origem da sessão (metadata do Payment Link) é o sinal mais fiável.
   const resultado = await sincronizarSubscricao(subId, await origemDaSessao(s), true);
+  if (desbloqueado) resultado.desbloqueado = true;
   if (resultado.origem === "click") Object.assign(resultado, await registarCompraClick(s));
   return resultado;
 }
@@ -377,18 +384,37 @@ async function registarCompraClick(s: Stripe.Checkout.Session): Promise<Record<s
   const telefone = (s.customer_details?.phone ?? "").trim() || null;
   const nome = (s.customer_details?.name ?? "").trim() || null;
   const loja = lojaDaSessao(s);
+  // Checkout NOVO de quem tinha sido recusado (o código da compra é outro): volta a pendente, senão
+  // paga, fica sem acesso e não aparece em admin.html. Lê-se antes de gravar o código novo.
+  const antes = await admin.from("subscritores").select("estado_click,codigo_compra,user_id").eq("email", email).maybeSingle();
+  if (antes.error) throw antes.error;
+  let reaberto = false;
+  if (reabreRecusado(antes.data?.estado_click, antes.data?.codigo_compra, codigo)) {
+    const re = await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", email).eq("estado_click", "recusado").select("email");
+    if (re.error) throw re.error;
+    reaberto = (re.data?.length ?? 0) > 0;
+  }
   const up = await admin.from("subscritores").update({ codigo_compra: codigo, telefone, nome, loja }).eq("email", email);
   if (up.error) throw up.error;
   // Condição na própria escrita (is null): nunca repõe 'pendente' em quem já está validado/recusado.
   const pend = await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", email).is("estado_click", null).select("email");
   if (pend.error) throw pend.error;
-  const pendente = (pend.data?.length ?? 0) > 0;
+  const pendente = (pend.data?.length ?? 0) > 0 || reaberto;
+  // Login para o cliente Click que pagou e espera a validação: não dá acesso a dados (RLS: tem_acesso
+  // exige 'validado'), mas deixa-o pedir o link de entrada e ver "Your Click access is being confirmed".
+  // Sem boas-vindas até ser validado. Falhar aqui não falha o evento.
+  if (antes.data && !antes.data.user_id) {
+    try {
+      const u = await garantirUtilizador(email, null);
+      if (u) await admin.from("subscritores").update({ user_id: u }).eq("email", email).is("user_id", null);
+    } catch (e) { console.error(`login do Click pendente não criado: ${semSegredos((e as Error).message)}`); }
+  }
   const enviado = await alertar(`New Click subscription · ${codigo}`, [
     `Name: ${nome ?? "—"}`, `Phone: ${telefone ?? "— (not collected at checkout)"}`, `E-mail: ${email}`, `Store: ${loja ?? "—"}`,
     `Purchase code: ${codigo}`, `Checkout session: ${s.id}`,
     `Confirm the payment, then tell Click: "${codigo} paid". Validate or reject at provendrop.com/admin.html.`,
   ]);
-  return { click: { codigo, telefone: !!telefone, loja: !!loja, pendente, email_enviado: enviado } };
+  return { click: { codigo, telefone: !!telefone, loja: !!loja, pendente, reaberto, email_enviado: enviado } };
 }
 
 // ───────────────────────────────────────────────────────────────────────
@@ -404,7 +430,11 @@ async function clienteDaCharge(ch: Stripe.Charge | Stripe.Dispute): Promise<stri
   return clienteDe(c);
 }
 
-/** Marca (bloqueado_em + motivo) todos os subscritores do cliente que ainda não estejam bloqueados: tem_acesso() passa a false. */
+/**
+ * Marca (bloqueado_em + motivo) todos os subscritores do cliente que ainda não estejam bloqueados:
+ * tem_acesso() passa a false. Um Click 'recusado' não é marcado: já não tem acesso, o reembolso foi
+ * feito por nós (Reject & refund) e a área deve dizer-lhe "not confirmed", não "suspended".
+ */
 async function bloquearPorCliente(customer: string | null, motivo: string): Promise<number> {
   if (!customer) return 0;
   const subs = await admin.from("subscricoes").select("email").eq("stripe_customer_id", customer);
@@ -412,11 +442,25 @@ async function bloquearPorCliente(customer: string | null, motivo: string): Prom
   let bloqueados = 0;
   for (const email of [...new Set((subs.data ?? []).map((s) => s.email))]) {
     const b = await admin.from("subscritores").update({ bloqueado_em: new Date().toISOString(), bloqueado_motivo: motivo })
-      .eq("email", email).is("bloqueado_em", null).select("email");
+      .eq("email", email).is("bloqueado_em", null).or("estado_click.is.null,estado_click.neq.recusado").select("email");
     if (b.error) throw b.error;
     bloqueados += b.data?.length ?? 0;
   }
   return bloqueados;
+}
+
+/**
+ * Tira o bloqueio de quem só estava bloqueado por um reembolso total ("reembolso ch_…") e volta a
+ * comprar. As disputas ficam bloqueadas (desbloqueio manual, depois de resolvidas). Devolve true se desbloqueou.
+ */
+async function desbloquearReembolso(email: string): Promise<boolean> {
+  if (!email) return false;
+  const d = await admin.from("subscritores").update({ bloqueado_em: null, bloqueado_motivo: null })
+    .eq("email", email).not("bloqueado_em", "is", null).like("bloqueado_motivo", "reembolso %").select("email");
+  if (d.error) throw d.error;
+  const ok = (d.data?.length ?? 0) > 0;
+  if (ok) console.log(`bloqueio por reembolso levantado a ${await idEmail(email)} (compra nova)`);
+  return ok;
 }
 
 async function aoAbrirDisputa(d: Stripe.Dispute): Promise<Record<string, unknown>> {
@@ -457,6 +501,10 @@ async function garantirUtilizador(email: string, userIdAtual: string | null): Pr
   const criado = await admin.auth.admin.createUser({ email, email_confirm: true });
   if (!criado.error) return criado.data.user?.id ?? null;
   if (!/already|exists|registered/i.test(criado.error.message) && criado.error.code !== "email_exists") throw criado.error;
+  // Já existe: o id vem de id_utilizador (0010), que não gera link. generateLink invalidaria o link
+  // de boas-vindas acabado de enviar por outro evento; só se usa se a função SQL ainda não existir.
+  const id = await admin.rpc("id_utilizador", { p_email: email });
+  if (!id.error) return (id.data as string | null) ?? null;
   const l = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: APP_URL } });
   if (l.error) throw l.error;
   return l.data.user?.id ?? null;
@@ -495,7 +543,9 @@ async function tentarBoasVindas(email: string, tipo: "boas_vindas" | "regresso")
       if (u) await admin.from("subscritores").update({ user_id: u }).eq("email", email);
     }
     const link = await linkDeEntrada(email);
-    if (tipo === "boas_vindas") await enviarBoasVindas(email, link);
+    // Click: o texto fala do grupo de WhatsApp, não do e-mail diário (que o Click não recebe).
+    if (sub.origem === "click") await enviarEmail({ to: email, ...moldeBoasVindasClick(link, MINUTOS) });
+    else if (tipo === "boas_vindas") await enviarBoasVindas(email, link);
     else await enviarRegresso(email, link);
     const marca = await admin.from("subscritores")
       .update(tipo === "boas_vindas" ? { boas_vindas_em: new Date().toISOString(), boas_vindas_tentativa_em: null } : { regresso_em: new Date().toISOString() })
