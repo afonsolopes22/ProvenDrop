@@ -1,0 +1,15 @@
+# ProvenDrop · https://provendrop.com
+# Private pages (app.html, admin.html, bem-vindo.html, bem-vindo-click.html, 404.html) are NOT listed here
+# on purpose: they carry <meta name="robots" content="noindex">, and a crawler can only see that tag if it
+# is allowed to fetch the page. The rules below cover files that cannot carry a noindex tag.
+User-agent: *
+Disallow: /docs/
+Disallow: /scripts/
+Disallow: /supabase/
+Disallow: /src/
+Disallow: /README.md
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /config.local.example.js
+
+Sitemap: https://provendrop.com/sitemap.xml
