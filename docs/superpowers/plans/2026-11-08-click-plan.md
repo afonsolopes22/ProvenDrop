@@ -28,7 +28,7 @@ estado: para revisão do Afonso
 ## Review Focus
 1. **Clientes Click já existentes** (pagaram antes desta mudança) → continuam com o que tinham e ganham acesso à área: a migração marca-os `validado` (teste na Tarefa R1).
 2. **Link `/c/<id>` desconhecido ou de coleção retirada** (`retirada=true`) → abre a Library com "This collection is no longer available." em vez de ecrã vazio ou erro (Tarefa R7).
-3. **Reject & refund carregado duas vezes, ou compra com TESTE100 (fatura de €0)** → a segunda vez não faz nada; €0 não chama a Refunds API, só cancela (Tarefa R4).
+3. **Reject & refund carregado duas vezes, ou compra com um código de teste de uso único, criado no Stripe (fatura de €0)** → a segunda vez não faz nada; €0 não chama a Refunds API, só cancela (Tarefa R4).
 4. **Link da coleção com variações** (`/` no fim, `?query`, maiúsculas, `http` vs `https`) → o mesmo `id_curto` (Tarefa V1).
 5. **Nicho ou país sem tradução** → a mensagem não deixa passar português: nicho desconhecido é omitido, país desconhecido aparece como código (Tarefa V1).
 
@@ -194,7 +194,7 @@ A rotina **só** muda para a mensagem nova (V1) depois de R7 estar em produção
 - [ ] Confirmar **Recolher números de telefone** ligado.
 - [ ] Supabase → Edge Functions → Secrets: `ADMIN_EMAIL` = o teu e-mail.
 
-### A2: teste completo (com TESTE100)
+### A2: teste completo (com um código de teste de uso único, criado no Stripe)
 - [ ] Compra Click: o código é igual na página, no WhatsApp e no e-mail de alerta; a mensagem traz `Store:`; login mostra "being confirmed".
 - [ ] `admin.html` → Validate → recebes o e-mail de acesso e entras na área.
 - [ ] 2.ª compra → Reject & refund → cancelada no Stripe e e-mail recebido.

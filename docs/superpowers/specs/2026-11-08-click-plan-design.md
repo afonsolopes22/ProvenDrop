@@ -85,6 +85,6 @@ Women's fashion · 14 ads · 4 days
 - Validação automática com a Click (API ou lista partilhada).
 
 ## 9. Testes
-- Compra Click com TESTE100: código igual na página, no WhatsApp e no e-mail; linha `pendente`; login mostra "being confirmed"; Validate → acesso; outra compra → Reject & refund → reembolso visível no Stripe e e-mail enviado.
+- Compra Click com um código de teste de uso único, criado no Stripe: código igual na página, no WhatsApp e no e-mail; linha `pendente`; login mostra "being confirmed"; Validate → acesso; outra compra → Reject & refund → reembolso visível no Stripe e e-mail enviado.
 - Mensagem diária gerada pela rotina num dia de teste: links `/c/<id>` abrem a coleção certa depois do login; sem login pedem login e voltam à coleção.
 - Capturas a 1280 e 375; sem português no texto visível ao cliente.
