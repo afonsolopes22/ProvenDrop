@@ -84,3 +84,16 @@ O estado de cada achado depois das correções está na secção **Estado dos ac
 | S14 | ✅ corrigido | `acct_` retirado de STRIPE.md; caminho da service key retirado do README. Os ids `price_/plink_/we_` de teste ficam (públicos, necessários). |
 | S15 | ✅ corrigido | `.gitignore` (data.json, feed_bot.json, *.zip, *.csv, *.bak, *service_key*, .provendrop/, `/32`), `.gitleaks.toml`, `.pre-commit-config.yaml`, workflow `secret-scan.yml` com `fetch-depth: 0`. |
 | S16/S17 | — | Informativos. |
+
+## Auditoria de 2026-11-10 (antes de abrir as vendas à Click)
+
+| # | Gravidade | Onde | Achado | Estado |
+|---|---|---|---|---|
+| S16 | Alto | migrações `0004`, `0006` | As funções `security definer` (`corrigir_email_subscritor`, `recalcular_subscritor`, `reservar_boas_vindas`, `registar_pedido_correcao`) tinham `revoke … from public`, mas o Supabase concede `EXECUTE` diretamente a `anon` e `authenticated`: eram chamáveis por `/rest/v1/rpc/…` com a chave pública. Com o e-mail de um membro, um anónimo trocava-lhe o e-mail na base. | Corrigido na migração `0010` (por aplicar em produção); teste em `supabase/tests/0010_revogar_execute.sql`. |
+| S17 | Médio | Stripe → webhook real | O endpoint só subscreve 6 eventos: faltam `charge.refunded` e `charge.dispute.created`. Reembolsos no painel não tiram acesso; disputas não alertam. | Por fazer no painel do Stripe. |
+| S18 | Médio | Stripe → portal do cliente | O cliente pode mudar o e-mail no portal: o webhook cria uma linha nova e a antiga fica com acesso depois do cancelamento. | Por fazer: tirar "email" das alterações permitidas. |
+| S19 | Médio | Supabase Auth | `disable_signup = false`: qualquer pessoa cria utilizadores e dispara e-mails (sem acesso a dados). | Por fazer: desligar "Allow new users to sign up". |
+| S20 | Baixo | `app.js` (`select("*")` em `feed_dia`) | `retirada_motivo` e `nota` chegam ao browser dos membros. | Por fazer: escolher as colunas ou usar uma vista. |
+| S21 | Baixo | `docs/` no GitHub Pages | O repositório é público e o Pages serve `docs/`, `scripts/` e `supabase/`; `docs/STRIPE.md` nomeia cupões. | Por fazer: tirar os códigos dos docs e não publicar essas pastas. |
+
+Verificado e bem a 2026-11-10: RLS ativa nas 9 tabelas; `anon` recebe 401 em todas e lista vazia no bucket `kits` (privado); `admin-click` devolve 401 sem sessão e só aceita o `ADMIN_EMAIL`; webhook só aceita modo real com assinatura; sem segredos no repositório; `config.js` só com a chave `anon`.

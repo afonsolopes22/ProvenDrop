@@ -16,7 +16,10 @@ export async function garantirUtilizador(admin: SupabaseClient, email: string, a
   const criado = await admin.auth.admin.createUser({ email, email_confirm: true });
   if (!criado.error) return criado.data.user?.id ?? null;
   if (!jaExiste(criado.error.message) && criado.error.code !== "email_exists") throw criado.error;
-  // Já existe: generateLink devolve o utilizador sem enviar nada.
+  // Já existe: o id vem de id_utilizador (0010), que não gera link; generateLink (que invalida o
+  // link anterior) só se usa se a função SQL ainda não existir.
+  const id = await admin.rpc("id_utilizador", { p_email: email });
+  if (!id.error) return (id.data as string | null) ?? null;
   const l = await admin.auth.admin.generateLink({ type: "magiclink", email, options: { redirectTo: appUrl } });
   if (l.error) throw l.error;
   return l.data.user?.id ?? null;

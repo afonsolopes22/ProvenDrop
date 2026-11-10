@@ -148,13 +148,21 @@ async function validar(req: Request, email: string): Promise<Response> {
       const u = await garantirUtilizador(admin, email, APP_URL);
       if (u) await admin.from("subscritores").update({ user_id: u }).eq("email", email);
     }
-    await enviarBoasVindasClick(admin, email, APP_URL, MINUTOS);
-    const marca = await admin.from("subscritores")
-      .update({ boas_vindas_em: new Date().toISOString(), boas_vindas_tentativa_em: null })
-      .eq("email", email);
-    if (marca.error) throw marca.error;
-    boasVindas = "enviadas";
-    console.log(`click validado: ${uid}, boas-vindas enviadas`);
+    // Reserva atómica (a mesma do webhook): se o varrimento de 15 min já pegou nesta linha, ou as
+    // boas-vindas já saíram, não se envia segunda vez (o segundo link mataria o primeiro).
+    const reserva = await admin.rpc("reservar_boas_vindas", { p_email: email, p_minutos: 10 });
+    if (reserva.error) throw reserva.error;
+    if (reserva.data == null) {
+      console.log(`click validado: ${uid}, boas-vindas já reservadas ou enviadas por outro caminho`);
+    } else {
+      await enviarBoasVindasClick(admin, email, APP_URL, MINUTOS);
+      const marca = await admin.from("subscritores")
+        .update({ boas_vindas_em: new Date().toISOString(), boas_vindas_tentativa_em: null })
+        .eq("email", email);
+      if (marca.error) throw marca.error;
+      boasVindas = "enviadas";
+      console.log(`click validado: ${uid}, boas-vindas enviadas`);
+    }
   } catch (e) {
     // A linha já está 'validado' sem boas_vindas_em: o varrimento do webhook (pg_cron, 15 em 15 min) repete-as.
     console.error(`click validado: ${uid}, boas-vindas por enviar: ${semSegredos((e as Error).message)}`);
