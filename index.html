@@ -73,7 +73,7 @@
           <a class="btn btn-go max-sm:w-full" href="#join">Subscribe</a>
           <a class="btn btn-line max-sm:w-full" href="#overview">See how it works</a>
         </div>
-        <p class="mt-5 text-[13px] font-medium text-ink-3">Six markets · three niches · Launch Kit with every collection · cancel anytime</p>
+        <p class="mt-5 text-[13px] font-medium text-ink-3">Eight markets · three niches · Launch Kit with every collection · cancel anytime</p>
       </div>
       <!-- Static mock-up of a daily entry (no real data on the public site: numbers blurred, details for members) -->
       <aside class="card-deep overflow-hidden lg:col-span-6" id="heroPanel" aria-label="Mock-up of a daily entry. Names, numbers, stores and links are reserved for members.">
@@ -93,7 +93,7 @@
           <div><dt>Days advertising</dt><dd class="select-none blur-[5px]">40</dd></div>
           <div><dt class="blur-[2px]">EU reach</dt><dd class="select-none blur-[5px]">120k</dd></div>
         </dl>
-        <div class="px-6 pt-4"><ul class="strip" aria-hidden="true"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div>
+        <div class="px-6 pt-4"><ul class="strip" style="grid-template-columns:repeat(8,minmax(0,1fr))" aria-hidden="true"><li>US</li><li>CA</li><li>GB</li><li>DE</li><li>DK</li><li class="ok">FR</li><li>IT</li><li>ES</li></ul></div>
         <p class="mt-5 border-t border-white/10 px-6 py-4 text-[13px] text-white/55">Names, numbers, stores, links and Launch Kits are reserved for members.</p>
       </aside>
     </div>
@@ -125,7 +125,7 @@
         <li class="card grid min-w-0 content-start gap-3 p-6 md:p-7">
           <span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">01</span>
           <h3 class="text-[20px] font-bold leading-snug tracking-tight text-ink">Product Research &amp; Market Validation</h3>
-          <p class="text-ink-2">Collections discovered from stores already advertising, then validated on advertising evidence and search demand across six markets.</p>
+          <p class="text-ink-2">Collections discovered from stores already advertising, then validated on advertising evidence and search demand across eight markets.</p>
           <ul class="mt-1 grid gap-2 border-t border-line pt-4 text-[14px] font-medium text-ink marker:text-brand list-disc pl-4">
             <li>Discover collections and opportunities</li>
             <li>Analyse advertising evidence and market demand</li>
@@ -198,7 +198,7 @@
               <div><dt class="blur-[2px]">Google ads</dt><dd class="select-none blur-[5px]">5</dd></div>
               <div><dt>Days advertising</dt><dd class="select-none blur-[5px]">40</dd></div>
               <div><dt class="blur-[2px]">EU reach</dt><dd class="select-none blur-[5px]">120k</dd></div>
-            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip"><li>IT</li><li>ES</li><li class="ok">FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
+            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip" style="grid-template-columns:repeat(8,minmax(0,1fr))"><li>US</li><li>CA</li><li>GB</li><li>DE</li><li>DK</li><li class="ok">FR</li><li>IT</li><li>ES</li></ul></div></div>
             <div class="grid content-start gap-3"><div class="text-[48px] font-extrabold leading-none tracking-tight text-white"><span class="select-none blur-[6px]">7.6</span><small class="ml-1.5 text-[13px] font-semibold text-white/55">/ 10</small></div><p class="max-w-[32ch] text-[13px] leading-snug text-white/60">Comes with the collection link and its Launch Kit.</p></div>
           </article>
           <article class="grid gap-6 border-b border-white/10 py-6 md:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,3fr)] md:gap-8">
@@ -208,7 +208,7 @@
               <div><dt class="blur-[2px]">Google ads</dt><dd class="select-none blur-[5px]">9</dd></div>
               <div><dt>Days advertising</dt><dd class="select-none blur-[5px]">21</dd></div>
               <div><dt class="blur-[2px]">EU reach</dt><dd class="select-none blur-[5px]">38k</dd></div>
-            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip"><li>IT</li><li class="ok">ES</li><li>FR</li><li>DE</li><li>GB</li><li>US</li></ul></div></div>
+            </dl><div class="mt-4"><p class="mb-2 text-[12px] font-semibold text-white/55">Strongest market</p><ul class="strip" style="grid-template-columns:repeat(8,minmax(0,1fr))"><li>US</li><li>CA</li><li>GB</li><li>DE</li><li>DK</li><li>FR</li><li>IT</li><li class="ok">ES</li></ul></div></div>
             <div class="grid content-start gap-3"><div class="text-[48px] font-extrabold leading-none tracking-tight text-white"><span class="select-none blur-[6px]">6.4</span><small class="ml-1.5 text-[13px] font-semibold text-white/55">/ 10</small></div><p class="max-w-[32ch] text-[13px] leading-snug text-white/60">Under observation, clearly labelled. Comes with its Launch Kit too: test it with a small budget.</p></div>
           </article>
         </div>
@@ -222,13 +222,13 @@
     <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
       <div class="mb-10 grid gap-5 lg:grid-cols-12 lg:items-end">
         <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Every day</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">What you receive every day</h2></div>
-        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">The collections, the proof behind each one, the Launch Kit with every one of them and the archive. Nothing to research on your side.</p>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">The collections, the proof behind each one, the Launch Kit with every one of them and the Library. Nothing to research on your side.</p>
       </div>
       <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">01</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The day’s collections</h3><p class="text-[14px] text-ink-2">One per niche whenever possible: women’s fashion (usually two a day), men’s fashion and home decoration.</p></li>
         <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">02</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The proof for each one</h3><p class="text-[14px] text-ink-2">How many Meta and Google ads are active, for how many days, how many people they reached and in which countries Google demand is rising.</p></li>
         <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">03</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The complete kit with every collection</h3><p class="text-[14px] text-ink-2">Launch Kit with every collection in the daily list — approved and under observation (clearly labelled): a creative prompt tailored to each collection — paste it into ChatGPT or your image AI and generate as many ad creatives as you want — plus reference photos, keywords, Shopping titles and landing-page copy.</p></li>
-        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">04</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The archive</h3><p class="text-[14px] text-ink-2">Every approved collection, and whether it is still being advertised.</p></li>
+        <li class="card grid min-w-0 content-start gap-3 p-6"><span class="grid size-9 place-items-center rounded-xl bg-brand-soft text-[13px] font-extrabold text-brand-dark">04</span><h3 class="text-[19px] font-bold leading-snug tracking-tight text-ink">The Library</h3><p class="text-[14px] text-ink-2">Every collection we have sent, with its kit, and whether it is still being advertised.</p></li>
       </ul>
     </div>
   </section>
@@ -253,16 +253,18 @@
   <section class="scroll-mt-16 py-14 md:py-20" id="markets">
     <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
-        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Markets</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Six markets, measured separately</h2></div>
+        <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Markets</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Eight markets, measured separately</h2></div>
         <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">A collection can be strong in one country and weak in another. Advertising activity and search demand are read for each market, so you know where to start.</p>
       </div>
-      <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-label="The six markets">
+      <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="The eight markets">
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">US</span><span class="text-[20px] font-extrabold tracking-tight text-ink">United States</span></li>
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">CA</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Canada</span></li>
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">GB</span><span class="text-[20px] font-extrabold tracking-tight text-ink">United Kingdom</span></li>
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">DE</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Germany</span></li>
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">DK</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Denmark</span></li>
+        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">FR</span><span class="text-[20px] font-extrabold tracking-tight text-ink">France</span></li>
         <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">IT</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Italy</span></li>
         <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">ES</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Spain</span></li>
-        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">FR</span><span class="text-[20px] font-extrabold tracking-tight text-ink">France</span></li>
-        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">DE</span><span class="text-[20px] font-extrabold tracking-tight text-ink">Germany</span></li>
-        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">GB</span><span class="text-[20px] font-extrabold tracking-tight text-ink">United Kingdom</span></li>
-        <li class="card flex items-center gap-4 px-5 py-4"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-[12px] font-extrabold text-brand-dark">US</span><span class="text-[20px] font-extrabold tracking-tight text-ink">United States</span></li>
       </ul>
     </div>
   </section>
@@ -331,7 +333,7 @@
     <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
       <div class="mb-8 grid gap-5 lg:grid-cols-12 lg:items-end">
         <div class="lg:col-span-7"><p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Delivery</p><h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Where you receive it</h2></div>
-        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">In your member area and in your e-mail, every day at <span class="font-bold text-ink" data-fill="hour">[HOUR]</span>. You sign in through the link we send you by e-mail, with no password to remember. The area holds today’s collections, the kits to download and the complete archive.</p>
+        <p class="text-[17px] leading-relaxed text-ink-2 lg:col-span-5">In your member area and in your e-mail, every day at <span class="font-bold text-ink" data-fill="hour">[HOUR]</span>. You sign in through the link we send you by e-mail, with no password to remember. The area holds today’s collections, the kits to download and the Library of everything we have sent.</p>
       </div>
       <div class="grid gap-8 lg:grid-cols-12 lg:gap-12">
         <div class="card-deep w-full max-w-[440px] overflow-hidden max-lg:mx-auto lg:col-span-5" role="img" aria-label="Example of the daily e-mail: one line per collection with numbers only, and a button that opens the member area">
@@ -354,8 +356,8 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
             <p class="mt-3 text-ink-2">Store links and kits are never in the e-mail: only the day’s summary. They live in the member area, after you sign in.</p>
             <div class="mt-5 grid gap-3 sm:grid-cols-2">
               <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Today</b><span class="mt-1 block text-[14px] text-ink-2">The day’s collections with their proof, the collection link and the kit download.</span></div>
-              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Archive</b><span class="mt-1 block text-[14px] text-ink-2">Every approved collection, filtered by niche, country and whether it is still advertised.</span></div>
-              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Preferences</b><span class="mt-1 block text-[14px] text-ink-2">Your niche and your countries, so what matters to you comes first.</span></div>
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Library</b><span class="mt-1 block text-[14px] text-ink-2">Every collection we have sent, with filters for niche, market, platform and whether it is still advertised.</span></div>
+              <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Preferences</b><span class="mt-1 block text-[14px] text-ink-2">Your niches, so what matters to you comes first.</span></div>
               <div class="card p-4"><b class="block text-[14px] font-bold text-ink">Manage subscription</b><span class="mt-1 block text-[14px] text-ink-2">Change your card or cancel, whenever you want.</span></div>
             </div>
           </div>
@@ -380,19 +382,16 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
       <div class="card grid gap-8 p-6 md:p-10 lg:grid-cols-12 lg:gap-14">
         <div class="lg:col-span-7">
           <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Priority</p>
-          <h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Your niche and your countries first</h2>
-          <p class="mt-4 text-[17px] leading-relaxed text-ink-2">When you join, you tell us your niche and the countries you sell in. The collections that match come first in your member area and in your daily e-mail; the others stay visible.</p>
+          <h2 class="mt-2 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Your niches first</h2>
+          <p class="mt-4 text-[17px] leading-relaxed text-ink-2">In your member area you choose the niches you sell in, and you can change them whenever you want. Collections in your niches come first, and the Library shows only those until you tick “Show all”.</p>
         </div>
         <figure class="min-w-0 lg:col-span-5">
-          <table class="w-full table-fixed border-separate border-spacing-1" role="img" aria-label="Diagram: memberships are limited per combination of niche and country. One example combination, women’s fashion in France, is highlighted.">
-            <thead><tr><th class="w-[26%]"></th><th class="p-1 text-[12px] font-bold text-ink-3">IT</th><th class="p-1 text-[12px] font-bold text-ink-3">ES</th><th class="p-1 text-[12px] font-bold text-ink-3">FR</th><th class="p-1 text-[12px] font-bold text-ink-3">DE</th><th class="p-1 text-[12px] font-bold text-ink-3">GB</th><th class="p-1 text-[12px] font-bold text-ink-3">US</th></tr></thead>
-            <tbody>
-              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Women’s</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-brand md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
-              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Men’s</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
-              <tr><th class="overflow-hidden pr-2 text-left text-[12px] font-bold text-ink-2">Home</th><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td><td class="h-10 rounded-lg bg-page md:h-12"></td></tr>
-            </tbody>
-          </table>
-          <figcaption class="mt-3 text-[13px] text-ink-2">Each square is one combination. Example highlighted: women’s fashion in France.</figcaption>
+          <ul class="grid gap-2">
+            <li class="flex items-center justify-between gap-3 rounded-xl bg-brand text-white px-4 py-3 text-[14px] font-bold">Women’s fashion<span class="text-[12px] font-semibold">Your niche</span></li>
+            <li class="flex items-center justify-between gap-3 rounded-xl bg-page text-ink-2 px-4 py-3 text-[14px] font-bold">Men’s fashion</li>
+            <li class="flex items-center justify-between gap-3 rounded-xl bg-page text-ink-2 px-4 py-3 text-[14px] font-bold">Home decoration</li>
+          </ul>
+          <figcaption class="mt-3 text-[13px] text-ink-2">Example: women’s fashion chosen. The other niches stay one click away.</figcaption>
         </figure>
       </div>
     </div>
@@ -452,7 +451,7 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
             <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">How you receive it</th><td data-l="Click"><span>Member area + daily list in the Click WhatsApp group</span></td><td data-l="Platform"><span>Member area on the website + daily e-mail</span></td></tr>
             <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Launch Kits</th><td data-l="Click"><span>Download button on every collection (+ ZIP in the group)</span></td><td data-l="Platform"><span>Download button on every collection</span></td></tr>
             <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Past collections</th><td data-l="Click"><span>Library with filters</span></td><td data-l="Platform"><span>Library with filters (niche, market, platform, still advertising)</span></td></tr>
-            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Niches</th><td data-l="Click"><span>Your niches first</span></td><td data-l="Platform"><span>Your niches first, in the area and in the e-mail</span></td></tr>
+            <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Niches</th><td data-l="Click"><span>Your niches first</span></td><td data-l="Platform"><span>Your niches first in the member area</span></td></tr>
             <tr><th class="whitespace-nowrap pl-5 text-left text-[13px] font-bold text-ink-2" scope="row">Price</th><td data-l="Click"><span>€<span data-fill="price-monthly">15</span>/month, no joining fee (Click clients only)</span></td><td data-l="Platform"><span>€<span data-fill="price-first">40</span> first month (joining fee + first month), then €<span data-fill="price-monthly">15</span>/month</span></td></tr>
           </tbody>
         </table>
@@ -483,12 +482,11 @@ under observation · <span class="redact" style="width:1.5em" aria-hidden="true"
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Why Google as well as Meta?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Many of the collections that are selling right now advertise only on Google Shopping and YouTube. We track both, so you don’t miss them.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How are collections validated?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Only collections that competitors are already paying to advertise, with demand checked market by market, from generic stores only. Every collection is checked again the next day before it reaches you.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How many collections do I receive?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Normally 1 to 4 a day, one per niche whenever possible; women’s fashion usually gets two. The number depends on what passes validation, and collections still being observed are labelled as such.</p></details>
-          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Which countries and niches are covered?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Italy, Spain, France, Germany, the United Kingdom and the United States. Three niches: women’s fashion, men’s fashion and home decoration.</p></details>
+          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Which countries and niches are covered?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">The United States, Canada, the United Kingdom, Germany, Denmark, France, Italy and Spain. Three niches: women’s fashion, men’s fashion and home decoration.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">What is included in the Launch Kit?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">A creative prompt tailored to the collection — paste it into ChatGPT or your image AI and generate as many ad creatives as you want — plus reference photos, Google Ads keywords, negative keywords, Shopping titles, landing-page copy and the opportunity analysis. The photos are references only and must not be published in ads.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Do you run my campaigns or produce my creatives?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">No. The Launch Kit gives you the creative prompt, the reference photos and the Google Ads material; you generate the creatives with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Can I cancel?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">Yes, whenever you want, in your member area (“Manage subscription”). There is no minimum term.</p></details>
           <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">How much does it cost?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2" id="faqPrice">€<span data-fill="price-monthly">15</span> a month<span data-if-joining>, plus a €<span data-fill="price-joining">25</span> joining fee charged with your first payment. The Click plan is €<span data-fill="price-monthly">15</span> a month with no joining fee</span>.</p></details>
-          <details><summary class="flex cursor-pointer items-center justify-between gap-5 py-4 text-[16px] font-bold text-ink md:text-[17px]">Why are memberships limited?<svg class="shrink-0 text-brand" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></summary><p class="max-w-[66ch] pb-5 text-[14.5px] text-ink-2">To reduce saturation. If too many stores in one country launch the same collection at the same time, it becomes less useful to all of them.</p></details>
         </div>
       </div>
     </div>
