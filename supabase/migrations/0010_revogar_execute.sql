@@ -26,7 +26,6 @@ revoke execute on function public.corrigir_email_subscritor(text, text, text, te
 revoke execute on function public.recalcular_subscritor(text)                             from public, anon, authenticated;
 revoke execute on function public.reservar_boas_vindas(text, integer)                     from public, anon, authenticated;
 revoke execute on function public.registar_pedido_correcao(text, integer, integer)        from public, anon, authenticated;
-revoke execute on function public.tocar_atualizado_em()                                   from public, anon, authenticated;
 revoke execute on function public.membro_ativo_direto()                                   from public, anon;
 
 grant execute on function public.corrigir_email_subscritor(text, text, text, text, text) to service_role;
@@ -34,6 +33,17 @@ grant execute on function public.recalcular_subscritor(text)                    
 grant execute on function public.reservar_boas_vindas(text, integer)                     to service_role;
 grant execute on function public.registar_pedido_correcao(text, integer, integer)        to service_role;
 grant execute on function public.membro_ativo_direto()                                   to authenticated, service_role;
+
+-- id do utilizador de Auth por e-mail, sem gerar magic link. Até aqui as funções usavam
+-- auth.admin.generateLink só para descobrir o id de um utilizador que já existia, e cada
+-- generateLink invalida o link anterior: com vários eventos do Stripe em paralelo, o link
+-- de boas-vindas acabado de enviar podia morrer. Só a service role a executa.
+create or replace function public.id_utilizador(p_email text) returns uuid
+language sql stable security definer set search_path = public, auth as $$
+  select u.id from auth.users u where lower(u.email) = lower(trim(p_email)) limit 1;
+$$;
+revoke execute on function public.id_utilizador(text) from public, anon, authenticated;
+grant execute on function public.id_utilizador(text) to service_role;
 
 -- Funções futuras: sem EXECUTE automático para anon/authenticated/public.
 alter default privileges in schema public revoke execute on functions from anon, authenticated;

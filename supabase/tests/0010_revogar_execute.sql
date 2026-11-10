@@ -10,7 +10,8 @@ begin
     'public.corrigir_email_subscritor(text,text,text,text,text)',
     'public.recalcular_subscritor(text)',
     'public.reservar_boas_vindas(text,integer)',
-    'public.registar_pedido_correcao(text,integer,integer)'
+    'public.registar_pedido_correcao(text,integer,integer)',
+    'public.id_utilizador(text)'
   ] loop
     foreach r in array array['anon', 'authenticated'] loop
       if has_function_privilege(r, f, 'execute') then raise exception 'falhou 1: % ainda executa %', r, f; end if;
