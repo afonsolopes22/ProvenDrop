@@ -38,7 +38,7 @@ window.PROVENDROP_CONFIG = {
      shown in the member area to former members. No live link exists yet
      (docs/STRIPE.md, "Por fazer"): while empty, former members see the normal
      Subscribe button and the "monthly fee only" promise is not shown. */
-  STRIPE_LINK_RETURN: "",
+    STRIPE_LINK_RETURN: "",
 
   /* Stripe customer portal login link (https://billing.stripe.com/p/login/…).
      LIVE link since 2026-11-06. Empty = "Manage subscription" buttons hidden
