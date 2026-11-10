@@ -10,7 +10,7 @@ Rótulos dos menus: o Dashboard do Stripe em português (Europa). Entre parênte
 |---|---|---|
 | Produto **ProvenDrop Direct**, 15 €/mês | `price_1UYaVjJPREpzETp6wboEOplv` | segredo `STRIPE_PRICE_DIRETO` (valor por omissão do `setup-supabase.ps1`) |
 | Produto **ProvenDrop via Click**, 15 €/mês | `price_1UYaWLJPREpzETp6beErOUxC` | segredo `STRIPE_PRICE_CLICK` (valor por omissão do `setup-supabase.ps1`) |
-| Produto **Adesão ProvenDrop**, 25 € uma vez, **só no link Direct** | `price_1UYaXiJPREpzETp6GoaPRcuA` (produto `prod_VZk1TG0Nv8evG3`) | só no Stripe |
+| Produto **ProvenDrop joining fee** (até 2026-11-10 "Adesão ProvenDrop"; nenhum código depende do nome, só dos IDs de preço), 25 € uma vez, **só no link Direct** | `price_1UYaXiJPREpzETp6GoaPRcuA` (produto `prod_VZk1TG0Nv8evG3`) | só no Stripe |
 | Payment Link **Direct** (Direct + Adesão: 40 € no 1.º mês, depois 15 €/mês) | `https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00` | `config.js` → `STRIPE_LINK_DIRECT` |
 | Payment Link **via Click** (só ProvenDrop via Click, 15 €/mês, **sem adesão**) | `https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01` | `config.js` → `STRIPE_LINK_CLICK`: botão "Subscribe with Click — €15/month" nos cartões "Are you a Click customer?" do site (desde 2026-11-06, visível a todos); a Click também o pode enviar |
 | Portal de cliente | `https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00` | `config.js` → `STRIPE_PORTAL_LINK` |
@@ -36,7 +36,7 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 ## a) Payment Link Direct: confirmar
 
 **Links de pagamento** (Payment Links) → abre o link `7sYaEY…`:
-- **Produtos**: ProvenDrop Direct 15,00 €/mês **+** Adesão ProvenDrop 25,00 € (o Stripe junta um preço único a uma subscrição: no 1.º pagamento cobra 40 €, depois 15 €/mês).
+- **Produtos**: ProvenDrop Direct 15,00 €/mês **+** ProvenDrop joining fee 25,00 € (o Stripe junta um preço único a uma subscrição: no 1.º pagamento cobra 40 €, depois 15 €/mês).
 - **Opções**: recolhe o e-mail (sempre); códigos promocionais: ver no painel (M6: cupões com limite de utilizações e duração `once`).
 - **Metadados** (Metadata): `origem` = `direto`. (Se o campo faltar, o webhook reconhece pelo `price_` de `STRIPE_PRICE_DIRETO`.)
 - **Depois do pagamento** → **Redirecionar** (não "mostrar página de confirmação") para `https://provendrop.com/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (domínio próprio desde 2026-11-08, DOMINIO.md; antes era `…afonsolopes22.github.io/ProvenDrop/…`). Desde 2026-11-06 o `session_id` é obrigatório: é com ele que a página mostra o e-mail mascarado da compra e permite corrigi-lo uma vez, nas 24 h seguintes (função `corrigir-email`, EMAIL.md §7). Na compra de teste de 06/11 o link redirecionava para a página inicial: corrigir.
