@@ -32,7 +32,7 @@ a:hover{color:#0A1C12}
 .fs12{font-size:12px}
 .c-muted{color:#48604F}
 .c-lime{color:#D4F57A}
-.c-green{color:#2E8B57}
+.c-green{color:#1F6B42}
 .c-amber{color:#9A6A12}
 
 /* Buttons */
@@ -57,6 +57,8 @@ a:hover{color:#0A1C12}
 .logo svg{flex-shrink:0}
 .logo-drop{color:#2E8B57}
 .logo-s{font-size:18px;gap:8px}
+/* AA: at 18px the wordmark green needs the darker tone (the 21px header logo passes as large text) */
+.logo-s .logo-drop{color:#1F6B42}
 .navl{display:flex;gap:30px;align-items:center}
 .navlink{text-decoration:none;font-size:12.5px}
 .head-cta{display:flex;gap:8px;align-items:center}
@@ -198,6 +200,17 @@ a:hover{color:#0A1C12}
 .plans-notes{display:flex;flex-direction:column;gap:10px}
 .plans-note{margin:0;font-size:12px;color:#48604F;line-height:1.6}
 
+/* FAQ: plain <details> accordion, mono questions */
+.faq{border-top:1px solid #DCE9D8}
+.faq-in{padding-top:110px;padding-bottom:110px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:64px;align-items:start}
+.qa-list{border-top:1px solid #DCE9D8}
+.qa{border-bottom:1px solid #DCE9D8}
+.qa summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;font-family:"Geist Mono",ui-monospace,monospace;font-size:13px;line-height:1.5;letter-spacing:.06em;text-transform:uppercase;color:#12301F}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::after{content:"+";font-size:18px;line-height:1;color:#1F6B42;flex-shrink:0}
+.qa[open] summary::after{content:"\2212"}
+.qa p{margin:0;padding:0 0 22px;max-width:62ch;font-size:16px;line-height:1.6;color:#3A5444}
+
 /* Footer */
 .site-foot{border-top:1px solid #DCE9D8}
 .foot-in{padding-top:32px;padding-bottom:32px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
@@ -215,7 +228,7 @@ a:hover{color:#0A1C12}
 @keyframes grow{from{transform:scaleX(.08)}to{transform:scaleX(1)}}
 @keyframes chkbg{to{background:#D4F57A;border-color:#12301F}}
 @keyframes chk{to{opacity:1}}
-@keyframes strike{to{color:#8AA290;text-decoration:line-through;text-decoration-color:#8AA290}}
+@keyframes strike{to{color:#5F7A66;text-decoration:line-through;text-decoration-color:#5F7A66}}
 @media (prefers-reduced-motion:no-preference){
  @supports (animation-timeline:view()){
   .reveal span{animation:lit linear both;animation-timeline:view();animation-range:entry 40% cover 55%}
@@ -240,6 +253,7 @@ a:hover{color:#0A1C12}
  .h3{font-size:34px}
  .float.hide-s,.tile.hide-s{display:none}
  .tgrid{grid-template-columns:minmax(0,1fr)}
+ .faq-in{grid-template-columns:minmax(0,1fr);gap:32px}
 }
 @media (max-width:640px){
  .wrap{padding-left:18px;padding-right:18px}
