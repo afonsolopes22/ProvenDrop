@@ -9,18 +9,23 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<!-- Geist and Geist Mono are served from this site (assets/fonts/, SIL OFL 1.1). No request to Google. -->
+<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-/* Same Hybrid Premium tokens as index.html: off-white page, graphite accents, green marks. */
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Same palette as the home page (home.css): light green page, deep green #12301F, lime #D4F57A, Geist + Geist Mono. */
 :root{
-  --light:#F7F8F6; --white:#FFFFFF; --ink:#171A18; --ink-2:#5C645E; --line:#E6E9E5; --line-2:#CFD4CE;
-  --dark:#101310; --dark-card:#191E1A; --dark-line:#2A312C; --on-dark:#F2F4F1; --on-dark-2:#A3ACA5;
-  --green:#78C995; --green-soft:#DFF3E5; --green-ink:#1D6E42;
-  --watch:#E2BC74; --watch-ink:#7A5610; --watch-soft:#F7EDD8;
-  --display:"Newsreader",Georgia,"Times New Roman",serif;
-  --body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --light:#F1F7EE; --white:#FFFFFF; --ink:#0A1C12; --ink-2:#3A5444; --line:#DCE9D8; --line-2:#CFE0CC;
+  --dark:#12301F; --dark-card:#183E29; --dark-line:#2C5A3E; --on-dark:#F1F7EE; --on-dark-2:#BFD7C4;
+  --green:#D4F57A; --green-soft:#EAF5D2; --green-ink:#1F6B42;
+  --watch:#E2BC74; --watch-ink:#8A5A0B; --watch-soft:#FBF1DC;
+  --display:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --ease:cubic-bezier(.23,1,.32,1);
   color-scheme:light;
 }
@@ -29,39 +34,39 @@ body{margin:0;background:var(--light);color:var(--ink);font-family:var(--body);f
 a{color:inherit}
 p{margin:0}
 .wrap{max-width:820px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 72px}
-h1,h2{font-family:var(--display);margin:0;font-weight:400;text-wrap:balance;letter-spacing:-.02em}
+h1,h2{font-family:var(--display);margin:0;font-weight:600;text-wrap:balance;letter-spacing:-.04em}
 h1{font-size:clamp(40px,6vw,64px);line-height:1.02}
 h1 em{font-style:normal;color:var(--green-ink)}
 .lede{color:var(--ink-2);font-size:clamp(18px,1.5vw,21px);line-height:1.5;margin-top:18px;max-width:58ch}
-.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.01em;text-decoration:none;margin-bottom:32px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.035em;text-decoration:none;margin-bottom:32px}
 .brand svg{display:block}
-.brand b{color:#0B1F1E;font-weight:800}.brand i{color:#1F6B42;font-style:normal;font-weight:800}
+.brand b{color:#0A1C12;font-weight:700}.brand i{color:#1F6B42;font-style:normal;font-weight:700}
 .ig{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin-top:12px;border-radius:8px;color:var(--ink-2);transition:color 150ms ease}
-.ig:hover{color:#0F766E}.ig svg{display:block}
-.tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:6px 12px;border-radius:999px;background:var(--green-soft);color:var(--green-ink);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+.ig:hover{color:var(--green-ink)}.ig svg{display:block}
+.tag{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:6px 10px;border-radius:6px;background:var(--green-soft);color:var(--dark);font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:#3FB06A}
 
 ol.steps{list-style:none;padding:0;margin:40px 0 0;display:grid;gap:14px;counter-reset:s}
-ol.steps>li{counter-increment:s;background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:22px 22px 22px 70px;position:relative}
-ol.steps>li::before{content:counter(s);position:absolute;left:22px;top:22px;width:32px;height:32px;border-radius:50%;background:var(--dark);color:var(--green);font-family:var(--display);font-size:17px;display:grid;place-items:center}
-ol.steps h2{font-size:clamp(22px,2.2vw,27px);line-height:1.2}
+ol.steps>li{counter-increment:s;background:var(--white);border:1px solid var(--line-2);border-radius:12px;padding:22px 22px 22px 70px;position:relative;box-shadow:0 18px 40px rgba(18,48,31,.06)}
+ol.steps>li::before{content:counter(s);position:absolute;left:22px;top:22px;width:32px;height:32px;border-radius:7px;background:var(--dark);color:var(--green);font-family:var(--mono);font-size:14px;font-weight:500;display:grid;place-items:center}
+ol.steps h2{font-size:clamp(21px,2.2vw,25px);line-height:1.2;letter-spacing:-.03em}
 ol.steps p,ol.steps li li{color:var(--ink-2)}
 ol.steps p{margin-top:8px}
 ol.steps ul{margin:10px 0 0;padding-left:18px;display:grid;gap:5px}
 ol.steps b{color:var(--ink);font-weight:600}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:6px;font:inherit;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;min-height:44px;padding:10px 18px;border:1px solid transparent;border-radius:8px;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--ease)}
 .btn:active{transform:scale(.98)}
-.btn-go{background:var(--green);color:#101310}
-.btn-line{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn-go{background:var(--dark);color:var(--green)}
+.btn-line{background:var(--light);color:var(--dark);border-color:var(--line-2)}
 .btn[hidden]{display:none}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 /* access box: masked e-mail + "Not my e-mail? Fix it" (bem-vindo.html?session_id=…, docs/EMAIL.md) */
-.access{margin-top:22px;background:var(--white);border:1px solid var(--line-2);border-radius:14px;padding:18px 20px}
+.access{margin-top:22px;background:var(--white);border:1px solid var(--line-2);border-radius:12px;padding:18px 20px}
 .access p{color:var(--ink-2)}
 .access b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
 .access .btn{margin-top:10px}
 .fix{margin-top:14px;display:grid;gap:10px}.fix[hidden]{display:none}
-.fix label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.fix label{display:block;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin-bottom:4px}
 .field{width:100%;min-height:44px;border:1px solid var(--line-2);border-radius:8px;background:var(--white);padding:8px 12px;font:inherit;font-size:16px;color:var(--ink)}
 .field:focus{outline:none;border-color:var(--green-ink)}
 .msg{margin-top:4px;border-radius:8px;padding:10px 12px;font-size:14.5px;line-height:1.45;background:var(--green-soft);color:var(--green-ink)}
@@ -70,8 +75,8 @@ ol.steps b{color:var(--ink);font-weight:600}
 .support a{font-weight:600;color:var(--green-ink)}
 footer nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px}
 footer nav a{font-weight:600;text-decoration-thickness:1px;text-underline-offset:3px}
-@media (hover:hover) and (pointer:fine){.btn-go:hover{background:#8FD6A8}.btn-line:hover{border-color:var(--ink)}}
-.rules{margin-top:32px;background:var(--watch-soft);border-radius:14px;padding:22px}
+@media (hover:hover) and (pointer:fine){.btn-go:hover{background:#0A1C12;color:#E4FB9F}.btn-line:hover{border-color:var(--dark)}}
+.rules{margin-top:32px;background:var(--watch-soft);border-radius:12px;padding:22px}
 .rules h2{font-size:21px}
 .rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;color:#4A4030}
 .note{margin-top:16px;color:var(--ink-2);font-size:14.5px}
