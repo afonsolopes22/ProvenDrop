@@ -22,6 +22,8 @@
      access to data is decided by the RLS policies on the server). -->
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+<!-- titulo.js: collection titles without the store name (the same file is used by the daily e-mail). Must load before app.js. -->
+<script src="titulo.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body class="bg-page text-ink">
@@ -126,7 +128,7 @@
           <div class="card-deep mt-4 p-5 md:p-6">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
               <span class="inline-flex items-center gap-2 text-[15px] font-bold text-white"><span class="size-2 rounded-full bg-[#3FB06A]"></span>Daily list</span>
-              <span class="text-[12px] font-semibold text-white/50">Your niches first · kit on every collection</span>
+              <span class="text-[12px] font-semibold text-white/50" id="hojeLema">Kit on every collection</span>
             </div>
             <div class="md:overflow-x-auto" id="feed"></div>
           </div>

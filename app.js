@@ -70,6 +70,9 @@
   /* The routine's internal note name ("2026-10-30 — Niche — Collection (store)") is never shown; only its date, as "Analysed 30 Oct". */
   const analisado = r => { const m = String(r.nota||"").match(/^\s*(\d{4}-\d{2}-\d{2})/); return m ? diaMes(m[1]) : ""; };
   const chave = r => `${String(r.loja||"").trim().toLowerCase()}|${String(r.colecao||"").trim().toLowerCase()}`;
+  /* Title shown to the member: never with the store name in it (titulo.js, shared with the daily e-mail).
+     "Men's Fashion | HERLINE London" → "Men's Fashion"; a title that is only the store name → "Collection". */
+  const titulo = r => (typeof window.pdLimparTitulo === "function" ? window.pdLimparTitulo(r.colecao, r.loja, r.link_colecao) : String(r.colecao||"").trim()) || "Collection";
   const plats = r => {
     const p = (Array.isArray(r.plataformas) ? r.plataformas : []).map(s => String(s).toLowerCase()).filter(s => s === "meta" || s === "google");
     if(p.length) return [...new Set(p)];
@@ -311,6 +314,13 @@
   /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02.
      One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css).
      opts.dia adds the sending day under the status ("Earlier this week"). */
+  /* Demand line: X = markets where search demand was confirmed (trends_validados); N = markets checked (trends_total,
+     sent by the research routine). While a row has no trends_total, the line shows X alone: no number is assumed. */
+  const procura = r => {
+    if(r.trends_validados == null) return "Demand: no data";
+    const x = Number(r.trends_validados), n = Number(r.trends_total);
+    return Number.isFinite(n) && n > 0 ? `Demand checked in ${esc(x)} of ${esc(n)} markets` : `Demand checked in ${esc(x)} ${x === 1 ? "market" : "markets"}`;
+  };
   function cartao(r, opts){
     const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase();
     const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
@@ -319,12 +329,12 @@
     const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
     return `<tr class="${pref ? "pref-first" : ""}"${attrC(r)}>
       <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${opts?.dia ? `<span class="sub mt-2">Sent ${esc(diaMes(r.dia))}</span>` : ""}${chips(r, "mt-2")}</td>
-      <td data-l="Collection"><div class="min-w-[160px] max-w-[220px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(r.colecao || "Collection")}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
+      <td data-l="Collection"><div class="min-w-[160px] max-w-[220px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(titulo(r))}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
       <td data-l="Niche"><div class="min-w-[112px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
       <td class="n md:text-right" data-l="Ads"><span class="block whitespace-nowrap"><span class="block">${fmt(metaAds(r))} <span class="text-[12px] font-medium text-white/60">Meta</span></span><span class="block">${fmt(googleAds(r))} <span class="text-[12px] font-medium text-white/60">Google</span></span></span></td>
       <td class="n md:text-right" data-l="Days">${dias(r)}</td>
       <td class="n md:text-right" data-l="Meta reach">${reach(r)}</td>
-      <td data-l="Markets"><div class="min-w-[120px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${r.trends_validados != null ? `Demand: ${esc(r.trends_validados)} of 6 markets` : "Demand: no data"}</span></div></td>
+      <td data-l="Markets"><div class="min-w-[120px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${procura(r)}</span></div></td>
       <td class="n md:text-right" data-l="Score"><span class="text-[22px] font-extrabold leading-none tracking-tight text-white">${score(r.score)}</span><span class="sub">/ 10</span></td>
     </tr>`;
   }
@@ -396,7 +406,7 @@
       return `<tr${attrC(r)}>
         <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>
         <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ainda}${chips(r, "mt-2")}</span></td>
-        <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(r.colecao)}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(r.colecao)}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}<span class="mt-2.5 block">${kit}</span></span></td>
+        <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(titulo(r))}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(titulo(r))}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}<span class="mt-2.5 block">${kit}</span></span></td>
         <td data-l="Niche"><span class="block min-w-[112px]"><b class="font-semibold">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap"><b class="font-extrabold">${score(r.score)}</b>${sc.mk ? `<span class="sub" title="${sc.proprio ? "Score for" : "Approved for"} ${esc(pais(sc.mk))}, the strongest market">${sc.proprio ? `${sc.valor} in ${esc(sc.mk)}` : `for ${esc(sc.mk)}`}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} when sent</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub whitespace-nowrap">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaMes(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
@@ -429,6 +439,8 @@
   /* Niches bar on Today and Library (2026-11-08): "Your niches: … · Edit"; Edit opens the same choice right there. */
   function renderBarras(){
     const n = sub?.nichos||[];
+    const escolhidos = NICHOS.filter(([v]) => n.includes(v)).length, lema = $("#hojeLema");
+    if(lema) lema.textContent = escolhidos > 0 && escolhidos < NICHOS.length ? "Your niches first · kit on every collection" : "Kit on every collection";
     const lista = n.length ? `<b class="text-ink">${esc(n.map(nicho).join(", "))}</b>` : `<span class="text-ink-3">none chosen — all collections, in the list’s order</span>`;
     document.querySelectorAll("[data-barra]").forEach(box => {
       box.innerHTML = `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] text-ink-2"><span class="font-semibold">Your niches:</span> ${lista}<button class="btn btn-line btn-sm ml-auto" type="button" data-pref-edit>Edit</button></div>
