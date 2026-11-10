@@ -177,10 +177,11 @@
     sub = error ? null : data;
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
-    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick();
+    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); iniciarContagem();
     /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
     if(!sub.guia_visto && !cPedido) abrirGuia(); else mostrarDica();
-    carregarHoje().then(ok => { if(ok) abrirColecao(); });
+    /* The Library loads right after the list, so "From your library" can say how many collections it has. */
+    carregarHoje().then(async ok => { if(!ok) return; await abrirColecao(); if(!verdes) carregarArquivo(); });
   }
 
   function semAcesso(){
@@ -200,7 +201,7 @@
     show("vSemAcesso");
   }
 
-  /* Which plan this member is on (design §5): under the Today title and in Subscription. */
+  /* Which plan this member is on (design §5): in the top of Today and in Subscription. */
   const PLANO = { click: "Plan: ProvenDrop × Click — member area + daily list in the Click WhatsApp group", direto: "Plan: ProvenDrop Platform — member area + daily e-mail" };
   const planoTexto = () => ehClick(sub) ? PLANO.click : PLANO.direto;
   function renderPlano(){ $("#plano").textContent = planoTexto(); }
@@ -241,19 +242,16 @@
     if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return false; }
     feedTodos = data || [];
     retiradas = new Set(); { const vistas = new Set(); for(const r of feedTodos){ const k = chave(r); if(vistas.has(k)) continue; vistas.add(k); if(r.retirada === true) retiradas.add(k); } }
-    if(!feedTodos.length){ feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return true; }
+    if(!feedTodos.length){ diaLista = ""; renderTopo([]); feed.innerHTML = '<div class="empty">No collections published yet. ' + (HORA ? "They arrive every day at " + esc(HORA) + "." : "") + '</div>'; return true; }
     const d = feedTodos[0].dia;
     feedRows = feedTodos.filter(r => r.dia === d && visivel(r));
-    const hoje = new Date().toISOString().slice(0,10);
-    $("#hojeTitulo").textContent = d === hoje ? "Today’s collections" : "Collections for " + dia(d);
-    $("#hojeSub").textContent = d === hoje ? dia(d) : "There is no list for today yet; this is the most recent one.";
-    $("#hojeHora").textContent = HORA ? "New collections every day at " + HORA : "";
+    diaLista = d;
     renderFeed(); renderSemana(d);
     if(verdes) renderArquivo();
     return true;
   }
 
-  /* Row attribute for /c/<id>: lets abrirColecao() find the row of a collection in any of the three tables. */
+  /* Attribute for /c/<id>: lets abrirColecao() find a collection in Today (card or "From your library" row) or in the Library table. */
   const attrC = r => C_RE.test(String(r.id_curto || "")) ? ` data-c="${esc(r.id_curto)}"` : "";
   /* Opens the collection a /c/<id> link asked for (R7), once the feed is in: the newest sending with that id_curto
      that is still visible (not withdrawn). Today when it sits in the day's list or in "Earlier this week", else the
@@ -262,7 +260,7 @@
   async function abrirColecao(){
     const c = cPedido; if(!c) return; esquecerC();
     const linha = feedTodos.find(r => String(r.id_curto || "").toUpperCase() === c && visivel(r));
-    const sel = `tr[data-c="${c}"]`;
+    const sel = `[data-c="${c}"]`;
     if(!linha){ go("arquivo"); msg($("#msgArquivo"), "This collection is no longer available."); return; }
     let tr = $("#tHoje " + sel);
     if(tr) go("hoje");
@@ -279,41 +277,124 @@
 
   /* Preferred niches first (the stored countries are no longer used to order or filter anything, 2026-11-08). */
   const porPreferencia = rows => { const pref = new Set((sub?.nichos||[]).map(s => s.toLowerCase())); return rows.slice().sort((a,b) => (pref.has(String(b.nicho||"").toLowerCase()) - pref.has(String(a.nicho||"").toLowerCase())) || (a.ordem - b.ordem)); };
-  /* High-density table (one row per collection) inside the dark panel; stacked key/value blocks under 768px (.dt). */
-  /* Meta and Google ads share one "Ads" column (two lines) so the row still fits at 1280 with real data
-     (seven-cell market strip, "Advertiser: …"), 2026-11-08. */
-  const tabela = (rows, opts) => `<table class="dt dt-dark"><thead><tr><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right" title="Active ads: Meta and Google">Ads</th><th class="text-right" title="Days advertising">Days</th><th class="text-right" title="Meta reach">Reach</th><th>Markets</th><th class="text-right">Score</th></tr></thead><tbody>${rows.map(r => cartao(r, opts)).join("")}</tbody></table>`;
+  /* ── Today: deep-green top, numbers, one card per collection, "From your library" (design Member.dc.html, 2026-11-10) ── */
+  const LISBOA = "Europe/Lisbon";
+  const emLisboa = (d, o) => Object.fromEntries(new Intl.DateTimeFormat("en-GB", Object.assign({ timeZone: LISBOA }, o)).formatToParts(d).filter(p => p.type !== "literal").map(p => [p.type, p.value]));
+  /* Today's date on the Lisbon calendar ("2026-11-10"): feed_dia.dia is a Lisbon day. */
+  const hojeLisboa = () => { const p = emLisboa(new Date(), { year: "numeric", month: "2-digit", day: "2-digit" }); return `${p.year}-${p.month}-${p.day}`; };
+  const diaExtenso = d => { const p = emLisboa(d, { weekday: "long", day: "numeric", month: "long" }); return `${p.weekday}, ${p.day} ${p.month}`; };
+  const saudacao = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
+  /* Time left until the next list: the next DAILY_TIME on the Lisbon clock. It is counted on the wall clock, so on the
+     night of a clock change the figure is off by that hour. Null when DAILY_TIME is not "HH:MM". */
+  function proximaLista(agora){
+    const m = HORA.match(/^(\d{1,2}):(\d{2})$/); if(!m) return null;
+    const p = emLisboa(agora, { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+    const s = (Number(p.hour) % 24) * 3600 + Number(p.minute) * 60 + Number(p.second);
+    let falta = Number(m[1]) * 3600 + Number(m[2]) * 60 - s; if(falta <= 0) falta += 86400;
+    const quando = new Date(agora.getTime() + falta * 1000), min = Math.ceil(falta / 60);
+    const mesmoDia = emLisboa(quando, { day: "numeric" }).day === emLisboa(agora, { day: "numeric" }).day;
+    return { h: Math.floor(min / 60), min: min % 60, dia: mesmoDia ? "Today" : emLisboa(quando, { weekday: "long" }).weekday };
+  }
+  function renderContagem(){
+    const box = $("#hojeProx"), p = proximaLista(new Date());
+    box.hidden = !p; if(!p) return;
+    $("#hojeConta").textContent = (p.h ? p.h + " h " : "") + p.min + " min";
+    $("#hojeQuando").textContent = `${p.dia} at ${HORA} · Lisbon time`;
+  }
+  let contagem = null;
+  function iniciarContagem(){ $("#hojeData").textContent = diaExtenso(new Date()); renderContagem(); if(!contagem) contagem = setInterval(renderContagem, 20000); }
+
+  /* Greeting and summary of the list shown (diaLista: its day, "" while there is none). */
+  let diaLista = "", filtroHoje = "todas";
+  function renderTopo(rows){
+    const n = rows.length, ok = rows.filter(aprovada).length, obs = n - ok, kits = rows.filter(temKit).length, deHoje = diaLista === hojeLisboa();
+    const col = k => k + (k === 1 ? " collection" : " collections"), e = k => (k === 1 ? "is" : "are");
+    $("#hojeData").textContent = diaExtenso(new Date());
+    $("#hojeLista").textContent = !diaLista || deHoje ? "Today’s collections" : "Collections for " + dia(diaLista);
+    if(!diaLista){ $("#hojeTitulo").textContent = saudacao() + ". No collections yet."; $("#hojeSub").textContent = HORA ? "They arrive every day at " + HORA + "." : ""; return; }
+    $("#hojeTitulo").textContent = !deHoje ? saudacao() + ". Today’s list is not in yet." : n ? `${saudacao()}. ${col(n)} ${e(n)} ready.` : saudacao() + ". No collections in today’s list.";
+    const partes = []; if(ok) partes.push(`${ok} ${e(ok)} approved`); if(obs) partes.push(`${obs} ${e(obs)} under observation`);
+    const frases = []; if(partes.length) frases.push(partes.join(" and ") + ".");
+    if(n) frases.push(kits === n ? (n === 1 ? "Its kit is ready to download." : "Every kit is ready to download.") : `${kits} of ${n} kits ${e(kits)} ready to download.`);
+    $("#hojeSub").textContent = (deHoje ? "" : `This is the most recent one, from ${dia(diaLista)}: ${col(n)}. `) + frases.join(" ");
+  }
+
+  /* Card photo: only the collection's own product photo, published by the research routine in the public bucket
+     "fotos" (feed_dia.imagem_url, migration 0012). An address anywhere else is ignored. Without a photo, or when it
+     does not load, the card keeps a plain light-green background with the niche icon: never another picture. */
+  const FOTOS_BASE = SB_URL.replace(/\/+$/, "") + "/storage/v1/object/public/fotos/";
+  const foto = r => { const u = String(r.imagem_url || "").trim(); return u.startsWith(FOTOS_BASE) && u.length > FOTOS_BASE.length && !/[\s"'<>\\]/.test(u) && !u.includes("..") ? u : ""; };
+  const imagem = r => { const u = foto(r); return u ? `<img src="${esc(u)}" alt="" loading="lazy" decoding="async" data-foto>` : ""; };
+  document.addEventListener("error", e => { const t = e.target; if(t instanceof HTMLImageElement && t.hasAttribute("data-foto")) t.remove(); }, true);
+  const NICHO_ICON = {
+    "roupa feminina": '<path d="M9 3v3.5L6.5 10l2 1.5L6 21h12l-2.5-9.5 2-1.5L15 6.5V3"/><path d="M9 6.5c1.2 1 4.8 1 6 0"/>',
+    "roupa masculina": '<path d="M8 3 3 6l2 4 2-1v12h10V9l2 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+    "house decor": '<path d="M8 3h8l3 8H5z"/><path d="M12 11v8M8 21h8"/>',
+    "joalharia": '<path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18"/>',
+    "": '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
+  };
+  const iconeNicho = r => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NICHO_ICON[String(r.nicho||"").trim().toLowerCase()] || NICHO_ICON[""]}</svg>`;
+
+  const EM_PAIS = { GB: "the UK", US: "the US", NL: "the Netherlands" };
+  const emPais = c => EM_PAIS[c] || pais(c);
+  const compacto = n => n >= 1e6 ? String(Math.round(n / 1e5) / 10) + "M" : n >= 1e4 ? Math.round(n / 1e3) + "k" : n >= 1e3 ? String(Math.round(n / 100) / 10) + "k" : String(Math.round(n));
+  /* Score ring: the collection score out of 10; green when approved, amber under observation. */
+  const anel = (r, ok) => { const tem = r.score != null && r.score !== "" && Number.isFinite(Number(r.score)), c = 2 * Math.PI * 22, v = tem ? Math.max(0, Math.min(10, Number(r.score))) : 0;
+    return `<span class="cc-ring" title="Score ${score(r.score)} out of 10"><svg viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="22" fill="none" stroke="#EEF4EC" stroke-width="4"/><circle cx="25" cy="25" r="22" fill="none" stroke="${ok ? "#2E8B57" : "#C98A1B"}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(c * v / 10).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 25 25)"/></svg><span class="sr-only">Score </span><b>${score(r.score)}</b></span>`; };
+  /* The eight markets: the strongest one dark, the other green markets (mercados_verdes) light green, the rest plain.
+     A strongest market outside the eight (NL/AT/CH/HU) is added as a ninth so it is never lost. */
+  const mercados = (mk, verdesMk) => { const g = new Set((verdesMk || []).map(s => String(s).toUpperCase())), cols = MARKETS.concat(mk && !MARKETS.includes(mk) ? [mk] : []);
+    return `<ul class="cc-mk" aria-label="Markets">${cols.map(c => `<li${c === mk ? ' class="best"' : g.has(c) ? ' class="g"' : ""} title="${esc(pais(c))}${c === mk ? " · strongest market" : g.has(c) ? " · strong market" : ""}">${esc(c)}</li>`).join("")}</ul>`; };
+  /* Ads: Meta and Google together in one number (the split goes in the tooltip; the platform chips sit on the photo). */
+  const kpiAds = r => { const m = metaAds(r), g = Number(googleAds(r)) || 0, mm = Number(m) || 0;
+    if(m == null && !g) return ["Ads", "—", ""];
+    return g > 0 && mm > 0 ? ["Ads", fmt(mm + g), `${fmt(mm)} on Meta · ${fmt(g)} on Google`] : g > 0 ? ["Google ads", fmt(g), ""] : ["Meta ads", fmt(mm), ""]; };
+  const kpiDias = r => { const n = diasAgora(r); return n != null ? fmt(n) : fmt(r.dias_ativo); };
+  const kpiAlcance = r => { const a = r.alcance_eu == null || r.alcance_eu === "" ? 0 : Number(r.alcance_eu); return a > 0 ? `<dd title="${fmt(a)} people reached by its Meta ads in the EU">${compacto(a)}</dd>` : `<dd ${REACH_TIP}>—</dd>`; };
+  const SETA = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5 8.5 3.5M4.5 3.5h4v4"/></svg>';
 
   function renderFeed(){
     const rows = porPreferencia(feedRows);
-    $("#feed").innerHTML = rows.length ? tabela(rows) : '<div class="empty">No collections on this day.</div>';
-    /* KPI strip above the table (counts only; nothing else is computed here) */
+    renderTopo(rows);
+    const vis = rows.filter(r => filtroHoje === "todas" || (filtroHoje === "ok") === aprovada(r));
+    $("#feed").innerHTML = vis.length ? `<div class="cc-grid">${vis.map(cartao).join("")}</div>`
+      : `<div class="empty">${!rows.length ? "No collections on this day." : filtroHoje === "ok" ? "No approved collections in this list." : "No collections under observation in this list."}</div>`;
+    /* numbers above the cards (counts of the whole list, whatever the filter) */
     const kpi = (id, v) => { const el = $(id); if(el) el.textContent = String(v); };
     kpi("#kpiTotal", rows.length); kpi("#kpiOk", rows.filter(aprovada).length); kpi("#kpiWatch", rows.filter(r => !aprovada(r)).length); kpi("#kpiKits", rows.filter(temKit).length);
   }
+  $("#hojeFiltro").addEventListener("click", e => {
+    const b = e.target.closest("[data-f]"); if(!b) return;
+    filtroHoje = b.dataset.f;
+    document.querySelectorAll("#hojeFiltro [data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    renderFeed();
+  });
 
-  /* "Earlier this week": the collections sent in the 7 days before the list shown, one row per store+collection
-     (the newest sending wins), same row format and kit as the daily list. Hidden when there are none. */
+  /* "From your library": the four collections sent before the list shown, one row per store+collection (the newest
+     sending wins), each with its kit. Hidden when there are none. The full list, with filters, is the Library tab. */
+  const ANTERIORES = 4;
   function renderSemana(d){
-    const sec = $("#semana"), lim = parse(d); if(!lim){ sec.hidden = true; return; }
-    const ini = new Date(lim.getTime() - 7 * 864e5), vistos = new Set(feedRows.map(chave)), rows = [];
-    for(const r of feedTodos){ if(r.dia >= d) continue; const dd = parse(r.dia); if(!dd || dd < ini) break; if(!visivel(r)) continue; const k = chave(r); if(vistos.has(k)) continue; vistos.add(k); rows.push(r); }
+    const sec = $("#semana"), vistos = new Set(feedRows.map(chave)), rows = [];
+    for(const r of feedTodos){ if(rows.length >= ANTERIORES) break; if(!d || r.dia >= d || !visivel(r)) continue; const k = chave(r); if(vistos.has(k)) continue; vistos.add(k); rows.push(r); }
     sec.hidden = !rows.length; if(!rows.length) return;
-    $("#semanaSub").textContent = rows.length + (rows.length === 1 ? " collection" : " collections") + " from the previous 7 days, each with its kit.";
-    $("#semanaBox").innerHTML = tabela(porPreferencia(rows), { dia: true });
+    $("#semanaBox").innerHTML = rows.map(linhaBib).join("");
+    renderVerTodos();
+  }
+  /* "See all N": N is known once the Library has loaded (it also counts approved collections from before the platform). */
+  function renderVerTodos(){ const a = $("#semanaTodos"); if(a) a.textContent = verdes ? `See all ${biblioteca().length} →` : "See all →"; }
+  function linhaBib(r){
+    const ok = aprovada(r), mk = String(r.mercado_destaque||"").toUpperCase(), st = ok ? "Approved" : "Observing";
+    const kit = r.zip_path ? `<button class="lkit" type="button" data-zip="${esc(r.zip_path)}" aria-label="Download the kit of ${esc(titulo(r))}">Kit</button>`
+      : kitExterno(r) ? `<a class="lkit" href="${esc(kitExterno(r))}" target="_blank" rel="noopener noreferrer" aria-label="Download the kit of ${esc(titulo(r))}">Kit</a>` : `<span></span>`;
+    return `<div class="lrow"${attrC(r)}><span class="lthumb">${iconeNicho(r)}${imagem(r)}</span><span class="min-w-0"><b class="block truncate font-semibold">${esc(titulo(r))}</b><span class="lsub">${st}${mk ? " · " + esc(mk) : ""} · ${score(r.score)}</span></span><span class="mut hide-m">${esc(nicho(r.nicho))}</span><span class="hide-m font-mono text-[12px]"${mk ? ` title="${esc(pais(mk))}"` : ""}>${esc(mk || "—")}</span><b class="hide-m tabular-nums">${score(r.score)}</b><span class="lst hide-m ${ok ? "ok" : "obs"}">${st}</span>${kit}</div>`;
   }
 
-  /* Eight-market strip; a strongest market outside the eight (NL/AT/CH/HU) is added as a ninth cell so it is never lost. */
-  function strip(mk, verdes){ const ok = new Set([mk, ...(verdes||[])].filter(Boolean).map(s => String(s).toUpperCase())); const cols = MARKETS.concat(mk && !MARKETS.includes(mk) ? [mk] : []); return `<ul class="strip" aria-label="Markets"${cols.length > 6 ? ` style="grid-template-columns:repeat(${cols.length},minmax(0,1fr))"` : ""}>${cols.map(c => `<li${ok.has(c) ? ' class="ok"' : ''} title="${esc(pais(c))}">${esc(c)}</li>`).join("")}</ul>`; }
   /* Score of the strongest market, shown next to the global score so it is clear why a collection is approved
      ("7.3 in CH"): the market named in a 🟢 verdict, else mercado_destaque; the routine's per-market score when
      the row carries one (scores_mercado), else the collection score. */
   const mercadoDoVeredito = r => { const m = String(r.veredito||"").match(/🟢[^()]*\(([A-Z]{2})\)/); return m ? m[1] : ""; };
   const scoreMercado = r => { const mk = mercadoDoVeredito(r) || String(r.mercado_destaque||"").toUpperCase(); const porMk = mk && r.scores_mercado && typeof r.scores_mercado === "object" ? r.scores_mercado[mk] : null; return { valor: score(porMk != null ? porMk : r.score), mk, proprio: porMk != null }; };
 
-  /* Every collection in the list comes with its kit (approved and under observation) since 2026-11-02.
-     One table row per collection (classes are Tailwind utilities + the .dt/.status/.plat components in src/tailwind.css).
-     opts.dia adds the sending day under the status ("Earlier this week"). */
   /* Demand line: X = markets where search demand was confirmed (trends_validados); N = markets checked (trends_total,
      sent by the research routine). While a row has no trends_total, the line shows X alone: no number is assumed. */
   const procura = r => {
@@ -321,22 +402,24 @@
     const x = Number(r.trends_validados), n = Number(r.trends_total);
     return Number.isFinite(n) && n > 0 ? `Demand checked in ${esc(x)} of ${esc(n)} markets` : `Demand checked in ${esc(x)} ${x === 1 ? "market" : "markets"}`;
   };
-  function cartao(r, opts){
-    const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase();
-    const pref = (sub?.nichos||[]).some(n => n.toLowerCase() === String(r.nicho||"").toLowerCase());
-    const kit = temKit(r) ? botaoKit(r, `Download Launch Kit${ok ? "" : " (under observation)"}`)
-                          : `<span class="nota text-[12px] font-medium text-white/50">Kit being prepared</span>`;
-    const adv = Number(googleAds(r)) > 0 && r.anunciante_google ? `<span class="adv sub mt-1 !text-white/80">Advertiser: ${esc(r.anunciante_google)}</span>` : "";
-    return `<tr class="${pref ? "pref-first" : ""}"${attrC(r)}>
-      <td data-l="Status"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ok ? "" : `<span class="obs mt-2 block max-w-[20ch] text-[12px] font-medium leading-snug text-amber-200/90">Under observation — test with a small budget</span>`}${opts?.dia ? `<span class="sub mt-2">Sent ${esc(diaMes(r.dia))}</span>` : ""}${chips(r, "mt-2")}</td>
-      <td data-l="Collection"><div class="min-w-[160px] max-w-[220px]"><h3 class="text-[16px] font-bold leading-snug text-white">${esc(titulo(r))}</h3><p class="shop mt-1 break-all text-[12px]">${lk ? `<a href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="text-white/50">${esc(r.loja || "")}</span>`}</p>${an ? `<p class="sub mt-1.5">Analysed ${esc(an)}</p>` : ""}<div class="mt-2.5">${kit}</div></div></td>
-      <td data-l="Niche"><div class="min-w-[112px]"><b class="font-semibold text-white">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}${adv}</div></td>
-      <td class="n md:text-right" data-l="Ads"><span class="block whitespace-nowrap"><span class="block">${fmt(metaAds(r))} <span class="text-[12px] font-medium text-white/60">Meta</span></span><span class="block">${fmt(googleAds(r))} <span class="text-[12px] font-medium text-white/60">Google</span></span></span></td>
-      <td class="n md:text-right" data-l="Days">${dias(r)}</td>
-      <td class="n md:text-right" data-l="Meta reach">${reach(r)}</td>
-      <td data-l="Markets"><div class="min-w-[120px]">${strip(mk, r.mercados_verdes)}<span class="sub mt-1.5">${procura(r)}</span></div></td>
-      <td class="n md:text-right" data-l="Score"><span class="text-[22px] font-extrabold leading-none tracking-tight text-white">${score(r.score)}</span><span class="sub">/ 10</span></td>
-    </tr>`;
+  /* One card per collection. Every collection in the list comes with its kit (approved and under observation) since
+     2026-11-02. The title never carries the store name (titulo.js); the store itself is one click away ("Store"). */
+  function cartao(r){
+    const ok = aprovada(r), lk = ligacao(r), mk = String(r.mercado_destaque||"").toUpperCase(), [adsL, adsV, adsT] = kpiAds(r);
+    const kit = r.zip_path ? `<button class="cc-btn bd" type="button" data-zip="${esc(r.zip_path)}">Download kit</button>`
+      : kitExterno(r) ? `<a class="cc-btn bd" href="${esc(kitExterno(r))}" target="_blank" rel="noopener noreferrer" title="Opens the kit link in a new tab">Download kit</a>`
+      : `<span class="cc-btn off">Kit being prepared</span>`;
+    return `<article class="cc"${attrC(r)}>
+      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${imagem(r)}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${ok ? "Approved" : "Observing"}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
+      <div class="cc-body">
+        <div class="cc-title"><h3>${esc(titulo(r))}</h3><span>${esc(nicho(r.nicho))}${mk ? ` · best in ${esc(emPais(mk))}` : ""}</span></div>
+        <dl class="cc-kpis"><div${adsT ? ` title="${esc(adsT)}"` : ""}><dt>${adsL}</dt><dd>${adsV}</dd></div><div><dt>Days live</dt><dd>${kpiDias(r)}</dd></div><div><dt>Reach</dt>${kpiAlcance(r)}</div></dl>
+        ${mercados(mk, r.mercados_verdes)}
+        <p class="cc-sub">${procura(r)}</p>
+        ${ok ? "" : `<p class="cc-note">Test with a small budget, or wait for tomorrow’s re-check.</p>`}
+        <div class="cc-acts">${kit}${lk ? `<a class="cc-btn bl" href="${esc(lk.href)}" target="_blank" rel="noopener" title="Opens the collection on the store, in a new tab">Store ${SETA}</a>` : ""}</div>
+      </div>
+    </article>`;
   }
 
   /* kits: short-lived signed URL from the private bucket; only works for members with access (RLS) */
@@ -359,6 +442,7 @@
       const { data, error } = await sb.from("verdes").select("*").order("data_aprovacao", { ascending: false });
       if(error){ box.innerHTML = '<div class="empty">The library could not be loaded right now.</div>'; return; }
       verdes = data || [];
+      renderVerTodos();
       const rows = biblioteca();
       const nichos = [...new Set(rows.map(r => r.nicho).filter(Boolean))], paises = [...new Set(rows.map(r => String(r.mercado_destaque||"").toUpperCase()).filter(Boolean))].sort();
       $("#fNicho").innerHTML = '<option value="">All</option>' + nichos.map(n => `<option value="${esc(n)}">${esc(nicho(n))}</option>`).join("");
@@ -440,7 +524,8 @@
   function renderBarras(){
     const n = sub?.nichos||[];
     const escolhidos = NICHOS.filter(([v]) => n.includes(v)).length, lema = $("#hojeLema");
-    if(lema) lema.textContent = escolhidos > 0 && escolhidos < NICHOS.length ? "Your niches first · kit on every collection" : "Kit on every collection";
+    /* Only true, and only shown, when one or two of the three niches are chosen. */
+    if(lema) lema.textContent = escolhidos > 0 && escolhidos < NICHOS.length ? "Your niches first" : "";
     const lista = n.length ? `<b class="text-ink">${esc(n.map(nicho).join(", "))}</b>` : `<span class="text-ink-3">none chosen — all collections, in the list’s order</span>`;
     document.querySelectorAll("[data-barra]").forEach(box => {
       box.innerHTML = `<div class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-line bg-white px-4 py-2.5 text-[13px] text-ink-2"><span class="font-semibold">Your niches:</span> ${lista}<button class="btn btn-line btn-sm ml-auto" type="button" data-pref-edit>Edit</button></div>
