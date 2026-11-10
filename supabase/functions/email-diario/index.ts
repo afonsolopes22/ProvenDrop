@@ -6,7 +6,10 @@
 // RECENTE de feed_dia (a rotina publica ao fim da tarde; às 09:00 do dia
 // seguinte sai a lista de ontem) e nunca envia a mesma lista duas vezes
 // (envios_diarios.feed_dia). O e-mail NÃO leva links das lojas nem dos zips:
-// só o resumo e um botão para a área. Cada linha: estado, coleção, nicho,
+// só o resumo e o botão para a área, que vai DUAS vezes: logo a seguir ao título
+// (o Gmail esconde atrás de "•••" o final que se repete de um dia para o outro) e
+// no fim. A data do dia vai no cabeçalho e no rodapé, para o e-mail nunca ser
+// igual ao anterior. O estado segue a regra da área de membros (estado.ts). Cada linha: estado, coleção, nicho,
 // mercado, "N Meta + N Google ads", dias, alcance e "kit ready" em todas as
 // que têm kit (aprovadas e a observar, desde 2026-11-02). Nunca o nome da
 // loja nem o anunciante Google.
@@ -20,9 +23,10 @@
 //   ALERT_EMAIL e não toca em envios_diarios (o envio das 09:00 do dia seguinte não é afetado).
 
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
-import { enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
+import { botaoHtml, enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { semSegredos } from "../_shared/log.ts";
+import { aprovada as regraAprovada, dataPorExtenso } from "./estado.ts";
 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -41,6 +45,7 @@ interface Item {
   anuncios_ativos: number | null; anuncios_meta: number | null; anuncios_google: number | null;
   dias_ativo: number | null; data_inicio: string | null;
   zip_url: string | null; zip_path: string | null; kit_pronto: boolean | null;
+  veredito: string | null; // só para decidir "approved" (estado.ts); o texto do veredito não vai no e-mail
 }
 
 /** Os nichos são guardados com os rótulos portugueses da rotina; o e-mail é em inglês. */
@@ -60,7 +65,7 @@ function agoraLisboa(d = new Date()) {
 }
 
 const k = (n: number | null) => n == null || n <= 0 ? "" : n >= 1000 ? `${Math.round(n / 1000)}k people` : `${Math.round(n)} people`;
-const aprovada = (i: Item) => /aprov/i.test(i.estado ?? "");
+const aprovada = (i: Item) => regraAprovada(i.estado, i.veredito);
 const mercado = (i: Item) => i.mercado_destaque || (i.paises_ads?.[0] ?? "");
 /** Dias contados até hoje quando há data_inicio; senão o valor da análise. */
 function dias(i: Item): string {
@@ -125,7 +130,7 @@ Deno.serve(async (req) => {
   if ((repetido.data?.length ?? 0) > 0 && !forcar) return json({ ok: true, saltado: "lista já enviada", feed_dia: feedDia });
 
   const feed = await admin.from("feed_dia")
-    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto")
+    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito")
     .eq("dia", feedDia).order("ordem");
   if (feed.error) return json({ erro: semSegredos(feed.error.message) }, 500);
   const itens = (feed.data ?? []) as Item[];
@@ -141,12 +146,15 @@ Deno.serve(async (req) => {
 
   const n = itens.length;
   const subject = `ProvenDrop · ${ddmm}: ${n} ${n === 1 ? "collection" : "collections"} today`;
-  const rodape = "Store links and Launch Kits (approved and under observation) are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.";
-  const text = itens.map(linhaTexto).join("\n") + `\n\nOpen today's collections: ${APP_URL}\n\n${rodape}`;
+  const hoje = dataPorExtenso(); // "Tuesday, 10 November" (Europe/Lisbon)
+  const titulo = `${n} ${n === 1 ? "collection" : "collections"} today`;
+  const botao = { texto: "Open today's collections", url: APP_URL };
+  const rodape = `List of ${hoje}. Store links and Launch Kits (approved and under observation) are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.`;
+  const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTexto).join("\n") + `\n\nOpen today's collections: ${APP_URL}\n\n${rodape}`;
   const html = molde(
-    `${n} ${n === 1 ? "collection" : "collections"} today`,
-    itens.map(linhaHtml).join(""),
-    { texto: "Open today's collections", url: APP_URL },
+    titulo,
+    `<p style="margin:-8px 0 0;font-size:15px;color:#5B6B66">${esc(hoje)}</p>` + botaoHtml(botao, "18px 0 24px") + itens.map(linhaHtml).join(""),
+    botao,
     rodape,
   );
 
