@@ -19,11 +19,10 @@ window.PROVENDROP_CONFIG = {
      + joining fee, metadata origem=direto, redirects to bem-vindo.html after
      payment. Empty = Subscribe button disabled.
      Test links (test mode) go to config.local.js, loaded only on localhost.
-     TEMPORARILY EMPTY (2026-11-06): the Stripe webhook is not configured yet,
-     so real payments would not reach Supabase. Re-enable after running
-     scripts/setup-supabase.ps1 and testing with the TESTE100 coupon:
-     "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00" */
-  STRIPE_LINK_DIRECT: "",
+     ACTIVE since 2026-11-10: the live webhook delivers and processes events
+     (checked in stripe_eventos); the link requires accepting the Terms and
+     accepts promotion codes (docs/STRIPE.md). */
+  STRIPE_LINK_DIRECT: "https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00",
 
   /* Stripe Payment Link of the CLICK plan (monthly fee only, no joining fee;
      metadata origem=click; redirects to bem-vindo-click.html?session_id=…, where
