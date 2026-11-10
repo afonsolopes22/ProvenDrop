@@ -15,7 +15,9 @@
 // Segredos: CRON_SECRET (igual ao valor em public.config), RESEND_API_KEY,
 //   EMAIL_FROM, APP_URL, HORA_ENVIO (ex.: "9").
 //
-// Envio manual (teste):  POST …/email-diario?forcar=1  com x-cron-secret.
+// Envio manual:  POST …/email-diario?forcar=1  com x-cron-secret (envia a todos e regista o dia).
+// Teste:  POST …/email-diario?teste=1  com x-cron-secret: envia a lista mais recente SÓ para
+//   ALERT_EMAIL e não toca em envios_diarios (o envio das 09:00 do dia seguinte não é afetado).
 
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
@@ -28,6 +30,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 const APP_URL = Deno.env.get("APP_URL") ?? "https://provendrop.com/app.html";
 const HORA_ENVIO = Number.parseInt((Deno.env.get("HORA_ENVIO") ?? "-1").split(":")[0], 10);
 const TOLERANCIA_DIAS = 7; // M1: em atraso há menos de 7 dias ainda recebe
+const ALERT_EMAIL = (Deno.env.get("ALERT_EMAIL") ?? "").trim();
 
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
@@ -99,7 +102,10 @@ function linhaHtml(i: Item): string {
 
 Deno.serve(async (req) => {
   if (!(await cronSecretOk(req))) return json({ erro: "não autorizado" }, 401); // S5
-  const forcar = new URL(req.url).searchParams.get("forcar") === "1";
+  const params = new URL(req.url).searchParams;
+  const teste = params.get("teste") === "1"; // só para ALERT_EMAIL, sem registo
+  const forcar = teste || params.get("forcar") === "1";
+  if (teste && !ALERT_EMAIL) return json({ erro: "ALERT_EMAIL em falta: o modo de teste não tem destinatário" }, 400);
   const { dia, hora, ddmm } = agoraLisboa();
 
   if (!forcar && hora !== HORA_ENVIO) return json({ ok: true, saltado: "fora da hora", hora, hora_envio: HORA_ENVIO });
@@ -144,7 +150,8 @@ Deno.serve(async (req) => {
     rodape,
   );
 
-  const mensagens: Mensagem[] = (subs.data ?? []).map((s) => ({ to: s.email, subject, html, text }));
+  const destinatarios = teste ? [ALERT_EMAIL] : (subs.data ?? []).map((s) => s.email as string);
+  const mensagens: Mensagem[] = destinatarios.map((to) => ({ to, subject, html, text }));
   let enviados = 0;
   try {
     enviados = mensagens.length ? await enviarEmails(mensagens) : 0;
@@ -155,6 +162,8 @@ Deno.serve(async (req) => {
     console.error(`email-diario ${feedDia}: ${erro}`);
     return json({ erro, feed_dia: feedDia, destinatarios: mensagens.length }, 502);
   }
+
+  if (teste) return json({ ok: true, teste: true, feed_dia: feedDia, colecoes: n, destinatarios: mensagens.length, enviados });
 
   const reg = await admin.from("envios_diarios").upsert({ dia, feed_dia: feedDia, enviados, enviado_em: new Date().toISOString() });
   if (reg.error) return json({ erro: semSegredos(reg.error.message) }, 500);
