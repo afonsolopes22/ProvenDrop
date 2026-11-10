@@ -40,6 +40,8 @@
 // Modos manuais (x-cron-secret, comparação em tempo constante — S5):
 //   POST …?reenviar_boas_vindas=<email>   reenvia a quem tem acesso (B3)
 //   POST …?varrer_boas_vindas=1           o mesmo que o pg_cron faz
+//   POST …?teste_email=boas_vindas|regresso|click   envia esse e-mail SÓ para ALERT_EMAIL, com o
+//        botão a abrir a área (nenhum link de entrada é criado); não lê nem escreve em subscritores
 //
 // Deploy:  supabase functions deploy stripe-webhook --no-verify-jwt
 // Segredos: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_ACCEPT_TEST,
@@ -132,9 +134,11 @@ Deno.serve(async (req) => {
   // Modos manuais / pg_cron (protegidos por x-cron-secret, tempo constante).
   const reenviar = url.searchParams.get("reenviar_boas_vindas");
   const varrer = url.searchParams.get("varrer_boas_vindas");
-  if (reenviar !== null || varrer !== null) {
+  const testeEmail = url.searchParams.get("teste_email");
+  if (reenviar !== null || varrer !== null || testeEmail !== null) {
     if (!(await cronSecretOk(req))) return json({ erro: "não autorizado" }, 401);
     try {
+      if (testeEmail !== null) return await emailDeTeste(testeEmail.trim());
       if (varrer !== null) return json(await varrerBoasVindas());
       return await reenviarBoasVindas(reenviar!.trim().toLowerCase());
     } catch (e) {
@@ -588,6 +592,21 @@ async function varrerBoasVindas(): Promise<Record<string, unknown>> {
     (await tentarBoasVindas(s.email, "boas_vindas")) ? enviadas++ : falhadas++;
   }
   return { ok: true, candidatos: candidatos.length, enviadas, falhadas, esgotadas };
+}
+
+/**
+ * Modo de teste dos e-mails de acesso: envia o e-mail pedido (o mesmo texto e o mesmo molde dos
+ * verdadeiros) SÓ para ALERT_EMAIL. O botão abre a área de membros sem link de entrada: nenhum
+ * token é criado e a tabela subscritores não é lida nem alterada.
+ */
+async function emailDeTeste(tipo: string): Promise<Response> {
+  const para = (Deno.env.get("ALERT_EMAIL") ?? "").trim();
+  if (!para) return json({ erro: "ALERT_EMAIL em falta: o modo de teste não tem destinatário" }, 400);
+  if (tipo === "boas_vindas") await enviarBoasVindas(para, APP_URL);
+  else if (tipo === "regresso") await enviarRegresso(para, APP_URL);
+  else if (tipo === "click") await enviarEmail({ to: para, ...moldeBoasVindasClick(APP_URL, MINUTOS) });
+  else return json({ erro: "teste_email desconhecido: boas_vindas, regresso ou click" }, 400);
+  return json({ ok: true, teste: true, tipo, destinatarios: 1 });
 }
 
 /** B3: só reenvia a quem tem acesso (direto, ou Click validado); 409 com o motivo para os outros. */
