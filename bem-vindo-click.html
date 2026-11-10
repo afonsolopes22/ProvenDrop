@@ -9,19 +9,25 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<!-- Geist and Geist Mono are served from this site (assets/fonts/, SIL OFL 1.1). No request to Google. -->
+<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Same palette as the home page (home.css): light green page, deep green #12301F, lime #D4F57A, Geist + Geist Mono. */
 :root{
-  --bg:#F4F6F2; --surface:#FFFFFF; --ink:#121A14; --muted:#5C675E; --line:#DDE2DA; --line-strong:#C7CEC4;
-  --go:#178246; --go-ink:#0F5F32; --go-soft:#E3F3E9;
-  --wait:#B4731A; --wait-soft:#FBEFDA;
-  --wa:#0B5C4B; --wa-bubble:#DCF3E4;
-  --header:rgba(244,246,242,.72);
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#F1F7EE; --surface:#FFFFFF; --ink:#0A1C12; --muted:#3A5444; --line:#DCE9D8; --line-strong:#CFE0CC;
+  --go:#1F6B42; --go-ink:#12301F; --go-soft:#EAF5D2;
+  --wait:#8A5A0B; --wait-soft:#FBF1DC;
+  --wa:#12301F; --wa-bubble:#EAF5D2;
+  --btn:#12301F; --btn-ink:#D4F57A;
+  --header:rgba(241,247,238,.72);
+  --display:"Geist",ui-sans-serif,system-ui,sans-serif;
+  --body:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   /* motion tokens — never approximate */
   --ease-out:cubic-bezier(0.23,1,0.32,1);
   --ease-in-out:cubic-bezier(0.77,0,0.175,1);
@@ -29,53 +35,55 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --bg:#0A1C12; --surface:#12301F; --ink:#F1F7EE; --muted:#BFD7C4; --line:#2C5A3E; --line-strong:#3A6B4C;
+  --go:#D4F57A; --go-ink:#D4F57A; --go-soft:#183E29;
   --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}}
+  --wa:#D4F57A; --wa-bubble:#183E29;
+  --btn:#D4F57A; --btn-ink:#12301F;
+  --header:rgba(10,28,18,.72); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0E1512; --surface:#151E19; --ink:#E8EEE9; --muted:#9BA69E; --line:#243029; --line-strong:#344439;
-  --go:#3FC77E; --go-ink:#8FE3B4; --go-soft:#123826;
+  --bg:#0A1C12; --surface:#12301F; --ink:#F1F7EE; --muted:#BFD7C4; --line:#2C5A3E; --line-strong:#3A6B4C;
+  --go:#D4F57A; --go-ink:#D4F57A; --go-soft:#183E29;
   --wait:#E6A94B; --wait-soft:#3A2C14;
-  --wa:#7FD3B8; --wa-bubble:#173B30;
-  --header:rgba(14,21,18,.72); color-scheme:dark}
+  --wa:#D4F57A; --wa-bubble:#183E29;
+  --btn:#D4F57A; --btn-ink:#12301F;
+  --header:rgba(10,28,18,.72); color-scheme:dark}
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:760px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 64px}
 a{color:inherit}
-h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02em}
-h1{font-size:clamp(34px,6vw,52px);font-weight:800;line-height:1.05}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.04em}
+h1{font-size:clamp(34px,6vw,52px);font-weight:600;line-height:1.02}
 h1 em{font-style:normal;color:var(--go)}
 .lead{color:var(--muted);font-size:18px;margin:14px 0 0;max-width:56ch}
 .lead+.lead{margin-top:8px}
-.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin-bottom:28px}
-.brand svg{display:block}.brand b{color:#0B1F1E;font-weight:800}.brand i{color:#1F6B42;font-style:normal;font-weight:800}
+.brand{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.035em;text-decoration:none;display:inline-flex;align-items:center;gap:10px;margin-bottom:28px}
+.brand svg{display:block}.brand b{color:#0A1C12;font-weight:700}.brand i{color:#1F6B42;font-style:normal;font-weight:700}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .brand b{color:#fff}:root:not([data-theme="light"]) .brand i{color:#3FB06A}}
 :root[data-theme="dark"] .brand b{color:#fff}:root[data-theme="dark"] .brand i{color:#3FB06A}
 .ig{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin-top:12px;border-radius:8px;color:var(--muted);transition:color 150ms ease}
-.ig:hover{color:#0F766E}.ig svg{display:block}
+.ig:hover{color:var(--go)}.ig svg{display:block}
 ol.steps{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:14px;counter-reset:s}
-ol.steps>li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 20px 20px 64px;position:relative}
-ol.steps>li::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-family:var(--mono);font-weight:500;display:grid;place-items:center}
-ol.steps h2{font-size:21px;font-weight:700;line-height:1.2}
+ol.steps>li{counter-increment:s;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:20px 20px 20px 64px;position:relative}
+ol.steps>li::before{content:counter(s);position:absolute;left:20px;top:18px;width:30px;height:30px;border-radius:7px;background:var(--btn);color:var(--btn-ink);font-family:var(--mono);font-size:14px;font-weight:500;display:grid;place-items:center}
+ol.steps h2{font-size:21px;font-weight:600;line-height:1.2;letter-spacing:-.03em}
 ol.steps p,ol.steps li li{color:var(--muted)}
 ol.steps p{margin:8px 0 0}
 ol.steps ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
 code{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--ink)}
-.btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--go);background:var(--go);color:var(--bg);transition:transform 160ms cubic-bezier(.23,1,.32,1)}
+.btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;text-decoration:none;padding:11px 16px;border-radius:8px;border:1px solid var(--btn);background:var(--btn);color:var(--btn-ink);transition:transform 160ms cubic-bezier(.23,1,.32,1)}
 .btn:active{transform:scale(.97)}
-.btn-wa{width:100%;justify-content:center;min-height:56px;margin-top:20px;font-size:17px;font-weight:700;border-radius:14px;background:#0F766E;border-color:#0F766E;color:#fff}
+.btn-wa{width:100%;justify-content:center;min-height:56px;margin-top:20px;font-size:15px;font-weight:500;border-radius:10px;background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
 .btn-wa svg{flex:none}
-.btn-wa small{display:block;font-size:13px;font-weight:500;opacity:.85}
+.btn-wa small{display:block;font-size:12px;font-weight:400;opacity:.85;letter-spacing:.02em}
 .pt{color:var(--muted);font-size:15px;margin:10px 0 0}
-.fee{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:var(--go-soft);color:var(--go-ink);font-size:13px;font-weight:600}
-.fee::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--go)}
+.fee{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 10px;border-radius:6px;background:var(--go-soft);color:var(--go-ink);font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.fee::before{content:"";width:8px;height:8px;border-radius:50%;background:#3FB06A}
 .btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
 .num{font-family:var(--mono);user-select:all}
-.rules{margin-top:28px;background:var(--wait-soft);border-radius:16px;padding:20px}
-.rules h2{font-size:19px;color:var(--ink)}
+.rules{margin-top:28px;background:var(--wait-soft);border-radius:12px;padding:20px}
+.rules h2{font-size:19px;font-weight:600;color:var(--ink)}
 .rules ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px}
 .note{margin-top:16px;color:var(--muted);font-size:14px}
 footer{margin-top:36px;color:var(--muted);font-size:14px}

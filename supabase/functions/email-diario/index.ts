@@ -12,7 +12,8 @@
 // igual ao anterior. O estado segue a regra da área de membros (estado.ts). Cada linha: estado, coleção, nicho,
 // mercado, "N Meta + N Google ads", dias, alcance e "kit ready" em todas as
 // que têm kit (aprovadas e a observar, desde 2026-11-02). Nunca o nome da
-// loja nem o anunciante Google.
+// loja nem o anunciante Google: o título da coleção passa por limparTitulo
+// (/titulo.js), que tira a parte que nomeia a loja.
 //
 // Deploy:  supabase functions deploy email-diario --no-verify-jwt
 // Segredos: CRON_SECRET (igual ao valor em public.config), RESEND_API_KEY,
@@ -27,6 +28,10 @@ import { botaoHtml, enviarEmails, esc, molde, type Mensagem } from "../_shared/e
 import { cronSecretOk } from "../_shared/auth.ts";
 import { semSegredos } from "../_shared/log.ts";
 import { aprovada as regraAprovada, dataPorExtenso } from "./estado.ts";
+// Títulos sem o nome da loja: o MESMO ficheiro que a área de membros carrega (/titulo.js, script clássico que
+// regista globalThis.pdLimparTitulo). Testes: ../_shared/titulo.test.ts.
+import "../../../titulo.js";
+const limparTitulo = (globalThis as unknown as { pdLimparTitulo: (c?: string | null, loja?: string | null, link?: string | null) => string }).pdLimparTitulo;
 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -46,6 +51,7 @@ interface Item {
   dias_ativo: number | null; data_inicio: string | null;
   zip_url: string | null; zip_path: string | null; kit_pronto: boolean | null;
   veredito: string | null; // só para decidir "approved" (estado.ts); o texto do veredito não vai no e-mail
+  loja: string | null; link_colecao: string | null; // só para limpar o título: nunca vão no e-mail
 }
 
 /** Os nichos são guardados com os rótulos portugueses da rotina; o e-mail é em inglês. */
@@ -87,7 +93,7 @@ const temKit = (i: Item) => i.kit_pronto === true || !!(i.zip_path || i.zip_url)
 
 function linhaTexto(i: Item): string {
   const ok = aprovada(i);
-  const cab = [i.colecao ?? "Collection", nicho(i), mercado(i)].filter(Boolean).join(" · ");
+  const cab = [limparTitulo(i.colecao, i.loja, i.link_colecao) || "Collection", nicho(i), mercado(i)].filter(Boolean).join(" · ");
   const partes = [
     ok ? "" : "under observation",
     anuncios(i),
@@ -130,7 +136,7 @@ Deno.serve(async (req) => {
   if ((repetido.data?.length ?? 0) > 0 && !forcar) return json({ ok: true, saltado: "lista já enviada", feed_dia: feedDia });
 
   const feed = await admin.from("feed_dia")
-    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito")
+    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito,loja,link_colecao")
     .eq("dia", feedDia).order("ordem");
   if (feed.error) return json({ erro: semSegredos(feed.error.message) }, 500);
   const itens = (feed.data ?? []) as Item[];

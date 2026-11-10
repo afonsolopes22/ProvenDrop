@@ -1,6 +1,6 @@
 /* ProvenDrop · home page (index.html only). Hand-written, no build step.
    Design: provendrop-site-v4 (2026-11-10). Deep green #12301F, lime #D4F57A, Geist + Geist Mono.
-   The other pages (app, admin, welcome, legal) use tailwind.css.
+   The other pages share the same palette and fonts: tailwind.css (app, admin, 404, legal) and inline styles (welcome pages).
    Motion: every animation is switched off under prefers-reduced-motion. The scroll-driven ones
    (statement text, crossed-out steps) live inside @supports (animation-timeline: view()),
    so browsers without support show the normal, finished state. The tilt of the hero mock-up and the

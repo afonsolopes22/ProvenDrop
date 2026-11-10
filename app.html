@@ -10,33 +10,35 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<!-- Geist and Geist Mono are served from this site (assets/fonts/, SIL OFL 1.1). The @font-face rules are in tailwind.css. -->
+<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Same clean SaaS theme as index.html; dashboard shell with a sidebar. -->
 <link rel="stylesheet" href="tailwind.css">
 <!-- S6: strict CSP (no inline scripts: the logic lives in app.js) and SRI on the pinned supabase-js.
-     connect-src must match SUPABASE_URL in config.js. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src https://maljrfgnnhtrjunnwlre.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'self'; object-src 'none'">
+     connect-src and img-src must match SUPABASE_URL in config.js (img-src: the card photos, public bucket "fotos"). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src https://maljrfgnnhtrjunnwlre.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://maljrfgnnhtrjunnwlre.supabase.co; base-uri 'none'; form-action 'self'; object-src 'none'">
 <!-- Supabase URL, anon key, portal link and delivery time come from config.js (public values only;
      access to data is decided by the RLS policies on the server). -->
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
+<!-- titulo.js: collection titles without the store name (the same file is used by the daily e-mail). Must load before app.js. -->
+<script src="titulo.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body class="bg-page text-ink">
 <div class="flex min-h-dvh">
   <!-- sidebar (desktop) / bottom tab bar (phones). Hidden entirely while signed out (CSS: body:has(#tabs[hidden])). -->
   <aside class="sticky top-0 flex h-dvh w-64 shrink-0 flex-col border-r border-line bg-white px-4 py-5 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:top-auto max-lg:z-20 max-lg:h-auto max-lg:w-auto max-lg:border-r-0 max-lg:border-t max-lg:px-2 max-lg:py-0 max-lg:pb-[env(safe-area-inset-bottom)]" id="side">
-    <a class="inline-flex items-center gap-2.5 px-2 text-[18px] font-extrabold tracking-tight no-underline max-lg:hidden" translate="no" href="./">
+    <a class="inline-flex items-center gap-2.5 px-2 text-[18px] font-bold tracking-[-0.035em] no-underline max-lg:hidden" translate="no" href="./">
       <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#12301F"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#D4F57A" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#D4F57A" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#D4F57A"/><circle cx="44.5" cy="13" r="4" fill="#3FB06A"/></svg>
       <span><span class="text-[#0B1F1E]">Proven</span><span class="text-[#1F6B42]">Drop</span></span>
     </a>
     <nav class="mt-7 grid gap-1 max-lg:mt-0 max-lg:flex max-lg:justify-around max-lg:gap-0" id="tabs" role="tablist" aria-label="Sections" hidden>
-      <p class="px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3 max-lg:hidden">General</p>
+      <p class="px-3 pb-1 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3 max-lg:hidden">General</p>
       <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="hoje" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg>Today</button>
       <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="arquivo" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg>Library</button>
-      <p class="mt-4 px-3 pb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-3 max-lg:hidden">Account</p>
+      <p class="mt-4 px-3 pb-1 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3 max-lg:hidden">Account</p>
       <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="prefs" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.5"/><circle cx="9" cy="17" r="2.5"/></svg>Preferences</button>
       <button class="side-link max-lg:min-h-0 max-lg:flex-col max-lg:gap-1 max-lg:rounded-lg max-lg:px-2 max-lg:py-2 max-lg:text-[11px]" role="tab" data-tab="conta" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Subscription</button>
     </nav>
@@ -49,7 +51,7 @@
   <div class="min-w-0 flex-1">
     <header class="sticky top-0 z-10 border-b border-line bg-white/85 backdrop-blur">
       <div class="mx-auto flex min-h-16 w-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <a class="inline-flex items-center gap-2.5 text-[17px] font-extrabold tracking-tight no-underline lg:hidden" translate="no" href="./">
+        <a class="inline-flex items-center gap-2.5 text-[17px] font-bold tracking-[-0.035em] no-underline lg:hidden" translate="no" href="./">
           <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#12301F"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#D4F57A" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#D4F57A" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#D4F57A"/><circle cx="44.5" cy="13" r="4" fill="#3FB06A"/></svg>
           <span><span class="text-[#0B1F1E]">Proven</span><span class="text-[#1F6B42]">Drop</span></span>
         </a>
@@ -62,8 +64,8 @@
       <!-- 0. not configured -->
       <section id="vConfig" hidden>
         <div class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9">
-          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
-          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink">The member area is not active yet</h1>
+          <p class="font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">The member area is not active yet</h1>
           <p class="mt-3 text-ink-2">This page starts working once the connection to the server is configured. Until then there is nothing to see here.</p>
           <p class="mt-6"><a class="btn btn-line" href="./">Back to the site</a></p>
         </div>
@@ -72,11 +74,11 @@
       <!-- 1. sign in -->
       <section id="vLogin" hidden>
         <form class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9" id="formLogin" novalidate>
-          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
-          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink">Sign in to your area</h1>
+          <p class="font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Sign in to your area</h1>
           <p class="mt-3 text-ink-2">Enter the e-mail you paid with. We send you a sign-in link: no password.</p>
           <div class="mt-6">
-            <label class="mb-1.5 block text-[13px] font-bold text-ink" for="email">E-mail</label>
+            <label class="mb-1.5 block font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2" for="email">E-mail</label>
             <input class="field" type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
           </div>
           <button class="btn btn-go mt-3 w-full" id="btnLogin" type="submit">Send sign-in link</button>
@@ -88,8 +90,8 @@
       <!-- 2. signed in but no active subscription -->
       <section id="vSemAcesso" hidden>
         <div class="card mx-auto mt-6 max-w-[520px] p-7 md:mt-16 md:p-9">
-          <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Member area</p>
-          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="semTitulo">No active subscription</h1>
+          <p class="font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-brand-dark">Member area</p>
+          <h1 class="mt-2 text-[clamp(28px,3.4vw,38px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink" id="semTitulo">No active subscription</h1>
           <p class="mt-3 text-ink-2" id="semTexto"></p>
           <div class="mt-6 flex flex-wrap gap-2.5">
             <a class="btn btn-go" id="semPortal" href="#" target="_blank" rel="noopener" hidden>Manage subscription</a>
@@ -104,53 +106,61 @@
       <!-- 3. member area -->
       <section id="vApp" hidden>
         <div id="tHoje" role="tabpanel">
-          <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-            <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="hojeTitulo">Today’s collections</h1><p class="mt-1 text-[14px] text-ink-2" id="hojeSub"></p></div>
-            <p class="rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-semibold text-ink-2 empty:hidden" id="hojeHora"></p>
-          </div>
-          <!-- Which plan (app.js renderPlano): "Plan: ProvenDrop × Click — …" or "Plan: ProvenDrop Platform — …". -->
-          <p class="mt-3 inline-flex max-w-full items-center gap-2 rounded-full bg-brand-soft px-3.5 py-1.5 text-[12px] font-semibold leading-snug text-brand-dark empty:hidden" id="plano"></p>
+          <!-- Today (design: Member.dc.html, provendrop-site-v4): deep-green top with the greeting and the countdown to the
+               next list, four numbers, one card per collection, and "From your library". Filled by app.js. -->
+          <section class="td-hero" aria-labelledby="hojeTitulo">
+            <div class="relative z-[1] min-w-0">
+              <p class="font-mono text-[11.5px] font-medium uppercase tracking-[0.06em] text-lime empty:hidden" id="hojeData"></p>
+              <h1 id="hojeTitulo">Today’s collections</h1>
+              <p class="td-lead" id="hojeSub"></p>
+              <!-- Which plan (app.js renderPlano): "Plan: ProvenDrop × Click — …" or "Plan: ProvenDrop Platform — …". -->
+              <p class="mt-3 font-mono text-[11px] font-medium uppercase leading-snug tracking-[0.06em] text-[#BFD7C4] empty:hidden" id="plano"></p>
+            </div>
+            <!-- Countdown to the next list (DAILY_TIME in config.js, Lisbon time); hidden when the time is not configured. -->
+            <div class="td-next" id="hojeProx" hidden><span class="font-mono text-[10.5px] font-medium uppercase tracking-[0.06em] text-[#BFD7C4]">Next list in</span><b id="hojeConta">—</b><span class="text-[12.5px] text-[#BFD7C4]" id="hojeQuando"></span></div>
+          </section>
           <div class="msg aviso" id="aviso" hidden></div>
           <!-- First visit of a Click member (app.js renderCaixaClick): closable, remembered in this browser. -->
           <div class="msg" id="caixaClick" hidden><div class="flex items-start justify-between gap-3"><span>Everything you get on WhatsApp is here too — plus all past collections, the launch kits and filters.</span><button class="tip-x !text-brand-dark hover:!bg-white/70" type="button" id="caixaClickFechar" aria-label="Close this message">✕</button></div></div>
+          <ul class="td-stats mt-5" aria-label="Today in numbers">
+            <li class="td-stat"><span class="td-ico bg-brand-soft"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#12301F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><p><span class="lbl">Collections today</span><b id="kpiTotal">—</b></p></li>
+            <li class="td-stat"><span class="td-ico bg-brand-soft"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F6B42" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><p><span class="lbl">Approved</span><b class="text-ok" id="kpiOk">—</b></p></li>
+            <li class="td-stat"><span class="td-ico bg-[#FBEFD6]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A5A0B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span><p><span class="lbl">Under observation</span><b class="text-watch" id="kpiWatch">—</b></p></li>
+            <li class="td-stat"><span class="td-ico bg-brand"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4F57A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span><p><span class="lbl">Kits ready</span><b id="kpiKits">—</b></p></li>
+          </ul>
+          <div class="mt-7 flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0"><h2 class="text-[22px] font-semibold leading-tight tracking-[-0.025em] text-ink" id="hojeLista">Today’s collections</h2><p class="mt-0.5 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-brand-dark empty:hidden" id="hojeLema"></p></div>
+            <!-- Filter of the cards below (app.js): All / Approved / Observing. -->
+            <div class="td-tabs" role="group" aria-label="Filter the collections" id="hojeFiltro"><button class="td-tab" type="button" data-f="todas" aria-pressed="true">All</button><button class="td-tab" type="button" data-f="ok" aria-pressed="false">Approved</button><button class="td-tab" type="button" data-f="obs" aria-pressed="false">Observing</button></div>
+          </div>
           <!-- Niches bar: "Your niches: … · Edit" opens the choice right here (app.js renderBarras). -->
-          <div class="mt-4" id="barHoje" data-barra></div>
+          <div class="mt-3" id="barHoje" data-barra></div>
           <!-- Discreet tip, only while no niche is chosen; closable (remembered in this browser). -->
           <p class="tip" id="hojePrefs" hidden><span>Tip: <a href="#" data-go="prefs">choose your niches in Preferences</a> to see them first.</span><button class="tip-x" type="button" id="hojePrefsFechar" aria-label="Close this tip">✕</button></p>
-          <dl class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Today in numbers">
-            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Collections today</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-ink" id="kpiTotal">—</dd></div>
-            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Approved</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-ok" id="kpiOk">—</dd></div>
-            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Under observation</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-watch" id="kpiWatch">—</dd></div>
-            <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Kits ready</dt><dd class="mt-1 text-[28px] font-extrabold leading-none tracking-tight tabular-nums text-brand-dark" id="kpiKits">—</dd></div>
-          </dl>
-          <div class="card-deep mt-4 p-5 md:p-6">
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <span class="inline-flex items-center gap-2 text-[15px] font-bold text-white"><span class="size-2 rounded-full bg-emerald-400"></span>Daily list</span>
-              <span class="text-[12px] font-semibold text-white/50">Your niches first · kit on every collection</span>
+          <!-- One card per collection (app.js cartao): the photo is the collection's own product photo (feed_dia.imagem_url,
+               bucket "fotos"); without one, a plain light-green background with the niche icon. Never another picture. -->
+          <div class="mt-4" id="feed"></div>
+          <!-- The four collections sent before this list (app.js renderSemana); hidden when there are none. -->
+          <section class="td-lib mt-8" id="semana" hidden aria-labelledby="semanaTitulo">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h2 class="text-[19px] font-semibold leading-tight tracking-[-0.025em] text-ink" id="semanaTitulo">From your library</h2>
+              <a class="font-mono text-[11.5px] font-medium uppercase tracking-[0.06em] text-brand-dark no-underline hover:underline" href="#" data-go="arquivo" id="semanaTodos">See all →</a>
             </div>
-            <div class="md:overflow-x-auto" id="feed"></div>
-          </div>
-          <!-- Collections of the previous 7 days (same row format, with kit); hidden when there are none. -->
-          <section class="mt-8" id="semana" hidden aria-labelledby="semanaTitulo">
-            <div class="mb-3 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-              <div><h2 class="text-[22px] font-extrabold leading-tight tracking-tight text-ink" id="semanaTitulo">Earlier this week</h2><p class="mt-1 text-[13px] text-ink-2" id="semanaSub"></p></div>
-              <a class="text-[13px] font-semibold text-brand-dark underline underline-offset-4" href="#" data-go="arquivo">See all in Library</a>
-            </div>
-            <div class="card-deep p-5 md:p-6"><div class="md:overflow-x-auto" id="semanaBox"></div></div>
+            <div id="semanaBox"></div>
           </section>
         </div>
 
         <div id="tArquivo" role="tabpanel" hidden>
-          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Library</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">All collections we have sent, with their kits. Where each one advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Library</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">All collections we have sent, with their kits. Where each one advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
           <!-- Notice for a /c/<id> link whose collection is unknown or withdrawn (app.js abrirColecao). -->
           <div class="msg" id="msgArquivo" hidden></div>
           <!-- Niches bar (same as Today): your niches come first; "Show all" also lists the other niches. -->
           <div class="mt-4" id="barLib" data-barra></div>
           <div class="card mt-4 p-5 md:p-6">
             <div class="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
-              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPais">Strongest market</label><select class="field" id="fPais"><option value="">All</option></select></div>
-              <div><label class="mb-1.5 block text-[13px] font-bold text-ink" for="fPlat">Platform</label><select class="field" id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
+              <div><label class="mb-1.5 block font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2" for="fNicho">Niche</label><select class="field" id="fNicho"><option value="">All</option></select></div>
+              <div><label class="mb-1.5 block font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2" for="fPais">Strongest market</label><select class="field" id="fPais"><option value="">All</option></select></div>
+              <div><label class="mb-1.5 block font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2" for="fPlat">Platform</label><select class="field" id="fPlat"><option value="">All</option><option value="meta">Meta</option><option value="google">Google</option><option value="both">Meta and Google</option></select></div>
               <label class="check min-h-11"><input type="checkbox" id="fAtivas"> Only still advertising</label>
               <label class="check min-h-11" id="fTodosWrap" title="Also show the collections outside your niches"><input type="checkbox" id="fTodos"> Show all</label>
             </div>
@@ -159,7 +169,7 @@
         </div>
 
         <div id="tPrefs" role="tabpanel" hidden>
-          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Preferences</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Your niches (optional) — collections in these niches appear first. All other collections stay visible, and each one shows the best market to launch in.</p></div>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Preferences</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">Your niches (optional) — collections in these niches appear first. All other collections stay visible, and each one shows the best market to launch in.</p></div>
           <!-- "Countries you sell in" removed 2026-11-08: ProvenDrop searches every market and each collection shows its strongest one.
                The subscritores.paises column stays in the database but is no longer shown or used. -->
           <form class="card mt-6 max-w-[760px] p-5 md:p-7" id="formPrefs">
@@ -171,12 +181,12 @@
         </div>
 
         <div id="tConta" role="tabpanel" hidden>
-          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-extrabold leading-[1.1] tracking-tight text-ink">Subscription</h1><p class="mt-1 text-[14px] text-ink-2">No minimum term: cancel whenever you want.</p></div>
+          <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Subscription</h1><p class="mt-1 text-[14px] text-ink-2">No minimum term: cancel whenever you want.</p></div>
           <div class="mt-6 max-w-[760px]">
             <dl class="grid gap-3 sm:grid-cols-3">
-              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">E-mail</dt><dd class="mt-1 truncate text-[15px] font-bold text-ink" id="contaEmail"></dd></div>
-              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Status</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaEstado"></dd></div>
-              <div class="card px-5 py-4"><dt class="text-[12px] font-semibold text-ink-2">Member since</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaDesde"></dd></div>
+              <div class="card px-5 py-4"><dt class="font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2">E-mail</dt><dd class="mt-1 truncate text-[15px] font-bold text-ink" id="contaEmail"></dd></div>
+              <div class="card px-5 py-4"><dt class="font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2">Status</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaEstado"></dd></div>
+              <div class="card px-5 py-4"><dt class="font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2">Member since</dt><dd class="mt-1 text-[15px] font-bold text-ink" id="contaDesde"></dd></div>
             </dl>
             <div class="card mt-3 p-5 md:p-6">
               <p class="mb-4 text-[14px] font-semibold text-ink" id="contaPlano"></p>
@@ -210,12 +220,12 @@
 <div class="fixed inset-0 z-30 grid place-items-center bg-ink/55 p-4 backdrop-blur-sm" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
   <div class="card relative max-h-[calc(100dvh-32px)] w-full max-w-[640px] overflow-y-auto p-7 pr-14 md:p-8 md:pr-14">
     <button class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-line bg-white text-[14px] font-bold text-ink hover:border-ink-2" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>
-    <p class="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-dark">Welcome · 1 minute</p>
-    <h2 class="mt-2 text-[clamp(24px,3vw,32px)] font-extrabold leading-[1.1] tracking-tight text-ink" id="guiaTitulo">Welcome. One minute to get started.</h2>
+    <p class="font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-brand-dark">Welcome · 1 minute</p>
+    <h2 class="mt-2 text-[clamp(24px,3vw,32px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink" id="guiaTitulo">Welcome. One minute to get started.</h2>
     <ol class="mt-5 grid gap-3">
-      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">1</span><b class="text-[14px] font-bold text-ink">Open a collection</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
-      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">2</span><b class="text-[14px] font-bold text-ink">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Every collection in the list comes with a kit: reference photos, a creative prompt tailored to the collection and the collection report. Collections under observation are labelled: test them with a small budget. Read README.txt first.</span></li>
-      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-lg bg-brand-soft text-[12px] font-extrabold text-brand-dark" aria-hidden="true">3</span><b class="text-[14px] font-bold text-ink">Paste the creative prompt into ChatGPT or your image AI</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">A creative prompt tailored to each collection — paste it into ChatGPT or your image AI and generate as many ad creatives as you want. Attach the reference photos; never publish the originals.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-md bg-brand font-mono text-[12px] font-medium text-lime" aria-hidden="true">1</span><b class="text-[14px] font-bold text-ink">Open a collection</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">“Today” has the day’s collections with the proof for each one: Meta and Google ads, days, reach and countries. Open the collection link to see the competitor store.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-md bg-brand font-mono text-[12px] font-medium text-lime" aria-hidden="true">2</span><b class="text-[14px] font-bold text-ink">Download the Launch Kit</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">Every collection in the list comes with a kit: reference photos, a creative prompt tailored to the collection and the collection report. Collections under observation are labelled: test them with a small budget. Read README.txt first.</span></li>
+      <li class="grid grid-cols-[36px_minmax(0,1fr)] gap-x-3 rounded-xl bg-page p-4"><span class="grid size-8 place-items-center rounded-md bg-brand font-mono text-[12px] font-medium text-lime" aria-hidden="true">3</span><b class="text-[14px] font-bold text-ink">Paste the creative prompt into ChatGPT or your image AI</b><span class="col-start-2 mt-1 text-[14px] text-ink-2">A creative prompt tailored to each collection — paste it into ChatGPT or your image AI and generate as many ad creatives as you want. Attach the reference photos; never publish the originals.</span></li>
     </ol>
     <div class="mt-6 flex flex-wrap gap-2.5">
       <button class="btn btn-go" type="button" id="guiaOk">Choose my niches (optional)</button>

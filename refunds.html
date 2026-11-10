@@ -11,13 +11,9 @@
 <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<!-- Manrope (variable, 400-800) served from this site: assets/fonts/ (SIL OFL 1.1, see OFL.txt). No request to Google.
-     The same block lives in index, terms, privacy and refunds; app.html and admin.html still use Google Fonts. -->
-<link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
-<style>
-@font-face{font-family:"Manrope";font-style:normal;font-weight:400 800;font-display:swap;src:url("assets/fonts/manrope-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:"Manrope";font-style:normal;font-weight:400 800;font-display:swap;src:url("assets/fonts/manrope-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-</style>
+<!-- Geist and Geist Mono are served from this site (assets/fonts/, SIL OFL 1.1). The @font-face rules are in tailwind.css. -->
+<link rel="preload" href="assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/geist-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Compiled Tailwind (src/tailwind.css → npm run build:css). Same theme as index.html. -->
 <link rel="stylesheet" href="tailwind.css">
 <!-- Legal page (2026-11-06). Legal details filled in on 2026-11-10. CONTACT_EMAIL comes from config.js. -->
@@ -26,7 +22,7 @@
 <body class="bg-page text-ink">
 <header class="border-b border-line bg-white/85 backdrop-blur">
   <div class="mx-auto flex min-h-16 w-full max-w-[1280px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-    <a class="inline-flex items-center gap-2.5 text-[18px] font-extrabold tracking-tight no-underline" translate="no" href="./" aria-label="ProvenDrop, back to the site">
+    <a class="inline-flex items-center gap-2.5 text-[18px] font-bold tracking-[-0.035em] no-underline" translate="no" href="./" aria-label="ProvenDrop, back to the site">
       <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#12301F"/><rect x="16" y="36" width="7" height="12" rx="2" fill="#D4F57A" opacity=".55"/><rect x="28.5" y="28" width="7" height="20" rx="2" fill="#D4F57A" opacity=".8"/><rect x="41" y="20" width="7" height="28" rx="2" fill="#D4F57A"/><circle cx="44.5" cy="13" r="4" fill="#3FB06A"/></svg>
       <span><span class="text-[#0B1F1E]">Proven</span><span class="text-[#1F6B42]">Drop</span></span>
     </a>
@@ -35,9 +31,9 @@
 </header>
 
 <main class="mx-auto w-full max-w-[1280px] px-4 py-10 sm:px-6 md:py-14 lg:px-8">
-  <article class="card mx-auto max-w-[760px] p-6 md:p-10 [&_h2]:mt-8 [&_h2]:text-[20px] [&_h2]:font-extrabold [&_h2]:tracking-tight [&_h2]:text-ink [&_p]:mt-3 [&_p]:text-[15px] [&_p]:leading-relaxed [&_p]:text-ink-2 [&_ul]:mt-3 [&_ul]:grid [&_ul]:gap-1.5 [&_ul]:pl-5 [&_ul]:text-[15px] [&_ul]:leading-relaxed [&_ul]:text-ink-2 [&_ul]:marker:text-brand [&_ul]:list-disc [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4 [&_mark]:rounded [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:font-semibold [&_mark]:text-amber-900">
-    <p class="!mt-0 text-[12px] font-bold uppercase tracking-[0.14em] !text-brand-dark">Legal</p>
-    <h1 class="mt-2 text-[clamp(30px,4vw,44px)] font-extrabold leading-[1.08] tracking-[-0.025em] text-ink">Refund policy</h1>
+  <article class="card mx-auto max-w-[760px] p-6 md:p-10 [&_h2]:mt-8 [&_h2]:text-[20px] [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-ink [&_p]:mt-3 [&_p]:text-[15px] [&_p]:leading-relaxed [&_p]:text-ink-2 [&_ul]:mt-3 [&_ul]:grid [&_ul]:gap-1.5 [&_ul]:pl-5 [&_ul]:text-[15px] [&_ul]:leading-relaxed [&_ul]:text-ink-2 [&_ul]:marker:text-brand [&_ul]:list-disc [&_a]:font-semibold [&_a]:text-brand-dark [&_a]:underline [&_a]:underline-offset-4 [&_mark]:rounded [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:font-semibold [&_mark]:text-amber-900">
+    <p class="!mt-0 font-mono text-[12px] font-medium uppercase tracking-[0.06em] !text-brand-dark">Legal</p>
+    <h1 class="mt-2 text-[clamp(30px,4vw,44px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Refund policy</h1>
     <p class="!text-ink-3">Last updated: 10 November 2026. This policy is part of the <a href="terms.html">Terms of service</a> and applies to both plans.</p>
 
     <h2>1. The subscription is monthly and you can cancel at any time</h2>
