@@ -23,6 +23,16 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 
 **Modo da função (S1/M11):** o webhook só aceita eventos do modo para que foi configurado. Com `sk_live_` o `setup-supabase.ps1` põe `STRIPE_ACCEPT_TEST=0` e só entram eventos `livemode=true`; eventos de teste recebem 200 vazio e um aviso no log.
 
+## Estado a 2026-11-10 (verificado pela API do Stripe, modo real)
+
+- **Os dois Payment Links estão ativos no site** (`config.js`): Direct `https://buy.stripe.com/7sYaEYd3Rcmid5w6nA4gg00` (`plink_1UYadLJPREpzETp6LsumQruC`, metadata `origem=direto`) e via Click `https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01` (`plink_1UYanHJPREpzETp6ixc4JBF0`, metadata `origem=click`).
+- **Depois do pagamento** → redirecionamento para `https://provendrop.com/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (Direct) e `https://provendrop.com/bem-vindo-click.html?session_id={CHECKOUT_SESSION_ID}` (Click).
+- **Termos obrigatórios** nos dois links: "I agree to the Terms of service, Refund policy and Privacy policy" com ligações para `terms.html`, `refunds.html` e `privacy.html` em provendrop.com.
+- **Códigos promocionais** ativos nos dois links. Cupão **`CLICK100`** (100 %, só o 1.º mês, 1 utilização) criado para o teste do plano Click (Parte A2 do plano Click); o `TESTE100` era o do teste Direct.
+- **Link Click**: campo personalizado de **texto obrigatório** "Your store name (as registered with Click)" (o webhook lê o primeiro campo de texto, seja qual for a key) e **recolha do telefone** ligada. O link Direct não recolhe telefone nem tem campos.
+- **Webhook** `provendrop-supabase` a entregar e a processar eventos (confirmado em `stripe_eventos`); segredos `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_DIRETO`, `STRIPE_PRICE_CLICK`, `APP_URL`, `ADMIN_EMAIL` definidos. **`ALERT_EMAIL` ainda por definir** (sem ele, e sem `EMAIL_REPLY_TO`, os alertas de compra Click, cancelamento, disputa e reembolso não têm destinatário).
+- Portal de cliente: `https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00` (`config.js` → `STRIPE_PORTAL_LINK`).
+
 ## a) Payment Link Direct: confirmar
 
 **Links de pagamento** (Payment Links) → abre o link `7sYaEY…`:
@@ -104,14 +114,15 @@ Em modo real o Checkout, o portal, os recibos e as faturas mostram o **Nome púb
 
 ## Por fazer (à mão, no painel ou no terminal)
 
-- [ ] Correr `scripts\setup-supabase.ps1` com `sk_live_` e o `whsec_` do endpoint real (os `price_` reais já são os valores por omissão). Aplica também a migração `0006` e faz deploy de `corrigir-email`; no fim volta a fazer deploy do `stripe-webhook` com `--no-verify-jwt`.
-- [ ] Link Direct → **Depois do pagamento** → Redirecionar para `…/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (a). Sem o parâmetro, a página não mostra o e-mail da compra nem o botão "Not my e-mail? Fix it".
+- [x] Segredos reais definidos à mão no painel (2026-11-08) e funções publicadas pelo CLI (`stripe-webhook` v16, `email-diario` v16, `corrigir-email` v1, `loja-click` v1, `admin-click` v1); migrações 0006–0009 aplicadas. O `setup-supabase.ps1` fica para quando for preciso rodar segredos.
+- [x] Link Direct → Depois do pagamento → `https://provendrop.com/bem-vindo.html?session_id={CHECKOUT_SESSION_ID}` (feito 2026-11-10).
 - [ ] Acrescentar `charge.dispute.created` e `charge.refunded` ao endpoint `provendrop-supabase` (A4): Programadores → Webhooks → `provendrop-supabase` → ⋯ → **Atualizar detalhes** → **Eventos** → procurar e marcar os dois → Guardar. Sem eles, uma disputa ou um reembolso total não revoga o acesso.
 - [ ] Criar o Payment Link **Direct de regresso** em modo real (só o preço mensal Direct; metadata `origem=direto`, `tipo=regresso`; → `bem-vindo.html`; sem códigos) e pôr o URL em `config.js` → `STRIPE_LINK_RETURN`. O `scripts\stripe-teste.ps1` só trabalha em modo de teste. Até existir, o site não promete "só mensalidade" a quem volta (frase e cartão "Coming back later?" retirados a 2026-11-06).
 - [ ] Galeria de 4 exemplos de criativos no Launch Kit: só com imagens sem qualquer marca.
-- [ ] Teste real (TESTE.md §7): pagar o Direct (40 €), ver a linha, entrar por magic link, descarregar o kit, cancelar no portal, perder o acesso, reembolsar; pelo link Click confirmar `origem = click`, sem acesso e sem adesão.
+- [ ] Definir o segredo `ALERT_EMAIL` (destinatário dos alertas: compra Click, cancelamento Click, disputas, reembolsos, reconciliação): `supabase secrets set ALERT_EMAIL=<o teu e-mail> --project-ref maljrfgnnhtrjunnwlre`.
+- [ ] Teste real (TESTE.md §7 e plano Click A2): compra Click com o cupão `CLICK100` (código igual na página, no WhatsApp e no alerta; linha `pendente`; login "being confirmed"; Validate em `admin.html` → acesso; 2.ª compra → Reject & refund); depois o Direct (40 €): ver a linha, entrar por magic link, descarregar o kit, cancelar no portal, perder o acesso, reembolsar.
 - [ ] Termos / privacidade / reembolsos: páginas publicadas a 2026-11-06 (`terms.html`, `privacy.html`, `refunds.html`, ligadas no rodapé de todas as páginas) **com marcadores `[A COMPLETAR PELO AFONSO]`** (nome legal, NIF, morada, IVA, região do Supabase, prazos, regra dos 14 dias). Depois de preenchidos: links em **Dados públicos** (`https://provendrop.com/terms.html`, `…/privacy.html`, `…/refunds.html`) e "Exigir que os clientes aceitem os termos de serviço" nos 2 links.
-- [ ] Quando houver domínio: redirecionamentos dos 2 links e do portal, `APP_URL`, Redirect URLs do Supabase (DOMINIO.md).
+- [x] Domínio `provendrop.com` (2026-11-08): redirecionamentos dos 2 links, `APP_URL` e Redirect URLs do Supabase já no domínio.
 
 ## Histórico: modo de teste (2026-11-02 → 2026-11-06)
 
