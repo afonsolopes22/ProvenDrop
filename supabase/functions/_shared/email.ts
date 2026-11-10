@@ -61,11 +61,14 @@ function baseSite(): string {
 }
 
 /** Molde HTML simples e legível em qualquer cliente de e-mail. Logótipo nas cores do site desde 2026-11-10
- *  (PNG apple-touch-icon.png: quadrado #12301F, barras #D4F57A, ponto #3FB06A; "Drop" #1F6B42). O botão mantém o teal #0F766E. */
+ *  (PNG apple-touch-icon.png: quadrado #12301F, barras #D4F57A, ponto #3FB06A; "Drop" #1F6B42). Botão como os do site: #12301F com texto #D4F57A. */
+/** Botão dos e-mails (verde-escuro com texto lima, como .btn-d no site). `margem` é o margin do parágrafo que o envolve. */
+export function botaoHtml(botao: { texto: string; url: string }, margem = "28px 0"): string {
+  return `<p style="margin:${margem}"><a href="${esc(botao.url)}" style="display:inline-block;background:#12301F;color:#D4F57A;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:8px">${esc(botao.texto)}</a></p>`;
+}
+
 export function molde(titulo: string, corpoHtml: string, botao?: { texto: string; url: string }, rodape?: string): string {
-  const b = botao
-    ? `<p style="margin:28px 0"><a href="${esc(botao.url)}" style="display:inline-block;background:#0F766E;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:10px">${esc(botao.texto)}</a></p>`
-    : "";
+  const b = botao ? botaoHtml(botao) : "";
   return `<!doctype html><html lang="en"><body style="margin:0;background:#F4F7F6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0E1A17">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px"><tr>
