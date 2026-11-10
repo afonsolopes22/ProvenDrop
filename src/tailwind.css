@@ -1,9 +1,11 @@
 /* ProvenDrop · Tailwind source. Build: `npm run build:css` → ../tailwind.css (committed).
-   Theme (2026-11-05, "clean SaaS"): light page, white rounded cards with a soft shadow,
-   teal brand colour, one deep-teal dark panel for the live data. Manrope everywhere.
-   Component classes exist only because app.js / index.html set them by name
-   (className = "msg erro", classList.toggle("top-mk"), generated rows) or need
-   pseudo-elements (status dot, stacked table labels). Everything else is utilities. */
+   Read by app.html, admin.html, 404.html and the legal pages. index.html has its own home.css.
+   Theme (2026-11-10, same look as the home page): light green page #F1F7EE, white cards,
+   deep green #12301F with lime #D4F57A, one deep-green panel for the live data.
+   Geist for text, Geist Mono (uppercase) for labels, table headers, status pills and buttons.
+   Component classes exist only because app.js / admin.js set them by name
+   (className = "msg erro", generated rows) or need pseudo-elements (status dot, stacked
+   table labels). Everything else is utilities. */
 @import "tailwindcss";
 @source "../index.html";
 @source "../app.html";
@@ -15,29 +17,39 @@
 @source "../refunds.html";
 @source "../404.html";
 
+/* Fonts served from this site (assets/fonts/, SIL OFL 1.1). Paths are relative to the compiled tailwind.css at the site root. */
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist";font-style:normal;font-weight:400 700;font-display:swap;src:url("assets/fonts/geist-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-symbols.woff2") format("woff2");unicode-range:U+2000-2001,U+2004-2008,U+200A,U+23B8-23BD,U+2500-259F}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin-ext.woff2") format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Geist Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("assets/fonts/geist-mono-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
 @theme {
-  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --color-page: #F4F7F6;
-  --color-line: #E2E8E6;
-  --color-line-2: #CBD5D1;
-  --color-ink: #0E1A17;
-  --color-ink-2: #5B6B66;
-  --color-ink-3: #8A9793;
-  --color-brand: #0D9488;
-  --color-brand-dark: #0F766E;
-  --color-brand-soft: #E3F4F1;
-  --color-deep: #07201E;
-  --color-deep-2: #0B2B28;
-  --color-deep-line: #184842;
-  --color-ok: #059669;
-  --color-ok-soft: #E3F5EC;
-  --color-watch: #C2700A;
-  --color-watch-soft: #FEF2E0;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-page: #F1F7EE;
+  --color-line: #DCE9D8;
+  --color-line-2: #CFE0CC;
+  --color-ink: #0A1C12;
+  --color-ink-2: #3A5444;
+  --color-ink-3: #48604F;
+  /* "brand" is the deep green of the home page; "brand-dark" is the label green that passes AA on white. */
+  --color-brand: #12301F;
+  --color-brand-dark: #1F6B42;
+  --color-brand-soft: #EAF5D2;
+  --color-lime: #D4F57A;
+  --color-lime-hi: #E4FB9F;
+  --color-deep: #12301F;
+  --color-deep-2: #183E29;
+  --color-deep-line: #2C5A3E;
+  --color-ok: #1F6B42;
+  --color-ok-soft: #EAF5D2;
+  --color-watch: #8A5A0B;
+  --color-watch-soft: #FBF1DC;
   --color-bad: #C62828;
   --color-bad-soft: #FDECEC;
-  --shadow-card: 0 1px 2px rgb(14 26 23 / 0.04), 0 10px 30px -14px rgb(14 26 23 / 0.14);
-  --shadow-pop: 0 20px 50px -20px rgb(14 26 23 / 0.35);
+  --shadow-card: 0 18px 40px rgb(18 48 31 / 0.08);
+  --shadow-pop: 0 20px 50px -20px rgb(18 48 31 / 0.35);
 }
 
 @layer base {
@@ -45,38 +57,44 @@
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body { @apply bg-page font-sans text-[15px] leading-relaxed text-ink antialiased; overflow-wrap: break-word; }
   h1, h2, h3 { @apply text-balance; }
-  ::selection { @apply bg-brand text-white; }
-  :focus-visible { @apply rounded-md outline-2 outline-offset-2 outline-brand; }
+  ::selection { @apply bg-brand text-lime; }
+  :focus-visible { @apply rounded-md outline-2 outline-offset-2 outline-brand-dark; }
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
 }
 
 @layer components {
-  /* cards */
-  .card { @apply rounded-2xl border border-line bg-white shadow-card; }
-  .card-deep { @apply rounded-2xl bg-deep text-white shadow-pop; }
+  /* cards: white window and deep-green panel, as on the home page */
+  .card { @apply rounded-xl border border-line-2 bg-white shadow-card; }
+  .card-deep { @apply rounded-3xl bg-deep text-[#F1F7EE] shadow-pop; }
 
-  /* buttons */
-  .btn { @apply inline-flex min-h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl border px-5 py-2 text-center text-[14px] font-semibold no-underline transition-colors duration-150; -webkit-tap-highlight-color: transparent; }
-  .btn-go { @apply border-brand bg-brand text-white hover:border-brand-dark hover:bg-brand-dark; }
-  .btn-line { @apply border-line-2 bg-white text-ink hover:border-ink-2; }
+  /* buttons: mono, like .btn-d / .btn-l on the home page */
+  .btn { @apply inline-flex min-h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-lg border px-[18px] py-2 text-center font-mono text-[13px] font-medium tracking-[0.04em] no-underline transition-colors duration-150; -webkit-tap-highlight-color: transparent; }
+  .btn-go { @apply border-brand bg-brand text-lime hover:border-ink hover:bg-ink hover:text-lime-hi; }
+  .btn-line { @apply border-line-2 bg-page text-brand hover:border-brand; }
+  .card-deep .btn-go { @apply border-lime bg-lime text-brand hover:border-lime-hi hover:bg-lime-hi hover:text-ink; }
   .card-deep .btn-line { @apply border-white/20 bg-white/5 text-white hover:border-white/50; }
-  .btn-sm { @apply min-h-9 rounded-lg px-3.5 py-1.5 text-[13px]; }
+  .btn-sm { @apply min-h-9 rounded-lg px-3.5 py-1.5 text-[12px]; }
   .btn[disabled], .btn[aria-disabled="true"] { @apply pointer-events-none cursor-not-allowed opacity-45; }
+  /* Kit buttons inside tables: compact, and the text colour is forced because app.js adds "!text-white"
+     to the link version (written for the old teal button). In cascade layers an !important here wins. */
+  .dt .btn-sm { @apply px-2.5 text-[11.5px] tracking-normal; }
+  .dt a.btn-go { color: var(--color-lime) !important; }
+  .dt-dark a.btn-go { color: var(--color-brand) !important; }
 
-  /* status pills (approved / under observation) */
-  .status { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-bold; }
+  /* status pills: approved in lime/green, under observation in amber; mono, uppercase */
+  .status { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 font-mono text-[11px] font-medium uppercase tracking-[0.06em]; }
   .status::before { content: ""; @apply size-1.5 shrink-0 rounded-full bg-current; }
-  .status.go { @apply bg-ok-soft text-ok; }
+  .status.go { @apply bg-lime text-brand; }
   .status.watch { @apply bg-watch-soft text-watch; }
-  .card-deep .status.go { @apply bg-ok/20 text-emerald-300; }
-  .card-deep .status.watch { @apply bg-watch/25 text-amber-300; }
+  .card-deep .status.go { @apply bg-lime/15 text-lime; }
+  .card-deep .status.watch { @apply bg-amber-300/15 text-amber-300; }
 
   /* values reserved for members (only drawn on dark panels) */
   .redact { @apply inline-block h-[0.62em] max-w-full rounded-md bg-white/15 align-baseline; }
 
   /* messages set by app.js (el.className = "msg erro") */
-  .msg { @apply mt-3 rounded-xl bg-brand-soft px-4 py-3 text-[14px] leading-snug text-brand-dark; }
+  .msg { @apply mt-3 rounded-lg bg-brand-soft px-4 py-3 text-[14px] leading-snug text-brand; }
   .msg.erro { @apply bg-bad-soft text-bad; }
   .msg.aviso { @apply bg-watch-soft text-watch; }
   .msg a { @apply font-semibold underline underline-offset-4; }
@@ -85,34 +103,34 @@
   .tip[hidden] { display: none; }
   .tip a { @apply font-semibold text-brand-dark underline underline-offset-4; }
   .tip-x { @apply grid size-7 shrink-0 cursor-pointer place-items-center rounded-full text-[12px] text-ink-3 hover:bg-white hover:text-ink; }
-  .empty { @apply rounded-xl border border-dashed border-line-2 px-5 py-10 text-center text-[14px] text-ink-2; }
+  .empty { @apply rounded-lg border border-dashed border-line-2 px-5 py-10 text-center text-[14px] text-ink-2; }
   .card-deep .empty { @apply border-white/15 text-white/60; }
 
-  /* KPI cells (dark panels): label + value */
+  /* KPI cells (dark panels): mono label + value */
   .facts { @apply grid gap-2; }
-  .facts > div { @apply min-w-0 rounded-xl bg-white/5 px-3 py-3; }
-  .facts dt { @apply text-[12px] font-medium text-white/55; }
-  .facts dd { @apply mt-1 whitespace-nowrap text-[20px] font-extrabold leading-tight tracking-tight tabular-nums text-white; }
+  .facts > div { @apply min-w-0 rounded-[10px] border border-deep-line bg-deep-2 px-3 py-3; }
+  .facts dt { @apply font-mono text-[11px] uppercase tracking-[0.06em] text-[#BFD7C4]; }
+  .facts dd { @apply mt-1 whitespace-nowrap text-[20px] font-semibold leading-tight tracking-tight tabular-nums text-[#F1F7EE]; }
   .at { @apply mt-0.5 block text-[11px] font-medium normal-case tracking-normal text-white/50; }
   .dt .at { @apply text-ink-3; }
   .dt-dark .at { @apply text-white/50; }
 
-  /* six-market strip */
+  /* market strip */
   .strip { @apply grid grid-cols-6 gap-1; }
-  .strip li { @apply grid h-8 place-items-center rounded-lg bg-white/5 text-[12px] font-bold text-white/55; }
-  .strip .ok { @apply bg-brand text-white; }
+  .strip li { @apply grid h-8 place-items-center rounded-lg bg-white/5 font-mono text-[12px] font-medium text-white/55; }
+  .strip .ok { @apply bg-lime text-brand; }
+  /* In the table the strip sits in a narrow column: two rows of four instead of eight squeezed cells
+     (app.js sets the column count inline, hence the !important). Stacked cards keep one row. */
+  @media (min-width: 768px) { .dt .strip { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } .dt .strip li { @apply h-6 text-[11px]; } }
 
-  /* advertising platforms */
-  .plat { @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-2.5 py-0.5 text-[12px] font-semibold text-ink-2; }
-  .plat.meta { @apply border-sky-200 bg-sky-50 text-sky-700; }
-  .plat.google { @apply border-amber-200 bg-amber-50 text-amber-700; }
-  .dt-dark .plat { @apply border-white/15 bg-white/10 text-white/80; }
-  .dt-dark .plat.meta { @apply text-sky-200; }
-  .dt-dark .plat.google { @apply text-amber-200; }
+  /* advertising platforms: neutral mono chips */
+  .plat { @apply inline-flex items-center gap-1.5 rounded-md border border-line-2 bg-page px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2; }
+  .plat.meta, .plat.google { @apply border-line-2 bg-page text-ink-2; }
+  .dt-dark .plat, .dt-dark .plat.meta, .dt-dark .plat.google { @apply border-deep-line bg-deep-2 text-[#BFD7C4]; }
 
-  /* data tables (index archive, app today/archive). Stacked key/value blocks under 768px. */
+  /* data tables (app today / library, admin). Under 768px every row becomes a stacked card. */
   .dt { @apply w-full border-collapse text-[14px]; }
-  .dt th { @apply whitespace-nowrap border-b border-line px-3 py-3 text-left text-[12px] font-bold text-ink-2; }
+  .dt th { @apply whitespace-nowrap border-b border-line px-3 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3; }
   .dt td { @apply border-b border-line px-3 py-3.5 align-top text-ink; }
   .dt tbody tr:last-child td { @apply border-b-0; }
   .dt tbody tr { @apply transition-colors duration-150 hover:bg-page; }
@@ -120,51 +138,52 @@
   .dt tr > :last-child { @apply pr-0; }
   .dt .n { @apply tabular-nums; }
   .dt .sub { @apply block text-[12px] font-medium leading-snug text-ink-3; }
-  .dt a { @apply font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:decoration-brand; }
-  .dt-dark th { @apply border-white/10 text-white/50; }
-  .dt-dark td { @apply border-white/10 text-white; }
+  .dt a { @apply font-semibold text-brand-dark underline decoration-brand-dark/30 underline-offset-4 hover:decoration-brand-dark; }
+  .dt-dark th { @apply border-white/10 text-[#BFD7C4]; }
+  .dt-dark td { @apply border-white/10 text-[#F1F7EE]; }
   .dt-dark tbody tr { @apply hover:bg-white/5; }
-  .dt-dark .sub { @apply text-white/50; }
-  .dt-dark a { @apply text-emerald-300 decoration-emerald-300/30 hover:decoration-emerald-300; }
-  .dt .pref-first > td:first-child { @apply border-l-[3px] border-l-brand pl-3; }
-  /* row opened from a /c/<id> link (app.js abrirColecao): teal ring on the row */
-  .dt tr.hit { @apply rounded-xl outline-2 outline-offset-2 outline-brand; }
+  .dt-dark .sub { @apply text-white/55; }
+  .dt-dark a { @apply text-lime decoration-lime/30 hover:decoration-lime; }
+  .dt .pref-first > td:first-child { @apply border-l-[3px] border-l-brand-dark pl-3; }
+  .dt-dark .pref-first > td:first-child { @apply border-l-lime; }
+  /* row opened from a /c/<id> link (app.js abrirColecao): ring on the row */
+  .dt tr.hit { @apply rounded-xl outline-2 outline-offset-2 outline-brand-dark; }
   .dt tr.hit > td { @apply bg-brand-soft; }
-  .dt-dark tr.hit > td { @apply bg-brand/20; }
+  .dt-dark tr.hit { @apply outline-lime; }
+  .dt-dark tr.hit > td { @apply bg-lime/10; }
   @media (max-width: 767px) {
     .dt thead { @apply sr-only; }
     .dt, .dt tbody, .dt tr, .dt td { @apply block w-full; }
-    .dt tr { @apply border-b border-line py-3; }
-    .dt-dark tr { @apply border-white/10; }
-    .dt tbody tr:last-child { @apply border-b-0; }
-    .dt td { @apply grid grid-cols-[104px_minmax(0,1fr)] gap-2.5 border-0 px-0 py-1; }
-    .dt td::before { content: attr(data-l); @apply pt-0.5 text-[12px] font-semibold text-ink-3; }
-    .dt-dark td::before { @apply text-white/50; }
+    /* one card per row */
+    .dt tbody { @apply grid gap-3; }
+    .dt tr, .dt tbody tr:last-child { @apply rounded-xl border border-line-2 bg-white px-4 py-3; }
+    .dt-dark tr, .dt-dark tbody tr:last-child { @apply border-deep-line bg-deep-2; }
+    .dt tbody tr { @apply hover:bg-white; }
+    .dt-dark tbody tr { @apply hover:bg-deep-2; }
+    .dt td { @apply grid grid-cols-[96px_minmax(0,1fr)] gap-2.5 border-0 px-0 py-1; }
+    .dt td::before { content: attr(data-l); @apply pt-0.5 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3; }
+    .dt-dark td::before { @apply text-[#BFD7C4]; }
     .dt td > * { @apply col-start-2; }
+    .dt .pref-first > td:first-child { @apply border-l-0 pl-0; }
+    .dt tr.pref-first { @apply border-l-[3px] border-l-brand-dark; }
+    .dt-dark tr.pref-first { @apply border-l-lime; }
   }
 
   /* forms */
-  .field { @apply min-h-11 w-full rounded-xl border border-line-2 bg-white px-3.5 py-2 text-[15px] text-ink placeholder:text-ink-3 focus:border-brand focus:outline-none; }
-  select.field { @apply appearance-none bg-no-repeat pr-10; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12' fill='none' stroke='%235B6B66' stroke-width='1.6'><path d='M2.5 4.5 6 8l3.5-3.5'/></svg>"); background-size: 14px 14px; background-position: right 14px center; }
-  .check { @apply flex cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] font-medium text-ink transition-colors has-checked:border-brand has-checked:bg-brand-soft; }
+  .field { @apply min-h-11 w-full rounded-lg border border-line-2 bg-white px-3.5 py-2 text-[15px] text-ink placeholder:text-ink-3 focus:border-brand focus:outline-none; }
+  select.field { @apply appearance-none bg-no-repeat pr-10; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 12 12' fill='none' stroke='%2348604F' stroke-width='1.6'><path d='M2.5 4.5 6 8l3.5-3.5'/></svg>"); background-size: 14px 14px; background-position: right 14px center; }
+  .check { @apply flex cursor-pointer items-center gap-2.5 rounded-lg border border-line-2 bg-white px-3.5 py-2.5 text-[14px] font-medium text-ink transition-colors has-checked:border-brand has-checked:bg-brand-soft; }
   .check input { @apply m-0 size-4 accent-brand; }
 
-  /* index: the strongest market in the markets list (toggled by script) */
-  .top-mk { @apply text-brand-dark; }
-  /* e-mail mock-up on index.html (rendered by script) */
+  /* small pulsing/static dots */
   .dot { @apply mr-2 inline-block size-2 rounded-full align-middle; }
-  .dot.go { @apply bg-emerald-400; }
+  .dot.go { @apply bg-[#3FB06A]; }
   .dot.watch { @apply bg-amber-400; }
   .time { @apply mt-1 block text-right text-[11px] text-white/45; }
-  /* faq */
-  .faq details[open] summary svg { transform: rotate(45deg); }
-  .faq summary svg { transition: transform 200ms ease; }
-  /* app sidebar links */
-  .side-link { @apply flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-[14px] font-semibold text-ink-2 transition-colors hover:bg-page hover:text-ink aria-selected:bg-brand-soft aria-selected:text-brand-dark; }
+  /* app sidebar links: mono, uppercase, like the home page navigation */
+  .side-link { @apply flex min-h-11 w-full items-center gap-3 rounded-lg px-3 font-mono text-[12.5px] font-medium uppercase tracking-[0.06em] text-ink-2 transition-colors hover:bg-page hover:text-ink aria-selected:bg-brand aria-selected:text-lime; }
   .side-link svg { @apply size-[18px] shrink-0; }
 }
 
-/* index: mobile menu (class toggled by script). Unlayered on purpose: it must beat the `hidden` utility. */
-#nav.open { display: flex; }
 /* app: the sidebar only exists while signed in (app.js toggles #tabs[hidden]). */
 body:has(#tabs[hidden]) #side { display: none; }
