@@ -118,7 +118,7 @@ a:hover{color:#0A1C12}
 .hp2{right:-6px;top:-34px}
 .fv1 .p1{right:-10px;top:-18px}
 .fv2 .p1{left:-16px;top:40%}
-.fv2 .p2{right:-24px;bottom:-38px}
+.fv2 .p2{right:-24px;bottom:-54px}
 .fv3 .p1{left:-30px;bottom:-44px}
 .fv3 .p2{right:-10px;top:-34px}
 .fv4 .p1{left:-24px;top:110px}
@@ -202,6 +202,8 @@ a:hover{color:#0A1C12}
 .chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .chead b{font-size:18px;letter-spacing:-.01em}
 .chead span{font-weight:600;font-size:22px}
+.cwhy{margin:-4px 0 0;font-size:13px;line-height:1.45;color:#3A5444}
+.cwhy b{color:#1F6B42;font-weight:600}
 .cstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .cstats div{background:#F6FAF3;border-radius:9px;padding:8px;display:flex;flex-direction:column}
 .cstats span{font-size:11px;color:#48604F}
