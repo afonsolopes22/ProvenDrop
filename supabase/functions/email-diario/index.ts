@@ -27,7 +27,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { botaoHtml, enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { semSegredos } from "../_shared/log.ts";
-import { aprovada as regraAprovada, dataPorExtenso } from "./estado.ts";
+import { aprovada as regraAprovada, cabecalho, dataPorExtenso } from "./estado.ts";
 // Títulos sem o nome da loja: o MESMO ficheiro que a área de membros carrega (/titulo.js, script clássico que
 // regista globalThis.pdLimparTitulo). Testes: ../_shared/titulo.test.ts.
 import "../../../titulo.js";
@@ -93,7 +93,8 @@ const temKit = (i: Item) => i.kit_pronto === true || !!(i.zip_path || i.zip_url)
 
 function linhaTexto(i: Item): string {
   const ok = aprovada(i);
-  const cab = [limparTitulo(i.colecao, i.loja, i.link_colecao) || "Collection", nicho(i), mercado(i)].filter(Boolean).join(" · ");
+  // título sem o nome da loja (titulo.js); igual ao nicho → uma só vez (estado.ts, cabecalho)
+  const cab = cabecalho(limparTitulo(i.colecao, i.loja, i.link_colecao) || "Collection", nicho(i), mercado(i));
   const partes = [
     ok ? "" : "under observation",
     anuncios(i),
@@ -104,12 +105,17 @@ function linhaTexto(i: Item): string {
   return `${ok ? "🟢" : "🟡"} ${cab} — ${partes.join(" · ")}`;
 }
 
+/** Uma linha da lista: a bola numa coluna de largura fixa e o texto noutra, para todos os itens ficarem
+ *  alinhados da mesma maneira em qualquer cliente de e-mail (o título e o detalhe começam na mesma coluna). */
 function linhaHtml(i: Item): string {
   const t = linhaTexto(i);
   const [bola, resto] = [t.slice(0, 2), t.slice(3)];
   const [cab, det] = resto.split(" — ");
-  return `<p style="margin:0 0 12px"><span>${bola}</span> <b>${esc(cab)}</b>${det ? `<br><span style="color:#5C645E">${esc(det)}</span>` : ""}</p>`;
+  const td = "padding:0 0 14px;vertical-align:top;font-size:16px;line-height:1.5";
+  return `<tr><td width="28" style="width:28px;${td}">${bola}</td><td style="${td}"><b>${esc(cab)}</b>${det ? `<br><span style="color:#5C645E">${esc(det)}</span>` : ""}</td></tr>`;
 }
+const listaHtml = (itens: Item[]) =>
+  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;margin:0">${itens.map(linhaHtml).join("")}</table>`;
 
 Deno.serve(async (req) => {
   if (!(await cronSecretOk(req))) return json({ erro: "não autorizado" }, 401); // S5
@@ -159,7 +165,7 @@ Deno.serve(async (req) => {
   const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTexto).join("\n") + `\n\nOpen today's collections: ${APP_URL}\n\n${rodape}`;
   const html = molde(
     titulo,
-    `<p style="margin:-8px 0 0;font-size:15px;color:#5B6B66">${esc(hoje)}</p>` + botaoHtml(botao, "18px 0 24px") + itens.map(linhaHtml).join(""),
+    `<p style="margin:-8px 0 0;font-size:15px;color:#5B6B66">${esc(hoje)}</p>` + botaoHtml(botao, "18px 0 24px") + listaHtml(itens),
     botao,
     rodape,
   );
