@@ -27,7 +27,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { botaoHtml, enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { semSegredos } from "../_shared/log.ts";
-import { aprovada as regraAprovada, cabecalho, dataPorExtenso } from "./estado.ts";
+import { aprovada as regraAprovada, cabecalho, dataPorExtenso, porqueFunciona } from "./estado.ts";
 // Títulos sem o nome da loja: o MESMO ficheiro que a área de membros carrega (/titulo.js, script clássico que
 // regista globalThis.pdLimparTitulo). Testes: ../_shared/titulo.test.ts.
 import "../../../titulo.js";
@@ -52,6 +52,7 @@ interface Item {
   zip_url: string | null; zip_path: string | null; kit_pronto: boolean | null;
   veredito: string | null; // só para decidir "approved" (estado.ts); o texto do veredito não vai no e-mail
   loja: string | null; link_colecao: string | null; // só para limpar o título: nunca vão no e-mail
+  porque_funciona: string | null; // "Why it's working" (0015): por baixo da linha de métricas
 }
 
 /** Os nichos são guardados com os rótulos portugueses da rotina; o e-mail é em inglês. */
@@ -104,6 +105,11 @@ function linhaTexto(i: Item): string {
   ].filter(Boolean);
   return `${ok ? "🟢" : "🟡"} ${cab} — ${partes.join(" · ")}`;
 }
+/** Versão em texto simples: a linha e, quando há, "Why it's working: …" por baixo. */
+function linhaTextoCompleta(i: Item): string {
+  const pq = porqueFunciona(i.porque_funciona);
+  return linhaTexto(i) + (pq ? `\n   Why it's working: ${pq}` : "");
+}
 
 /** Uma linha da lista: a bola numa coluna de largura fixa e o texto noutra, para todos os itens ficarem
  *  alinhados da mesma maneira em qualquer cliente de e-mail (o título e o detalhe começam na mesma coluna). */
@@ -112,7 +118,9 @@ function linhaHtml(i: Item): string {
   const [bola, resto] = [t.slice(0, 2), t.slice(3)];
   const [cab, det] = resto.split(" — ");
   const td = "padding:0 0 14px;vertical-align:top;font-size:16px;line-height:1.5";
-  return `<tr><td width="28" style="width:28px;${td}">${bola}</td><td style="${td}"><b>${esc(cab)}</b>${det ? `<br><span style="color:#5C645E">${esc(det)}</span>` : ""}</td></tr>`;
+  const pq = porqueFunciona(i.porque_funciona);
+  const porque = pq ? `<br><span style="color:#1F6B42;font-size:14px"><b>Why it’s working:</b> ${esc(pq)}</span>` : "";
+  return `<tr><td width="28" style="width:28px;${td}">${bola}</td><td style="${td}"><b>${esc(cab)}</b>${det ? `<br><span style="color:#5C645E">${esc(det)}</span>` : ""}${porque}</td></tr>`;
 }
 const listaHtml = (itens: Item[]) =>
   `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;margin:0">${itens.map(linhaHtml).join("")}</table>`;
@@ -142,7 +150,7 @@ Deno.serve(async (req) => {
   if ((repetido.data?.length ?? 0) > 0 && !forcar) return json({ ok: true, saltado: "lista já enviada", feed_dia: feedDia });
 
   const feed = await admin.from("feed_dia")
-    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito,loja,link_colecao")
+    .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito,loja,link_colecao,porque_funciona")
     .eq("dia", feedDia)
     .not("retirada", "is", true) // coleções retiradas depois de enviadas (0007): fora do e-mail, como na área de membros
     .order("ordem");
@@ -164,7 +172,7 @@ Deno.serve(async (req) => {
   const titulo = `${n} ${n === 1 ? "collection" : "collections"} today`;
   const botao = { texto: "Open today's collections", url: APP_URL };
   const rodape = `List of ${hoje}. Store links and Launch Kits (approved and under observation) are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.`;
-  const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTexto).join("\n") + `\n\n${rodape}`;
+  const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTextoCompleta).join("\n") + `\n\n${rodape}`;
   const html = molde(
     titulo,
     `<p style="margin:-8px 0 0;font-size:15px;color:#5B6B66">${esc(hoje)}</p>` + botaoHtml(botao, "18px 0 24px") + listaHtml(itens),

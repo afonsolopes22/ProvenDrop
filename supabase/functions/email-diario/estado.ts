@@ -31,3 +31,8 @@ export function cabecalho(titulo: string | null | undefined, nicho: string | nul
   const partes = t && n && norm(t) === norm(n) ? [n, m] : [t, n, m];
   return partes.filter(Boolean).join(" · ");
 }
+
+/** "Why it's working" (feed_dia.porque_funciona): a frase sem espaços a mais; vazia ou nula → "" (não aparece). */
+export function porqueFunciona(v: string | null | undefined): string {
+  return (v ?? "").replace(/\s+/g, " ").trim();
+}
