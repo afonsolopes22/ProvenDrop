@@ -650,13 +650,13 @@ async function enviarRegresso(email: string, link: string) {
   const texto =
     `Welcome back! Your access is active again.\n\n` +
     `Sign in to your member area with this link (personal, valid for ${MINUTOS} minutes):\n${link}\n\n` +
-    `Your niche and countries are as you left them. The day's collections arrive every day at ${HORA} (Lisbon time).`;
+    `Your preferences are as you left them. The day's collections arrive every day at ${HORA} (Lisbon time).`;
   const html = molde(
     "Welcome back",
     `<p>Welcome back! Your access is active again.</p>
      <p>Sign in to your member area with this button (personal, valid for ${esc(MINUTOS)} minutes):</p>`,
     { texto: "Sign in to ProvenDrop", url: link },
-    `Your niche and countries are as you left them. The day's collections arrive every day at ${esc(HORA)} (Lisbon time).`,
+    `Your preferences are as you left them. The day's collections arrive every day at ${esc(HORA)} (Lisbon time).`,
   );
   await enviarEmail({ to: email, subject: "Welcome back to ProvenDrop", html, text: texto });
 }
