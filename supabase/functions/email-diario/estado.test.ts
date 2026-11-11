@@ -1,6 +1,6 @@
 // deno test supabase/functions/email-diario/estado.test.ts
 import { assertEquals } from "jsr:@std/assert@1";
-import { aprovada, cabecalho, dataPorExtenso } from "./estado.ts";
+import { aprovada, cabecalho, dataPorExtenso, porqueFunciona } from "./estado.ts";
 
 Deno.test("estado: as combinações reais do feed dão o mesmo que a área de membros", () => {
   // lista de 2026-11-10: a 1.ª a observar, as outras duas aprovadas (o e-mail mostrava as três com 🟡)
@@ -45,4 +45,13 @@ Deno.test("cabeçalho: título diferente do nicho mantém as três partes; parte
   assertEquals(cabecalho("Collection", "", "GB"), "Collection · GB");
   assertEquals(cabecalho("Turtlenecks", "Women's fashion", null), "Turtlenecks · Women's fashion");
   assertEquals(cabecalho(null, "Men's fashion", "GB"), "Men's fashion · GB");
+});
+
+Deno.test("why it's working: frase limpa; nula, vazia ou só espaços não aparece", () => {
+  assertEquals(porqueFunciona("Cosy cable knits, 14 ads for 75 days, demand rising in Spain"), "Cosy cable knits, 14 ads for 75 days, demand rising in Spain");
+  assertEquals(porqueFunciona("  14 ads\n for   75 days "), "14 ads for 75 days");
+  assertEquals(porqueFunciona(null), "");
+  assertEquals(porqueFunciona(undefined), "");
+  assertEquals(porqueFunciona(""), "");
+  assertEquals(porqueFunciona(" \n\t "), "");
 });
