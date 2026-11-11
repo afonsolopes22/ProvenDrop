@@ -19,3 +19,15 @@ export function dataPorExtenso(d: Date = new Date()): string {
   );
   return `${p.weekday}, ${p.day} ${p.month}`;
 }
+
+/**
+ * Cabeçalho de uma coleção no e-mail: "Título · Nicho · Mercado". Quando o título limpo é igual ao
+ * nicho (ex.: "Men's Fashion" na coleção e "Men's fashion" no nicho), o nome aparece uma só vez:
+ * "Men's fashion · GB". A comparação ignora maiúsculas, o tipo de apóstrofo e espaços a mais.
+ */
+export function cabecalho(titulo: string | null | undefined, nicho: string | null | undefined, mercado: string | null | undefined): string {
+  const norm = (v: string) => v.toLowerCase().replace(/[\u2018\u2019\u02BC`]/g, "'").replace(/\s+/g, " ").trim();
+  const t = (titulo ?? "").trim(), n = (nicho ?? "").trim(), m = (mercado ?? "").trim();
+  const partes = t && n && norm(t) === norm(n) ? [n, m] : [t, n, m];
+  return partes.filter(Boolean).join(" · ");
+}

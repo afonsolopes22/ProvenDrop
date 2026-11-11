@@ -200,7 +200,8 @@ select cron.schedule(
       headers := jsonb_build_object(
                    'Content-Type', 'application/json',
                    'x-cron-secret', (select valor from public.config where chave = 'cron_secret')),
-      body    := '{}'::jsonb
+      body    := '{}'::jsonb,
+      timeout_milliseconds := 30000   -- 0013: o pg_net espera 5 s por omissão, menos do que um arranque a frio
     );
   $cron$
 );

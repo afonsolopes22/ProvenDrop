@@ -1,6 +1,6 @@
 // deno test supabase/functions/email-diario/estado.test.ts
 import { assertEquals } from "jsr:@std/assert@1";
-import { aprovada, dataPorExtenso } from "./estado.ts";
+import { aprovada, cabecalho, dataPorExtenso } from "./estado.ts";
 
 Deno.test("estado: as combinações reais do feed dão o mesmo que a área de membros", () => {
   // lista de 2026-11-10: a 1.ª a observar, as outras duas aprovadas (o e-mail mostrava as três com 🟡)
@@ -30,4 +30,19 @@ Deno.test("data: por extenso em inglês, no fuso de Lisboa", () => {
   assertEquals(dataPorExtenso(new Date("2026-12-31T23:30:00Z")), "Thursday, 31 December");
   // no verão Lisboa está em UTC+1: 23:30 UTC já é o dia seguinte
   assertEquals(dataPorExtenso(new Date("2026-07-14T23:30:00Z")), "Wednesday, 15 July");
+});
+
+Deno.test("cabeçalho: título igual ao nicho aparece uma só vez", () => {
+  // lista de 2026-11-10: a coleção "Men's Fashion | HERLINE London" fica "Men's Fashion" e o nicho é "Men's fashion"
+  assertEquals(cabecalho("Men's Fashion", "Men's fashion", "GB"), "Men's fashion · GB");
+  assertEquals(cabecalho("Men\u2019s  fashion ", "Men's fashion", "GB"), "Men's fashion · GB");
+  assertEquals(cabecalho("HOME DECORATION", "Home decoration", "DE"), "Home decoration · DE");
+});
+
+Deno.test("cabeçalho: título diferente do nicho mantém as três partes; partes vazias saem", () => {
+  assertEquals(cabecalho("Laundry Baskets", "Home decoration", "GB"), "Laundry Baskets · Home decoration · GB");
+  assertEquals(cabecalho("Men's Fashion Coats", "Men's fashion", "IT"), "Men's Fashion Coats · Men's fashion · IT");
+  assertEquals(cabecalho("Collection", "", "GB"), "Collection · GB");
+  assertEquals(cabecalho("Turtlenecks", "Women's fashion", null), "Turtlenecks · Women's fashion");
+  assertEquals(cabecalho(null, "Men's fashion", "GB"), "Men's fashion · GB");
 });
