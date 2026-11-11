@@ -143,7 +143,9 @@ Deno.serve(async (req) => {
 
   const feed = await admin.from("feed_dia")
     .select("ordem,nicho,colecao,mercado_destaque,paises_ads,estado,alcance_eu,anuncios_ativos,anuncios_meta,anuncios_google,dias_ativo,data_inicio,zip_url,zip_path,kit_pronto,veredito,loja,link_colecao")
-    .eq("dia", feedDia).order("ordem");
+    .eq("dia", feedDia)
+    .not("retirada", "is", true) // coleções retiradas depois de enviadas (0007): fora do e-mail, como na área de membros
+    .order("ordem");
   if (feed.error) return json({ erro: semSegredos(feed.error.message) }, 500);
   const itens = (feed.data ?? []) as Item[];
   if (!itens.length) return json({ ok: true, saltado: "feed vazio", feed_dia: feedDia });
