@@ -214,6 +214,13 @@
   .cc-title { display: flex; flex-direction: column; gap: 3px; padding-right: 56px; }
   .cc-title h3 { font-size: 18px; line-height: 1.25; letter-spacing: -0.02em; font-weight: 700; text-wrap: wrap; overflow-wrap: anywhere; }
   .cc-title span { font-size: 13px; color: var(--color-ink-3); }
+  /* "Why it's working": label with a small bulb, then the sentence, two lines at most */
+  .why { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding-right: 56px; }
+  .why-l { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-brand-dark); }
+  .why-l svg { flex-shrink: 0; }
+  .why-t { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; font-size: 13.5px; line-height: 1.4; color: var(--color-ink-2); }
+  .why.why-dt { margin-top: 8px; padding-right: 0; }
+  .why.why-dt .why-t { font-size: 12.5px; }
   .cc-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .cc-kpis div { display: flex; min-width: 0; flex-direction: column; border-radius: 10px; background: #F4F8F1; padding: 8px 10px; }
   .cc-kpis dt { font-size: 11px; color: var(--color-ink-3); white-space: nowrap; }

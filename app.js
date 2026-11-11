@@ -351,6 +351,11 @@
     return g > 0 && mm > 0 ? ["Ads", fmt(mm + g), `${fmt(mm)} on Meta · ${fmt(g)} on Google`] : g > 0 ? ["Google ads", fmt(g), ""] : ["Meta ads", fmt(mm), ""]; };
   const kpiDias = r => { const n = diasAgora(r); return n != null ? fmt(n) : fmt(r.dias_ativo); };
   const kpiAlcance = r => { const a = r.alcance_eu == null || r.alcance_eu === "" ? 0 : Number(r.alcance_eu); return a > 0 ? `<dd title="${fmt(a)} people reached by its Meta ads in the EU">${compacto(a)}</dd>` : `<dd ${REACH_TIP}>—</dd>`; };
+  /* "Why it's working" (feed_dia.porque_funciona, migration 0015): one sentence from the research routine, up to 140
+     characters. Shown under the title, two lines at most (the full sentence is in the tooltip). No sentence: nothing. */
+  const porque = r => String(r.porque_funciona ?? "").replace(/\s+/g, " ").trim();
+  const LAMPADA = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
+  const blocoPorque = (r, cls) => { const t = porque(r); return t ? `<p class="why${cls ? " " + cls : ""}" title="${esc(t)}"><span class="why-l">${LAMPADA}Why it’s working</span><span class="why-t">${esc(t)}</span></p>` : ""; };
   const SETA = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5 8.5 3.5M4.5 3.5h4v4"/></svg>';
 
   function renderFeed(){
@@ -413,6 +418,7 @@
       <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${imagem(r)}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${ok ? "Approved" : "Observing"}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
       <div class="cc-body">
         <div class="cc-title"><h3>${esc(titulo(r))}</h3><span>${esc(nicho(r.nicho))}${mk ? ` · best in ${esc(emPais(mk))}` : ""}</span></div>
+        ${blocoPorque(r)}
         <dl class="cc-kpis"><div${adsT ? ` title="${esc(adsT)}"` : ""}><dt>${adsL}</dt><dd>${adsV}</dd></div><div><dt>Days live</dt><dd>${kpiDias(r)}</dd></div><div><dt>Reach</dt>${kpiAlcance(r)}</div></dl>
         ${mercados(mk, r.mercados_verdes)}
         <p class="cc-sub">${procura(r)}</p>
@@ -490,7 +496,7 @@
       return `<tr${attrC(r)}>
         <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>
         <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ainda}${chips(r, "mt-2")}</span></td>
-        <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(titulo(r))}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(titulo(r))}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}<span class="mt-2.5 block">${kit}</span></span></td>
+        <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(titulo(r))}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(titulo(r))}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}${blocoPorque(r, "why-dt")}<span class="mt-2.5 block">${kit}</span></span></td>
         <td data-l="Niche"><span class="block min-w-[112px]"><b class="font-semibold">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap"><b class="font-extrabold">${score(r.score)}</b>${sc.mk ? `<span class="sub" title="${sc.proprio ? "Score for" : "Approved for"} ${esc(pais(sc.mk))}, the strongest market">${sc.proprio ? `${sc.valor} in ${esc(sc.mk)}` : `for ${esc(sc.mk)}`}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Ads"><span><span class="whitespace-nowrap">${fmt(r.anuncios_ativos)} when sent</span>${Number(googleAds(r)) > 0 ? `<span class="sub">${fmt(googleAds(r))} on Google</span>` : ""}${r.anuncios_ultima_verificacao != null ? `<span class="sub whitespace-nowrap">${fmt(r.anuncios_ultima_verificacao)} on ${esc(diaMes(r.ultima_verificacao) || "—")}</span>` : ""}</span></td>
