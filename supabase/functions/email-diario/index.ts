@@ -6,9 +6,9 @@
 // RECENTE de feed_dia (a rotina publica ao fim da tarde; às 09:00 do dia
 // seguinte sai a lista de ontem) e nunca envia a mesma lista duas vezes
 // (envios_diarios.feed_dia). O e-mail NÃO leva links das lojas nem dos zips:
-// só o resumo e o botão para a área, que vai DUAS vezes: logo a seguir ao título
-// (o Gmail esconde atrás de "•••" o final que se repete de um dia para o outro) e
-// no fim. A data do dia vai no cabeçalho e no rodapé, para o e-mail nunca ser
+// só o resumo e UM botão para a área, logo a seguir ao título (no fim, o Gmail
+// escondia-o atrás de "•••" por se repetir de um dia para o outro; desde 2026-11-11
+// já não vai lá). A data do dia vai no cabeçalho e no rodapé, para o e-mail nunca ser
 // igual ao anterior. O estado segue a regra da área de membros (estado.ts). Cada linha: estado, coleção, nicho,
 // mercado, "N Meta + N Google ads", dias, alcance e "kit ready" em todas as
 // que têm kit (aprovadas e a observar, desde 2026-11-02). Nunca o nome da
@@ -162,11 +162,11 @@ Deno.serve(async (req) => {
   const titulo = `${n} ${n === 1 ? "collection" : "collections"} today`;
   const botao = { texto: "Open today's collections", url: APP_URL };
   const rodape = `List of ${hoje}. Store links and Launch Kits (approved and under observation) are only in your member area, after you sign in. To cancel: “Manage subscription”, in the member area.`;
-  const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTexto).join("\n") + `\n\nOpen today's collections: ${APP_URL}\n\n${rodape}`;
+  const text = `${hoje} · ${titulo}\n\nOpen today's collections: ${APP_URL}\n\n` + itens.map(linhaTexto).join("\n") + `\n\n${rodape}`;
   const html = molde(
     titulo,
     `<p style="margin:-8px 0 0;font-size:15px;color:#5B6B66">${esc(hoje)}</p>` + botaoHtml(botao, "18px 0 24px") + listaHtml(itens),
-    botao,
+    undefined, // um só botão, antes da lista (pedido de 2026-11-11; no fim o Gmail escondia-o)
     rodape,
   );
 
