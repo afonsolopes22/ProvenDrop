@@ -12,7 +12,18 @@
   if (!key || h === "localhost" || h === "127.0.0.1" || h === "[::1]" || /\.localhost$/.test(h)) return;
   /* official PostHog loader stub (loads array.js from eu-assets.i.posthog.com) */
   !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  /* Stable id without cookies: a signed-in member is the Supabase user id (read from the session the member area
+     keeps in localStorage), so identify() never merges a fresh random id; anonymous visitors get one id per page
+     view, as "memory" persistence would mint anyway (bootstrapping it keeps PostHog from warning in the console). */
+  var uid = "";
+  try {
+    var ref = String(C.SUPABASE_URL || "").replace(/^https:\/\//, "").split(".")[0];
+    var s = ref && JSON.parse(localStorage.getItem("sb-" + ref + "-auth-token") || "null");
+    uid = (s && s.user && s.user.id) ? String(s.user.id) : "";
+  } catch (e) { uid = ""; }
+  var anon = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
   window.posthog.init(key, {
+    bootstrap: uid ? { distinctID: uid, isIdentifiedID: true } : { distinctID: anon },
     api_host: host,
     ui_host: "https://eu.posthog.com",
     persistence: "memory",
