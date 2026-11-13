@@ -95,6 +95,7 @@ footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
      STRIPE_PORTAL_LINK ("Manage subscription" opens the Stripe customer portal; only when that value is empty
      does the button fall back to WhatsApp) and CONTACT_EMAIL (optional, shown in the footer). -->
 <script src="config.js"></script>
+<script src="analytics.js"></script>
 </head>
 <body>
 <main class="wrap">
@@ -213,5 +214,6 @@ footer .contact{margin:10px 0 0}footer .contact a{font-weight:600}
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ var c=document.getElementById("contactLine"); c.innerHTML='Questions? Write to <a href="mailto:'+mail+'">'+mail+'</a>.'; c.hidden=false; }
 })();
 </script>
+<script>window.pdTrack&&window.pdTrack("pagamento_concluido",{plano:"click"});</script>
 </body>
 </html>

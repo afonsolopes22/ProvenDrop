@@ -177,6 +177,7 @@
     sub = error ? null : data;
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
+    window.pdIdentify(user.id, { origem: sub?.origem || "" }); window.pdTrack("area_membros_entrada", { via_link_c: !!cPedido });
     renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); iniciarContagem();
     /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
     if(!sub.guia_visto && !cPedido) abrirGuia(); else mostrarDica();
@@ -259,6 +260,7 @@
      notice. The id is forgotten either way. */
   async function abrirColecao(){
     const c = cPedido; if(!c) return; esquecerC();
+    window.pdTrack("link_colecao_aberto", { id_curto: c });
     const linha = feedTodos.find(r => String(r.id_curto || "").toUpperCase() === c && visivel(r));
     const sel = `[data-c="${c}"]`;
     if(!linha){ go("arquivo"); msg($("#msgArquivo"), "This collection is no longer available."); return; }
@@ -431,11 +433,19 @@
   /* kits: short-lived signed URL from the private bucket; only works for members with access (RLS) */
   document.addEventListener("click", async e => {
     const b = e.target.closest("[data-zip]"); if(!b) return;
+    window.pdTrack("kit_descarregado", { id_curto: b.closest("[data-c]")?.dataset.c || "" });
     b.disabled = true; const t = b.textContent; b.textContent = "Preparing…";
     const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, SIGNED_URL_SECONDS);
     b.disabled = false; b.textContent = t;
     if(error || !data?.signedUrl) return alert("The kit could not be prepared. Please try again.");
     const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  /* analytics: the member opens a collection on the store ("Store" button) or an external kit link */
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a.cc-btn, a.lkit"); if(!a) return;
+    const c = a.closest("[data-c]")?.dataset.c || "";
+    window.pdTrack(a.classList.contains("bl") ? "colecao_aberta" : "kit_descarregado", { id_curto: c });
   });
 
   /* ── library (was "Archive" until 2026-11-08) ───────────────────── */

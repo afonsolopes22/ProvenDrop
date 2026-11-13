@@ -322,6 +322,7 @@
 </div>
 <!-- Every public value (Stripe links, portal link, delivery time, prices, contact) lives in config.js. Nothing is invented when a value is empty. -->
 <script src="config.js"></script>
+<script src="analytics.js"></script>
 <script>
 (function(){
   var C=window.PROVENDROP_CONFIG||{}, s=function(k){ return String(C[k]==null?"":C[k]).trim(); };
@@ -360,6 +361,10 @@
     var a=document.createElement("a"); a.href="mailto:"+mail; a.textContent=mail; fc.appendChild(a); fc.hidden=false;
   }
 })();
+</script>
+<script>
+/* analytics: clicks on the subscribe buttons (the payment itself is counted on the welcome pages) */
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("#btnSubscribe,#btnClick,.js-click-link,a[href='#plans']");if(!a)return;window.pdTrack&&window.pdTrack("subscribe_click",{plano:(a.id==="btnClick"||a.classList.contains("js-click-link"))?"click":(a.id==="btnSubscribe"?"direto":"ver_planos")});});
 </script>
 </body>
 </html>

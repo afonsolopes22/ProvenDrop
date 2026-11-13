@@ -17,10 +17,11 @@
 <link rel="stylesheet" href="tailwind.css">
 <!-- S6: strict CSP (no inline scripts: the logic lives in app.js) and SRI on the pinned supabase-js.
      connect-src and img-src must match SUPABASE_URL in config.js (img-src: the card photos, public bucket "fotos"). -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src https://maljrfgnnhtrjunnwlre.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://maljrfgnnhtrjunnwlre.supabase.co; base-uri 'none'; form-action 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://eu-assets.i.posthog.com; connect-src https://maljrfgnnhtrjunnwlre.supabase.co https://eu.i.posthog.com https://eu-assets.i.posthog.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://maljrfgnnhtrjunnwlre.supabase.co; base-uri 'none'; form-action 'self'; object-src 'none'">
 <!-- Supabase URL, anon key, portal link and delivery time come from config.js (public values only;
      access to data is decided by the RLS policies on the server). -->
 <script src="config.js"></script>
+<script src="analytics.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" integrity="sha384-YieCqqg9gQufX7+5HcFvCEg/n3KUEdl8/Jb+A6J0npf1mB740VayvwKjTrtCeUoy" crossorigin="anonymous"></script>
 <!-- titulo.js: collection titles without the store name (the same file is used by the daily e-mail). Must load before app.js. -->
 <script src="titulo.js" defer></script>

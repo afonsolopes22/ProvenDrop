@@ -87,6 +87,7 @@ footer p+p{margin-top:8px}
 <!-- After-payment page of the direct subscription. The Stripe Payment Link redirects here;
      Click Dynamics customers land on bem-vindo-click.html instead. Values come from config.js. -->
 <script src="config.js"></script>
+<script src="analytics.js"></script>
 </head>
 <body>
 <main class="wrap">
@@ -209,5 +210,6 @@ footer p+p{margin-top:8px}
   });
 })();
 </script>
+<script>window.pdTrack&&window.pdTrack("pagamento_concluido",{plano:"direto"});</script>
 </body>
 </html>

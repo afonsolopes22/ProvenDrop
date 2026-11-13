@@ -45,6 +45,12 @@ window.PROVENDROP_CONFIG = {
      (bem-vindo-click.html falls back to WhatsApp). */
   STRIPE_PORTAL_LINK: "https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00",
 
+  /* PostHog product analytics (EU cloud, project "ProvenDrop", since 2026-11-13).
+     The project token (phc_…) is public by design: it can only SEND events. Empty = analytics off.
+     analytics.js reads these two values; it never runs on localhost. */
+  POSTHOG_KEY: "phc_tPR88szrRKLyytWEjc9gpXwnsRq8BeKfArL8sEWd7avj",
+  POSTHOG_HOST: "https://eu.i.posthog.com",
+
   /* Time the daily collections are delivered, Europe/Lisbon, "HH:MM".
      Must match the HORA_ENVIO secret of the email-diario function
      (scripts/setup-supabase.ps1 reads it from here). */
