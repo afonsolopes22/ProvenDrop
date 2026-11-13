@@ -86,3 +86,7 @@ Deno.test("normalizarEmail: trim e minúsculas; null → vazio", () => {
   assertEquals(normalizarEmail(" X@Y.Z "), "x@y.z");
   assertEquals(normalizarEmail(null), "");
 });
+
+Deno.test("validarCorpo aceita listar_auto (validados automaticamente nos últimos 7 dias)", () => {
+  assertEquals(validarCorpo({ acao: "listar_auto" }), { ok: true, corpo: { acao: "listar_auto" } });
+});

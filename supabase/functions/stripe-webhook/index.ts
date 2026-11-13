@@ -22,13 +22,15 @@
 // e (direto, ou click com estado_click = 'validado'), e ativo ou em_atraso há
 // menos de 7 dias (M1).
 //
-// Plano Click (0008/0009): cada checkout Click grava codigo_compra, telefone,
-// nome, loja e estado_click = 'pendente' (só se ainda for null: uma renovação
-// ou um evento repetido nunca volta a pôr pendente quem já está validado ou
-// recusado) e alerta o Afonso ("New Click subscription"). Um checkout NOVO de quem
-// tinha sido recusado volta a 'pendente'. O cliente pendente fica com login (sem
-// acesso a dados) para ver "being confirmed". A validação é feita em admin.html
-// (admin-click). Quando uma subscrição Click passa a cancelado,
+// Plano Click (0008/0009/0016): cada checkout Click grava codigo_compra, telefone,
+// nome e loja. Desde 2026-11-13 (CLICK_AUTO_VALIDAR, por omissão ligado) a compra
+// nova fica logo estado_click = 'validado' com validado_auto_em, recebe o e-mail de
+// acesso e o Afonso recebe "Click purchase — access granted automatically" com um
+// botão "Reject & refund" (admin.html?compra=<código>). Com CLICK_AUTO_VALIDAR=false
+// fica 'pendente' como antes. A escrita só acontece onde estado_click is null: uma
+// renovação ou um evento repetido nunca muda um 'recusado' nem um 'validado'. Um
+// checkout NOVO de quem tinha sido recusado volta a 'pendente' (revisão manual,
+// nunca automático). Regras em compra_click.ts. Quando uma subscrição Click passa a cancelado,
 // alerta "Click subscription cancelled" para a Click tirar a pessoa do grupo.
 //
 // Boas-vindas (A3): só com acesso (direto ou Click validado), com reserva
@@ -47,7 +49,7 @@
 // Segredos: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_ACCEPT_TEST,
 //   STRIPE_PRICE_DIRETO, STRIPE_PRICE_CLICK, STRIPE_PAYMENT_LINK_DIRETO (opcional),
 //   RESEND_API_KEY, EMAIL_FROM, EMAIL_REPLY_TO, ALERT_EMAIL, APP_URL, HORA_ENVIO,
-//   MAGIC_LINK_MINUTOS, CRON_SECRET. SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
+//   MAGIC_LINK_MINUTOS, CRON_SECRET, CLICK_AUTO_VALIDAR (opcional; por omissão true). SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
 //   são injetadas pelo Supabase.
 //
 // Logs e respostas sem e-mails nem erros internos (B5/S13): os e-mails aparecem
@@ -66,7 +68,8 @@ import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 import { codigoDeCompra } from "../_shared/codigo.ts";
 import { lojaDaSessao } from "../_shared/loja.ts";
-import { reabreRecusado } from "./click.ts";
+import { autoValidarClick, type LinhaClick, registarCompraClick as decidirCompraClick } from "./compra_click.ts";
+import { temAcesso as regraAcesso } from "../_shared/acesso.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -91,6 +94,8 @@ const EM_CURSO_MIN = 5;          // A2: janela em que um evento repetido recebe 
 const RESERVA_MIN = 10;          // A3: nova tentativa de boas-vindas só passados 10 min
 const MAX_TENTATIVAS = 5;        // A3: depois disto, alerta
 const TOLERANCIA_DIAS = 7;       // M1
+/** Click com acesso imediato (2026-11-13); por omissão ligado. "false" volta à validação manual (pendente). */
+const CLICK_AUTO_VALIDAR = autoValidarClick(Deno.env.get("CLICK_AUTO_VALIDAR"));
 
 /** "9" ou "09:00" → "09:00"; vazio → "[HOUR]" (nunca se inventa uma hora). */
 function horaTexto(): string {
@@ -115,17 +120,8 @@ const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 const erroInterno = (status = 500) => json({ erro: "erro interno" }, status);
 
-/** Espelho de public.tem_acesso() (0009): não bloqueado; direto, ou click validado pela Click; ativo ou em atraso < 7 dias. */
-function temAcesso(s: Subscritor | null | undefined): boolean {
-  if (!s || s.bloqueado_em) return false;
-  const porta = s.origem === "direto" || (s.origem === "click" && s.estado_click === "validado");
-  if (!porta) return false;
-  if (s.estado === "ativo") return true;
-  if (s.estado === "em_atraso" && s.em_atraso_desde) {
-    return Date.now() - new Date(s.em_atraso_desde).getTime() < TOLERANCIA_DIAS * 864e5;
-  }
-  return false;
-}
+/** Espelho de public.tem_acesso() (0009): a regra está em _shared/acesso.ts (testada). */
+const temAcesso = (s: Subscritor | null | undefined): boolean => regraAcesso(s);
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -366,59 +362,38 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
   // A origem da sessão (metadata do Payment Link) é o sinal mais fiável.
   const resultado = await sincronizarSubscricao(subId, await origemDaSessao(s), true);
   if (desbloqueado) resultado.desbloqueado = true;
-  if (resultado.origem === "click") Object.assign(resultado, await registarCompraClick(s));
+  if (resultado.origem === "click") resultado.click = await registarCompraClick(s);
   return resultado;
 }
 
 /**
- * Plano Click (2026-11-08): a Click confirma que a pessoa é cliente e põe-na no grupo de
- * WhatsApp; o Afonso valida ou recusa em admin.html. Guarda em subscritores o código
- * "PD-XXXXXX" (o mesmo que bem-vindo-click.html mostra e põe na mensagem de WhatsApp), o
- * telefone, o nome e a loja do checkout, e estado_click = 'pendente' SÓ se a linha ainda
- * não tiver estado_click (quem já está validado ou recusado nunca volta a pendente por um
- * evento repetido ou um novo checkout). Envia "New Click subscription" ao Afonso
- * (ALERT_EMAIL, por alertar()). Se o e-mail falhar (Resend ainda sem domínio), a linha
- * fica na mesma: consulta-se com
- *   select email, nome, telefone, loja, codigo_compra, estado_click from subscritores where origem = 'click'.
+ * Plano Click: grava código "PD-XXXXXX" (o mesmo de bem-vindo-click.html), telefone, nome e loja do checkout e
+ * decide o estado_click (compra_click.ts). Com acesso imediato, envia já o e-mail de entrada e alerta o Afonso com
+ * "Reject & refund". Se o alerta falhar (Resend), a linha fica na mesma: consulta-se com
+ *   select email, nome, telefone, loja, codigo_compra, estado_click, validado_auto_em from subscritores where origem = 'click'.
  */
 async function registarCompraClick(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
   const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
   if (!email) return { click: "sem e-mail na sessão" };
-  const codigo = await codigoDeCompra(s.id);
-  const telefone = (s.customer_details?.phone ?? "").trim() || null;
-  const nome = (s.customer_details?.name ?? "").trim() || null;
-  const loja = lojaDaSessao(s);
-  // Checkout NOVO de quem tinha sido recusado (o código da compra é outro): volta a pendente, senão
-  // paga, fica sem acesso e não aparece em admin.html. Lê-se antes de gravar o código novo.
-  const antes = await admin.from("subscritores").select("estado_click,codigo_compra,user_id").eq("email", email).maybeSingle();
-  if (antes.error) throw antes.error;
-  let reaberto = false;
-  if (reabreRecusado(antes.data?.estado_click, antes.data?.codigo_compra, codigo)) {
-    const re = await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", email).eq("estado_click", "recusado").select("email");
-    if (re.error) throw re.error;
-    reaberto = (re.data?.length ?? 0) > 0;
-  }
-  const up = await admin.from("subscritores").update({ codigo_compra: codigo, telefone, nome, loja }).eq("email", email);
-  if (up.error) throw up.error;
-  // Condição na própria escrita (is null): nunca repõe 'pendente' em quem já está validado/recusado.
-  const pend = await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", email).is("estado_click", null).select("email");
-  if (pend.error) throw pend.error;
-  const pendente = (pend.data?.length ?? 0) > 0 || reaberto;
-  // Login para o cliente Click que pagou e espera a validação: não dá acesso a dados (RLS: tem_acesso
-  // exige 'validado'), mas deixa-o pedir o link de entrada e ver "Your Click access is being confirmed".
-  // Sem boas-vindas até ser validado. Falhar aqui não falha o evento.
-  if (antes.data && !antes.data.user_id) {
-    try {
-      const u = await garantirUtilizador(email, null);
-      if (u) await admin.from("subscritores").update({ user_id: u }).eq("email", email).is("user_id", null);
-    } catch (e) { console.error(`login do Click pendente não criado: ${semSegredos((e as Error).message)}`); }
-  }
-  const enviado = await alertar(`New Click subscription · ${codigo}`, [
-    `Name: ${nome ?? "—"}`, `Phone: ${telefone ?? "— (not collected at checkout)"}`, `E-mail: ${email}`, `Store: ${loja ?? "—"}`,
-    `Purchase code: ${codigo}`, `Checkout session: ${s.id}`,
-    `Confirm the payment, then tell Click: "${codigo} paid". Validate or reject at provendrop.com/admin.html.`,
-  ]);
-  return { click: { codigo, telefone: !!telefone, loja: !!loja, pendente, reaberto, email_enviado: enviado } };
+  const verificar = <T>(r: { data: T; error: unknown }) => { if (r.error) throw r.error; return r.data; };
+  return await decidirCompraClick({
+    autoValidar: CLICK_AUTO_VALIDAR,
+    agora: () => new Date().toISOString(),
+    ler: async (e) => verificar(await admin.from("subscritores")
+      .select("estado_click,codigo_compra,user_id,boas_vindas_em,validado_auto_em,origem,estado,bloqueado_em,em_atraso_desde")
+      .eq("email", e).maybeSingle()) as LinhaClick | null,
+    gravarDados: async (e, d) => { verificar(await admin.from("subscritores").update(d).eq("email", e)); },
+    // Condição na própria escrita (is null): nunca muda quem já está validado ou recusado.
+    marcarSeSemEstado: async (e, campos) => ((verificar(await admin.from("subscritores").update(campos).eq("email", e).is("estado_click", null).select("email")) as unknown[]) ?? []).length > 0,
+    reabrirRecusado: async (e) => ((verificar(await admin.from("subscritores").update({ estado_click: "pendente" }).eq("email", e).eq("estado_click", "recusado").select("email")) as unknown[]) ?? []).length > 0,
+    garantirLogin: async (e) => {
+      const u = await garantirUtilizador(e, null);
+      if (u) await admin.from("subscritores").update({ user_id: u }).eq("email", e).is("user_id", null);
+    },
+    enviarAcesso: (e, tipo) => tentarBoasVindas(e, tipo),
+    alertar,
+    linkAdmin: (codigo) => new URL(`admin.html?compra=${encodeURIComponent(codigo)}`, APP_URL).href,
+  }, { email, codigo: await codigoDeCompra(s.id), telefone: (s.customer_details?.phone ?? "").trim() || null, nome: (s.customer_details?.name ?? "").trim() || null, loja: lojaDaSessao(s), sessao: s.id });
 }
 
 // ───────────────────────────────────────────────────────────────────────

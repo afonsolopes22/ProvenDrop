@@ -8,6 +8,8 @@
 //                                       (origem=click, estado_click=pendente, mais recentes primeiro)
 //     {"acao":"validar","email":"…"}  → {ok:true, boas_vindas:"enviadas"|"por_enviar"}
 //     {"acao":"recusar","email":"…"}  → {ok:true, reembolsado:bool, cancelada:bool, email_enviado:bool}
+//     {"acao":"listar_auto"}          → [ {…, estado_click, validado_auto_em} ] validados automaticamente nos
+//                                       últimos 7 dias (e os que já foram recusados), mais recentes primeiro
 //
 // Autorização: a função valida o JWT ela própria (verify_jwt = false em config.toml)
 // com supabase.auth.getUser(jwt) num cliente com a anon key, e só aceita o utilizador
@@ -15,9 +17,10 @@
 //   sem JWT válido → 401 {"erro":"sem_sessao"}; outro e-mail → 403 {"erro":"nao_autorizado"};
 //   corpo inválido → 400 {"erro":"corpo_invalido"}.
 //
-// Idempotência: validar e recusar fazem `update subscritores set estado_click = …
-// where email = … and estado_click = 'pendente'`; 0 linhas → 409 {"erro":"nao_pendente"}
-// e nada mais acontece (um segundo "Reject & refund" não reembolsa duas vezes).
+// Idempotência: validar faz `update … where estado_click = 'pendente'`; recusar faz o mesmo para
+// pendente OU validado automaticamente (validado_auto_em preenchido, desde 2026-11-13; recusa.ts,
+// podeRecusar). 0 linhas → 409 {"erro":"nao_pendente"} e nada mais acontece (um segundo "Reject &
+// refund" não reembolsa duas vezes; uma validação feita à mão não se recusa aqui).
 // Fatura de 0 (cupão TESTE100) → não se chama a Refunds API, só se cancela (acoes.ts,
 // decidirReembolso). Se o Stripe falhar depois de a linha já estar 'recusado', o Afonso
 // recebe um alerta para terminar à mão e a resposta é 502 {"erro":"stripe_falhou"}.
@@ -37,9 +40,10 @@ import { enviarEmail, moldeRecusaClick } from "../_shared/email.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
 import {
-  ASSUNTO_RECUSA, autorizar, decidirReembolso, type FaturaLista, paraPendente, TEXTO_RECUSA, ultimaFaturaPaga, URL_SITE, validarCorpo,
+  ASSUNTO_RECUSA, autorizar, type FaturaLista, paraPendente, TEXTO_RECUSA, URL_SITE, validarCorpo,
 } from "./acoes.ts";
 import { enviarBoasVindasClick, garantirUtilizador } from "./boas_vindas.ts";
+import { recusarCompra } from "./recusa.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
   apiVersion: "2025-02-24.acacia", // versão do SDK stripe@17.7.0 (as faturas vêm na forma acacia: payment_intent no topo)
@@ -104,6 +108,7 @@ Deno.serve(async (req) => {
     if (!v.ok) return json(req, { erro: v.erro }, v.status);
     switch (v.corpo.acao) {
       case "listar": return json(req, await listar());
+      case "listar_auto": return json(req, await listarAuto());
       case "validar": return await validar(req, v.corpo.email);
       case "recusar": return await recusar(req, v.corpo.email);
     }
@@ -124,6 +129,17 @@ async function listar() {
     .order("criado_em", { ascending: false });
   if (q.error) throw q.error;
   return (q.data ?? []).map((r) => paraPendente(r as Record<string, unknown>));
+}
+
+/** Validados automaticamente nos últimos 7 dias (os que ainda têm acesso e os já recusados), para rever. */
+async function listarAuto() {
+  const desde = new Date(Date.now() - 7 * 864e5).toISOString();
+  const q = await admin.from("subscritores")
+    .select("email,nome,telefone,loja,codigo_compra,criado_em,estado_click,validado_auto_em")
+    .eq("origem", "click").gte("validado_auto_em", desde)
+    .order("validado_auto_em", { ascending: false });
+  if (q.error) throw q.error;
+  return (q.data ?? []).map((r) => ({ ...paraPendente(r as Record<string, unknown>), estado_click: String(r.estado_click ?? ""), validado_auto_em: String(r.validado_auto_em ?? "") }));
 }
 
 /** Update condicional (é o que torna a ação idempotente): devolve a linha se estava pendente, null se não. */
@@ -171,53 +187,36 @@ async function validar(req: Request, email: string): Promise<Response> {
 }
 
 /**
- * Reject & refund: estado_click = 'recusado'; por cada subscrição Click a cobrar
- * (ativo/em_atraso), reembolso total da última fatura paga (só se houve valor) e
- * cancelamento imediato; e-mail ao cliente com o texto exato do plano.
+ * Reject & refund (recusa.ts): pendente ou validado automaticamente → 'recusado'; por cada subscrição Click a
+ * cobrar, reembolso total da última fatura paga (só se houve valor) e cancelamento imediato; e-mail ao cliente.
  */
 async function recusar(req: Request, email: string): Promise<Response> {
   const uid = await idEmail(email);
-  const linha = await marcar(email, "recusado");
-  if (!linha) return json(req, { erro: "nao_pendente" }, 409);
-  const codigo = linha.codigo_compra ?? "—";
-
-  let reembolsado = false, cancelada = false;
-  try {
-    const subs = await admin.from("subscricoes")
-      .select("stripe_subscription_id")
-      .eq("email", email).eq("origem", "click").in("estado", ["ativo", "em_atraso"]);
-    if (subs.error) throw subs.error;
-    for (const s of subs.data ?? []) {
-      const subId = s.stripe_subscription_id as string;
-      const faturas = await stripe.invoices.list({ subscription: subId, limit: 5 });
-      const paga = ultimaFaturaPaga(faturas.data as unknown as FaturaLista[]);
-      const d = paga ? decidirReembolso(paga) : { reembolsar: false, payment_intent: null };
-      if (d.reembolsar && d.payment_intent) {
-        await stripe.refunds.create({ payment_intent: d.payment_intent });
-        reembolsado = true;
-      }
-      await stripe.subscriptions.cancel(subId);
-      cancelada = true;
-    }
-  } catch (e) {
-    // A linha já está 'recusado' (um novo clique dá 409): o Afonso termina à mão no Stripe.
-    console.error(`click recusado: ${uid}, Stripe falhou (reembolsado=${reembolsado}, cancelada=${cancelada}): ${semSegredos((e as Error).message)}`);
-    await alertar(`Click rejection needs a manual step in Stripe · ${codigo}`, [
-      `Subscriber ${uid} (purchase code ${codigo}) was marked as rejected, but Stripe failed half-way.`,
-      `Refund done: ${reembolsado ? "yes" : "no"}. Subscription cancelled: ${cancelada ? "yes" : "no"}.`,
-      "Finish in the Stripe dashboard (Customers → search by e-mail): refund the last paid invoice in full and cancel the subscription immediately.",
-      "The customer has NOT been e-mailed yet; tell them once it is done.",
-    ]);
-    return json(req, { erro: "stripe_falhou", reembolsado, cancelada }, 502);
+  const r = await recusarCompra({
+    marcarRecusado: async (e) => {
+      const up = await admin.from("subscritores").update({ estado_click: "recusado" })
+        .eq("email", e).eq("origem", "click")
+        .or("estado_click.eq.pendente,and(estado_click.eq.validado,validado_auto_em.not.is.null)")
+        .select("codigo_compra");
+      if (up.error) throw up.error;
+      return (up.data?.[0] as { codigo_compra: string | null } | undefined) ?? null;
+    },
+    subscricoesClick: async (e) => {
+      const q = await admin.from("subscricoes").select("stripe_subscription_id").eq("email", e).eq("origem", "click").in("estado", ["ativo", "em_atraso"]);
+      if (q.error) throw q.error;
+      return (q.data ?? []).map((x) => x.stripe_subscription_id as string);
+    },
+    faturas: async (subId) => (await stripe.invoices.list({ subscription: subId, limit: 5 })).data as unknown as FaturaLista[],
+    reembolsar: async (pi) => { await stripe.refunds.create({ payment_intent: pi }); },
+    cancelar: async (subId) => { await stripe.subscriptions.cancel(subId); },
+    enviarEmailCliente: async (e) => { await enviarEmail({ to: e, ...moldeRecusaClick(ASSUNTO_RECUSA, TEXTO_RECUSA, URL_SITE) }); },
+    alertar,
+  }, email);
+  if (!r.ok && r.erro === "nao_pendente") return json(req, { erro: "nao_pendente" }, 409);
+  if (!r.ok) {
+    console.error(`click recusado: ${uid}, Stripe falhou (reembolsado=${r.reembolsado}, cancelada=${r.cancelada})`);
+    return json(req, { erro: "stripe_falhou", reembolsado: r.reembolsado, cancelada: r.cancelada }, 502);
   }
-
-  let emailEnviado = false;
-  try {
-    await enviarEmail({ to: email, ...moldeRecusaClick(ASSUNTO_RECUSA, TEXTO_RECUSA, URL_SITE) });
-    emailEnviado = true;
-  } catch (e) {
-    console.error(`click recusado: ${uid}, e-mail ao cliente falhou: ${semSegredos((e as Error).message)}`);
-  }
-  console.log(`click recusado: ${uid}, reembolsado=${reembolsado}, cancelada=${cancelada}, email=${emailEnviado}`);
-  return json(req, { ok: true, reembolsado, cancelada, email_enviado: emailEnviado });
+  console.log(`click recusado: ${uid}, reembolsado=${r.reembolsado}, cancelada=${r.cancelada}, email=${r.email_enviado}`);
+  return json(req, r);
 }
