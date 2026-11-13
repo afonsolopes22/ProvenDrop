@@ -30,7 +30,7 @@ export function ultimaFaturaPaga(faturas: FaturaLista[]): Fatura | null {
 
 // ── corpo do pedido ─────────────────────────────────────────────────────
 
-export type Corpo = { acao: "listar" } | { acao: "validar" | "recusar"; email: string };
+export type Corpo = { acao: "listar" | "listar_auto" } | { acao: "validar" | "recusar"; email: string };
 export type Recusa = { ok: false; status: 400 | 403; erro: "corpo_invalido" | "nao_autorizado" };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,12 +40,12 @@ export function normalizarEmail(v: unknown): string {
   return String(v ?? "").trim().toLowerCase();
 }
 
-/** `{acao:"listar"}` ou `{acao:"validar"|"recusar", email}`; qualquer outra coisa → 400 corpo_invalido. */
+/** `{acao:"listar"|"listar_auto"}` ou `{acao:"validar"|"recusar", email}`; qualquer outra coisa → 400 corpo_invalido. */
 export function validarCorpo(c: unknown): { ok: true; corpo: Corpo } | Recusa {
   const invalido: Recusa = { ok: false, status: 400, erro: "corpo_invalido" };
   if (!c || typeof c !== "object" || Array.isArray(c)) return invalido;
   const acao = (c as { acao?: unknown }).acao;
-  if (acao === "listar") return { ok: true, corpo: { acao: "listar" } };
+  if (acao === "listar" || acao === "listar_auto") return { ok: true, corpo: { acao } };
   if (acao !== "validar" && acao !== "recusar") return invalido;
   const email = normalizarEmail((c as { email?: unknown }).email);
   if (!EMAIL_RE.test(email)) return invalido;
