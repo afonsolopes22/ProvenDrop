@@ -8,16 +8,17 @@ export function destinoAlertas(): string {
   return (Deno.env.get("ALERT_EMAIL") ?? Deno.env.get("EMAIL_REPLY_TO") ?? "").trim();
 }
 
-export async function alertar(assunto: string, linhas: string[]): Promise<boolean> {
+/** `botao` (opcional): um botão no e-mail (ex.: "Reject & refund" → admin.html); na versão em texto vai o endereço. */
+export async function alertar(assunto: string, linhas: string[], botao?: { texto: string; url: string }): Promise<boolean> {
   const to = destinoAlertas();
-  const texto = linhas.join("\n");
+  const texto = linhas.join("\n") + (botao ? `\n\n${botao.texto}: ${botao.url}` : "");
   if (!to) { console.error(`ALERTA sem destinatário (define ALERT_EMAIL): ${assunto}`); return false; }
   try {
     await enviarEmail({
       to,
       subject: `[ProvenDrop] ${assunto}`,
       text: texto,
-      html: molde(assunto, linhas.map((l) => `<p style="margin:0 0 10px">${esc(l)}</p>`).join("")),
+      html: molde(assunto, linhas.map((l) => `<p style="margin:0 0 10px">${esc(l)}</p>`).join(""), botao),
     });
     return true;
   } catch (e) {
