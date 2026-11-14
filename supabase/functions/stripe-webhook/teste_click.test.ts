@@ -2,7 +2,7 @@
 // Teste grátis do plano Click (2026-11-14): normalização, decisão e "um teste por pessoa", com uma base em memória
 // que respeita a chave única (tipo, valor) de testes_click_usados.
 import { assert, assertEquals } from "jsr:@std/assert@1";
-import { avaliarTesteClick, decidirTeste, type DepsTesteClick, normalizarLoja, normalizarTelefone } from "./teste_click.ts";
+import { avaliarTesteClick, decidirTeste, fimDaOferta, ofertaTerminou, TRIAL_ATE_PADRAO, type DepsTesteClick, normalizarLoja, normalizarTelefone } from "./teste_click.ts";
 import { temAcesso } from "../_shared/acesso.ts";
 
 Deno.test("telefone: só dígitos, com indicativo; curto demais não conta", () => {
@@ -133,4 +133,47 @@ Deno.test("acesso: Click validado em 'teste' tem acesso; em 'teste' mas pendente
   assert(!temAcesso({ ...s, estado_click: "pendente" }));
   assert(!temAcesso({ ...s, estado_click: "recusado" }));
   assert(!temAcesso({ ...s, bloqueado_em: "2026-11-14T10:00:00Z" }));
+});
+
+// Promoção de lançamento: só há teste para subscrições criadas até TRIAL_ATE (2026-11-20 23:59, Lisboa = UTC).
+Deno.test("fim da oferta: por omissão 2026-11-20T23:59:00Z; valor inválido usa o de omissão", () => {
+  assertEquals(TRIAL_ATE_PADRAO, "2026-11-20T23:59:00+00:00");
+  assertEquals(fimDaOferta(undefined), Date.parse("2026-11-20T23:59:00Z"));
+  assertEquals(fimDaOferta("  "), Date.parse("2026-11-20T23:59:00Z"));
+  assertEquals(fimDaOferta("lixo"), Date.parse("2026-11-20T23:59:00Z"));
+  assertEquals(fimDaOferta("2026-12-01T00:00:00+00:00"), Date.parse("2026-12-01T00:00:00Z"));
+});
+
+Deno.test("ofertaTerminou: até às 23:59:00 ainda conta; depois não", () => {
+  const ate = fimDaOferta(undefined);
+  assertEquals(ofertaTerminou(Date.parse("2026-11-20T23:58:59Z"), ate), false);
+  assertEquals(ofertaTerminou(Date.parse("2026-11-20T23:59:00Z"), ate), false);
+  assertEquals(ofertaTerminou(Date.parse("2026-11-20T23:59:01Z"), ate), true);
+  assertEquals(ofertaTerminou(Date.parse("2026-11-21T10:00:00Z"), ate), true);
+});
+
+Deno.test("compra nova em trialing depois da oferta → acaba o teste e cobra logo, sem gastar o teste da pessoa", async () => {
+  const b = base();
+  const r = await avaliarTesteClick(b.deps, { ...compra("sub_9"), ofertaTerminou: true });
+  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: true });
+  assertEquals(b.fim, ["sub_9"]);
+  assertEquals(b.usados.size, 0);
+  assertEquals(b.guardado.teste_repetido, false);
+  assertEquals(b.guardado.teste_motivo, "trial offer ended");
+  assertEquals(b.guardado.telefone_norm, "351912345678");
+});
+
+Deno.test("depois da oferta, se a cobrança falhar → cancela e alerta", async () => {
+  const b = base(); b.falhar();
+  const r = await avaliarTesteClick(b.deps, { ...compra("sub_9"), ofertaTerminou: true });
+  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: false });
+  assertEquals(b.cancelados, ["sub_9"]);
+  assertEquals(b.alertas.length, 1);
+});
+
+Deno.test("dentro do prazo (ofertaTerminou false) continua como antes", async () => {
+  const b = base();
+  const r = await avaliarTesteClick(b.deps, { ...compra("sub_1"), ofertaTerminou: false });
+  assertEquals(r.teste, true);
+  assertEquals(b.fim, []);
 });

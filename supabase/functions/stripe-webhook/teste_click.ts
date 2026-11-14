@@ -5,6 +5,24 @@
 // sem espaços, pontuação nem acentos) ficam em testes_click_usados com a subscrição que teve o teste. Se algum já
 // lá estava com OUTRA subscrição, ou se o cartão é pré-pago, o teste acaba já (trial_end = now) e o primeiro mês é
 // cobrado. Se essa cobrança falhar, a subscrição é cancelada: ninguém fica com acesso grátis por isso.
+//
+// Promoção de lançamento (2026-11-14): só há teste para subscrições criadas até TRIAL_ATE (por omissão
+// 2026-11-20 23:59 em Lisboa, que em novembro é UTC; o segredo CLICK_TRIAL_ATE pode mudá-lo). Rede de segurança:
+// se depois disso chegar uma compra nova em "trialing" (o link ainda com o teste ligado), o teste acaba na hora
+// e o primeiro mês é cobrado, como num teste repetido. Quem já está em teste continua os 5 dias normais.
+
+export const TRIAL_ATE_PADRAO = "2026-11-20T23:59:00+00:00";
+
+/** Fim da oferta em ms; vazio ou inválido → TRIAL_ATE_PADRAO. */
+export function fimDaOferta(v: string | null | undefined): number {
+  const t = Date.parse(String(v ?? "").trim());
+  return Number.isFinite(t) ? t : Date.parse(TRIAL_ATE_PADRAO);
+}
+
+/** A subscrição foi criada depois do fim da oferta? (às 23:59:00 em ponto ainda conta) */
+export function ofertaTerminou(criadaEmMs: number, fimMs: number): boolean {
+  return criadaEmMs > fimMs;
+}
 
 /** Telefone só com dígitos, com indicativo ("00" inicial tirado). Menos de 8 dígitos: não conta. */
 export function normalizarTelefone(v: string | null | undefined): string | null {
@@ -41,7 +59,7 @@ export interface DepsTesteClick {
   alertar: (assunto: string, linhas: string[]) => Promise<boolean>;
 }
 
-export interface CompraTeste { email: string; sub: string; codigo: string; emTeste: boolean; telefone: string | null; loja: string | null; cartao: DadosCartao | null }
+export interface CompraTeste { email: string; sub: string; codigo: string; emTeste: boolean; telefone: string | null; loja: string | null; cartao: DadosCartao | null; ofertaTerminou?: boolean }
 
 export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): Promise<{ teste: boolean; motivo: string | null; cobrado: boolean | null }> {
   const telefone = normalizarTelefone(c.telefone), loja = normalizarLoja(c.loja);
@@ -57,8 +75,9 @@ export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): P
   if (impressao) valores.push({ tipo: "cartao", valor: impressao });
   if (telefone) valores.push({ tipo: "telefone", valor: telefone });
   if (loja) valores.push({ tipo: "loja", valor: loja });
-  const repetidos = valores.length ? await deps.reclamar(valores, c.email, c.sub) : [];
-  const d = decidirTeste({ funding: c.cartao?.funding, repetidos });
+  // Fora do prazo da oferta não há teste para ninguém, e o teste da pessoa não fica gasto.
+  const repetidos = !c.ofertaTerminou && valores.length ? await deps.reclamar(valores, c.email, c.sub) : [];
+  const d = c.ofertaTerminou ? { teste: false, motivo: "trial offer ended" } : decidirTeste({ funding: c.cartao?.funding, repetidos });
   await deps.guardar(c.email, { teste_repetido: repetidos.length > 0, teste_motivo: d.motivo });
   if (d.teste) return { teste: true, motivo: null, cobrado: null };
 

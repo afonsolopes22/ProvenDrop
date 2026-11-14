@@ -49,7 +49,7 @@
 // Segredos: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_ACCEPT_TEST,
 //   STRIPE_PRICE_DIRETO, STRIPE_PRICE_CLICK, STRIPE_PAYMENT_LINK_DIRETO (opcional),
 //   RESEND_API_KEY, EMAIL_FROM, EMAIL_REPLY_TO, ALERT_EMAIL, APP_URL, HORA_ENVIO,
-//   MAGIC_LINK_MINUTOS, CRON_SECRET, CLICK_AUTO_VALIDAR (opcional; por omissão true). SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
+//   MAGIC_LINK_MINUTOS, CRON_SECRET, CLICK_AUTO_VALIDAR (opcional; por omissão true), CLICK_TRIAL_ATE (opcional; por omissão 2026-11-20T23:59:00+00:00). SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
 //   são injetadas pelo Supabase.
 //
 // Logs e respostas sem e-mails nem erros internos (B5/S13): os e-mails aparecem
@@ -70,7 +70,7 @@ import { codigoDeCompra } from "../_shared/codigo.ts";
 import { lojaDaSessao } from "../_shared/loja.ts";
 import { autoValidarClick, type LinhaClick, registarCompraClick as decidirCompraClick } from "./compra_click.ts";
 import { temAcesso as regraAcesso } from "../_shared/acesso.ts";
-import { avaliarTesteClick, type TipoDado } from "./teste_click.ts";
+import { avaliarTesteClick, fimDaOferta, ofertaTerminou, type TipoDado } from "./teste_click.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -97,6 +97,8 @@ const MAX_TENTATIVAS = 5;        // A3: depois disto, alerta
 const TOLERANCIA_DIAS = 7;       // M1
 /** Click com acesso imediato (2026-11-13); por omissão ligado. "false" volta à validação manual (pendente). */
 const CLICK_AUTO_VALIDAR = autoValidarClick(Deno.env.get("CLICK_AUTO_VALIDAR"));
+// Fim da promoção do teste grátis (teste_click.ts): por omissão 2026-11-20T23:59:00+00:00.
+const CLICK_TRIAL_ATE = fimDaOferta(Deno.env.get("CLICK_TRIAL_ATE"));
 
 /** "9" ou "09:00" → "09:00"; vazio → "[HOUR]" (nunca se inventa uma hora). */
 function horaTexto(): string {
@@ -428,7 +430,8 @@ async function cartaoDaSubscricao(sub: Stripe.Subscription): Promise<{ fingerpri
 /**
  * Anti-abuso do teste grátis (teste_click.ts): guarda cartão, telefone e loja normalizados; se algum já teve teste
  * noutra subscrição, ou se o cartão é pré-pago, acaba o teste e cobra logo (payment_behavior error_if_incomplete:
- * se a cobrança falha, a subscrição é cancelada).
+ * se a cobrança falha, a subscrição é cancelada). O mesmo se a subscrição foi criada depois do fim da oferta
+ * (CLICK_TRIAL_ATE): quem já está em teste não é tocado, porque isto só corre na compra (checkout.session.completed).
  */
 async function avaliarTesteDaCompra(s: Stripe.Checkout.Session, subId: string): Promise<ResultadoTeste> {
   const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
@@ -449,7 +452,7 @@ async function avaliarTesteDaCompra(s: Stripe.Checkout.Session, subId: string): 
     cancelar: async (id) => { await stripe.subscriptions.cancel(id); },
     guardar: async (e, d) => { const u = await admin.from("subscritores").update(d).eq("email", e); if (u.error) throw u.error; },
     alertar,
-  }, { email, sub: subId, codigo: await codigoDeCompra(s.id), emTeste: sub.status === "trialing", telefone: s.customer_details?.phone ?? null, loja: lojaDaSessao(s), cartao });
+  }, { email, sub: subId, codigo: await codigoDeCompra(s.id), emTeste: sub.status === "trialing", ofertaTerminou: ofertaTerminou(sub.created * 1000, CLICK_TRIAL_ATE), telefone: s.customer_details?.phone ?? null, loja: lojaDaSessao(s), cartao });
   return { ...r, ultimos4: cartao?.last4 ?? null };
 }
 
