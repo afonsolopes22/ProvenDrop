@@ -29,7 +29,8 @@ export interface LinhaClick {
   em_atraso_desde: string | null;
 }
 
-export interface CompraClick { email: string; codigo: string; telefone: string | null; nome: string | null; loja: string | null; sessao: string }
+/** `nota`: linhas extra no alerta ao Afonso (ex.: teste grátis, ou porque não houve teste). */
+export interface CompraClick { email: string; codigo: string; telefone: string | null; nome: string | null; loja: string | null; sessao: string; nota?: string[] }
 
 export interface DepsCompraClick {
   autoValidar: boolean;
@@ -72,7 +73,7 @@ export async function registarCompraClick(deps: DepsCompraClick, c: CompraClick)
 
   const dados = [
     `Purchase code: ${c.codigo}`, `Store: ${c.loja ?? "—"}`, `E-mail: ${c.email}`, `Phone: ${c.telefone ?? "— (not collected at checkout)"}`,
-    `Name: ${c.nome ?? "—"}`, `Checkout session: ${c.sessao}`,
+    `Name: ${c.nome ?? "—"}`, `Checkout session: ${c.sessao}`, ...(c.nota ?? []),
   ];
   const botaoAdmin = (texto: string) => ({ texto, url: deps.linkAdmin(c.codigo) });
   let enviado: boolean;
