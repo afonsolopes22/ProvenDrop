@@ -277,6 +277,7 @@ a:hover{color:#0A1C12}
 .plan-name{margin:0;font-weight:600;font-size:28px;letter-spacing:-.03em}
 .price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .price-sub-d{color:#BFD7C4}
+.plan-trial{margin:-6px 0 0;font-size:15px;font-weight:600;color:#D4F57A}
 .plan-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;color:#3A5444}
 .plan-list-d{color:#DCEBD8}
 .plan-btn{justify-content:center;margin-top:6px}
