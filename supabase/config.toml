@@ -21,6 +21,10 @@ verify_jwt = false
 [functions.admin-click]
 verify_jwt = false
 
+# Chamada por app.html com o JWT do membro (kit em teste grátis, Start my plan now): a função valida-o ela própria.
+[functions.conta-membro]
+verify_jwt = false
+
 # Chamada pelo browser (bem-vindo-click.html) sem sessão: devolve só a loja indicada no checkout Click
 # (para a mensagem de WhatsApp), a partir do ?session_id=, validado no Stripe; nunca e-mail, nome ou telefone.
 [functions.loja-click]
