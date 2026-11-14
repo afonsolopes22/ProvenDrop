@@ -121,6 +121,19 @@
             <div class="td-next" id="hojeProx" hidden><span class="font-mono text-[10.5px] font-medium uppercase tracking-[0.06em] text-[#BFD7C4]">Next list in</span><b id="hojeConta">—</b><span class="text-[12.5px] text-[#BFD7C4]" id="hojeQuando"></span></div>
           </section>
           <div class="msg aviso" id="aviso" hidden></div>
+          <!-- Free trial of the Click plan (app.js renderTeste): days left and "Start my plan now", with an in-page confirmation. -->
+          <div class="trial" id="teste" hidden>
+            <div class="min-w-0"><p class="trial-t" id="testeTitulo">Free trial</p><p class="trial-s" id="testeTexto"></p></div>
+            <div class="trial-acts" id="testeAcoes">
+              <button class="btn btn-go btn-sm" type="button" id="testeComecar">Start my plan now</button>
+            </div>
+            <div class="trial-acts" id="testeConfirmar" hidden>
+              <span class="text-[13px] font-semibold text-ink">Start now and pay €<span data-preco-mes>15</span> today?</span>
+              <button class="btn btn-go btn-sm" type="button" id="testeSim">Yes, start my plan</button>
+              <button class="btn btn-line btn-sm" type="button" id="testeNao">Not yet</button>
+            </div>
+            <p class="trial-msg" id="testeMsg" hidden></p>
+          </div>
           <!-- First visit of a Click member (app.js renderCaixaClick): closable, remembered in this browser. -->
           <div class="msg" id="caixaClick" hidden><div class="flex items-start justify-between gap-3"><span>Everything you get on WhatsApp is here too — plus all past collections, the launch kits and filters.</span><button class="tip-x !text-brand-dark hover:!bg-white/70" type="button" id="caixaClickFechar" aria-label="Close this message">✕</button></div></div>
           <ul class="td-stats mt-5" aria-label="Today in numbers">
@@ -155,6 +168,8 @@
           <div><h1 class="text-[clamp(28px,3.4vw,40px)] font-semibold leading-[1.05] tracking-[-0.035em] text-ink">Library</h1><p class="mt-1 max-w-[64ch] text-[14px] text-ink-2">All collections we have sent, with their kits. Where each one advertises (Meta, Google or both), its Meta reach and whether the store is still advertising it.</p></div>
           <!-- Notice for a /c/<id> link whose collection is unknown or withdrawn (app.js abrirColecao). -->
           <div class="msg" id="msgArquivo" hidden></div>
+          <!-- Free trial: the Library opens when the plan starts (the database does not serve it during the trial). -->
+          <div class="trial mt-4" id="libTeste" hidden><div class="min-w-0"><p class="trial-t">The Library opens when your plan starts</p><p class="trial-s">During the free trial you get the full daily list and one kit download a day. Start your plan to see every past collection, with its kit and filters.</p></div><div class="trial-acts"><button class="btn btn-go btn-sm" type="button" data-go="hoje">Back to today</button></div></div>
           <!-- Niches bar (same as Today): your niches come first; "Show all" also lists the other niches. -->
           <div class="mt-4" id="barLib" data-barra></div>
           <div class="card mt-4 p-5 md:p-6">

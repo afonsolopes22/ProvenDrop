@@ -72,10 +72,17 @@ export const TEXTO_RECUSA =
 export const URL_SITE = "https://provendrop.com/";
 
 /** Linha da lista de pendentes devolvida pela ação `listar`. */
-export interface Pendente { email: string; nome: string | null; telefone: string | null; loja: string | null; codigo_compra: string | null; criado_em: string | null }
+export interface Pendente {
+  email: string; nome: string | null; telefone: string | null; loja: string | null; codigo_compra: string | null; criado_em: string | null;
+  /** Teste grátis (0017): estado da subscrição (teste/ativo/…), últimos 4 do cartão, e se já houve teste com algum dos dados. */
+  estado: string | null; cartao_ultimos4: string | null; teste_repetido: boolean; teste_motivo: string | null;
+}
 
 /** Projeta uma linha de subscritores na forma pública da lista (nunca outros campos). */
 export function paraPendente(r: Record<string, unknown>): Pendente {
   const t = (v: unknown) => (v == null || v === "" ? null : String(v));
-  return { email: String(r.email ?? ""), nome: t(r.nome), telefone: t(r.telefone), loja: t(r.loja), codigo_compra: t(r.codigo_compra), criado_em: t(r.criado_em) };
+  return {
+    email: String(r.email ?? ""), nome: t(r.nome), telefone: t(r.telefone), loja: t(r.loja), codigo_compra: t(r.codigo_compra), criado_em: t(r.criado_em),
+    estado: t(r.estado), cartao_ultimos4: t(r.cartao_ultimos4), teste_repetido: r.teste_repetido === true, teste_motivo: t(r.teste_motivo),
+  };
 }

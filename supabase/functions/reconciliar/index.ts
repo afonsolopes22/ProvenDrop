@@ -28,10 +28,11 @@ const TOLERANCIA_DIAS = 7;
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 
-type Estado = "ativo" | "em_atraso" | "incompleto" | "cancelado";
+type Estado = "ativo" | "teste" | "em_atraso" | "incompleto" | "cancelado";
 function estadoDe(status: Stripe.Subscription.Status): Estado {
   switch (status) {
-    case "active": case "trialing": return "ativo";
+    case "active": return "ativo";
+    case "trialing": return "teste"; // teste grátis do plano Click (0017)
     case "past_due": case "unpaid": return "em_atraso";
     case "incomplete": return "incompleto";
     default: return "cancelado";
@@ -70,9 +71,9 @@ Deno.serve(async (req) => {
     }
     // c) Acesso sem subscrição direto viva.
     const comAcesso = (membros.data ?? []).filter((m) => m.origem === "direto" && !m.bloqueado_em &&
-      (m.estado === "ativo" || (m.estado === "em_atraso" && m.em_atraso_desde && Date.now() - new Date(m.em_atraso_desde).getTime() < TOLERANCIA_DIAS * 864e5)));
+      (m.estado === "ativo" || m.estado === "teste" || (m.estado === "em_atraso" && m.em_atraso_desde && Date.now() - new Date(m.em_atraso_desde).getTime() < TOLERANCIA_DIAS * 864e5)));
     for (const m of comAcesso) {
-      const viva = (subs.data ?? []).some((s) => s.email === m.email && s.origem === "direto" && (s.estado === "ativo" || s.estado === "em_atraso"));
+      const viva = (subs.data ?? []).some((s) => s.email === m.email && s.origem === "direto" && (s.estado === "ativo" || s.estado === "teste" || s.estado === "em_atraso"));
       if (!viva) divergencias.push(`• ${await idEmail(m.email)}: tem acesso sem subscrição direto ativa/em atraso em subscricoes`);
       if (!m.boas_vindas_em && m.estado === "ativo") divergencias.push(`• ${await idEmail(m.email)}: ativo sem boas-vindas enviadas`);
     }

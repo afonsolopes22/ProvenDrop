@@ -124,7 +124,16 @@
   const data = v => { const d = v ? new Date(v) : null; return d && !isNaN(d) ? d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"; };
 
   const filtrar = rows => compra ? rows.filter(p => String(p.codigo_compra || "").toUpperCase() === compra) : rows;
-  const CABECALHO = (ultima, data) => `<table class="dt"><thead><tr><th>Name</th><th>Store</th><th>Phone</th><th>E-mail</th><th>Code</th><th>${data}</th><th>${ultima}</th></tr></thead><tbody>`;
+  /* Free trial (0017): plan state, and whether a card, phone or store already had a trial (or the card is prepaid). */
+  const ESTADO_PLANO = { teste: "Free trial", ativo: "Paid", em_atraso: "Payment overdue", cancelado: "Cancelled", incompleto: "Not completed" };
+  function plano(p){
+    const e = ESTADO_PLANO[p.estado] || (p.estado ? String(p.estado) : "—");
+    const repetido = p.teste_repetido ? `<span class="status watch mt-1" title="${esc(p.teste_motivo || "")}">Repeat trial</span>` : "";
+    const prepago = !p.teste_repetido && /prepaid/.test(p.teste_motivo || "") ? `<span class="status watch mt-1">Prepaid card</span>` : "";
+    const motivo = p.teste_motivo ? `<span class="sub">No trial: ${esc(p.teste_motivo)}</span>` : "";
+    return `<span class="grid justify-items-start gap-1"><b class="font-semibold">${esc(e)}</b>${repetido}${prepago}${motivo}</span>`;
+  }
+  const CABECALHO = (ultima, data) => `<table class="dt"><thead><tr><th>Name</th><th>Store</th><th>Phone</th><th>Card</th><th>Plan</th><th>E-mail</th><th>Code</th><th>${data}</th><th>${ultima}</th></tr></thead><tbody>`;
 
   function render(){
     const box = $("#lista"), boxA = $("#listaAuto"), f = $("#filtro");
@@ -155,6 +164,8 @@
       `<td data-l="Name"><b>${esc(txt(p.nome))}</b></td>` +
       `<td data-l="Store">${esc(txt(p.loja))}</td>` +
       `<td data-l="Phone" class="n whitespace-nowrap">${esc(txt(p.telefone))}</td>` +
+      `<td data-l="Card" class="n whitespace-nowrap">${p.cartao_ultimos4 ? "•••• " + esc(p.cartao_ultimos4) : "—"}</td>` +
+      `<td data-l="Plan">${plano(p)}</td>` +
       `<td data-l="E-mail"><a href="mailto:${e}">${e}</a></td>` +
       `<td data-l="Code" class="n font-semibold whitespace-nowrap">${esc(txt(p.codigo_compra))}</td>` +
       `<td data-l="${modo === "auto" ? "Validated on" : "Paid on"}" class="n whitespace-nowrap">${esc(data(modo === "auto" ? p.validado_auto_em : p.criado_em))}</td>` +

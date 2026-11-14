@@ -101,7 +101,7 @@
      subscription or a Click one that Click has confirmed (estado_click = 'validado'; 'pendente'/'recusado' wait outside). */
   const diasAtraso = s => s?.em_atraso_desde ? Math.floor((Date.now() - new Date(s.em_atraso_desde).getTime()) / 864e5) : null;
   const ehClick = s => s?.origem === "click";
-  const temAcesso = s => !!s && !s.bloqueado_em && (s.origem === "direto" || (ehClick(s) && s.estado_click === "validado")) && (s.estado === "ativo" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
+  const temAcesso = s => !!s && !s.bloqueado_em && (s.origem === "direto" || (ehClick(s) && s.estado_click === "validado")) && (s.estado === "ativo" || s.estado === "teste" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
 
   const views = ["vConfig","vLogin","vSemAcesso","vApp"];
   function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
@@ -168,7 +168,7 @@
   sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
   entrarPorTokenHash().then(ok => { if(!ok) sb.auth.getSession().then(({ data }) => { if(!mesmoUser(data.session)) entrar(data.session); }); });
 
-  const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em";
+  const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em,teste_fim";
   async function entrar(session){
     user = session?.user || null;
     if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
@@ -178,11 +178,11 @@
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
     window.pdIdentify(user.id, { origem: sub?.origem || "" }); window.pdTrack("area_membros_entrada", { via_link_c: !!cPedido });
-    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); iniciarContagem();
+    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); renderTeste(); iniciarContagem();
     /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
     if(!sub.guia_visto && !cPedido) abrirGuia(); else mostrarDica();
     /* The Library loads right after the list, so "From your library" can say how many collections it has. */
-    carregarHoje().then(async ok => { if(!ok) return; await abrirColecao(); if(!verdes) carregarArquivo(); });
+    carregarHoje().then(async ok => { if(!ok) return; await abrirColecao(); if(!verdes && !emTeste()) carregarArquivo(); });
   }
 
   function semAcesso(){
@@ -226,7 +226,7 @@
   function go(tab){
     Object.entries(paineis).forEach(([k, s]) => { $(s).hidden = k !== tab; });
     document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-    if(tab === "arquivo" && !verdes) carregarArquivo();
+    if(tab === "arquivo"){ const t = emTeste(); $("#libTeste").hidden = !t; $("#arqBox").closest(".card").hidden = t; $("#barLib").hidden = t; if(!t && !verdes) carregarArquivo(); }
     scrollTo({ top: 0 });
   }
   $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) go(b.dataset.tab); });
@@ -435,10 +435,21 @@
     const b = e.target.closest("[data-zip]"); if(!b) return;
     window.pdTrack("kit_descarregado", { id_curto: b.closest("[data-c]")?.dataset.c || "" });
     b.disabled = true; const t = b.textContent; b.textContent = "Preparing…";
-    const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, SIGNED_URL_SECONDS);
-    b.disabled = false; b.textContent = t;
-    if(error || !data?.signedUrl) return alert("The kit could not be prepared. Please try again.");
-    const a = document.createElement("a"); a.href = data.signedUrl; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
+    let link = null;
+    if(emTeste()){
+      /* Free trial: the link comes from conta-membro, which allows one kit a day (the bucket is closed to trials). */
+      const r = await contaMembro({ acao: "kit", zip_path: b.dataset.zip });
+      b.disabled = false; b.textContent = t;
+      if(r.status === 429) return avisoTeste("Free trial: one kit download a day. You can download today’s kit again, or start your plan to download them all.");
+      if(r.status !== 200 || !r.body.url) return alert("The kit could not be prepared. Please try again.");
+      link = r.body.url;
+    } else {
+      const { data, error } = await sb.storage.from("kits").createSignedUrl(b.dataset.zip, SIGNED_URL_SECONDS);
+      b.disabled = false; b.textContent = t;
+      if(error || !data?.signedUrl) return alert("The kit could not be prepared. Please try again.");
+      link = data.signedUrl;
+    }
+    const a = document.createElement("a"); a.href = link; a.rel = "noopener"; a.target = "_blank"; document.body.appendChild(a); a.click(); a.remove();
   });
 
   /* analytics: the member opens a collection on the store ("Store" button) or an external kit link */
@@ -565,10 +576,56 @@
   function mostrarDica(){ $("#hojePrefs").hidden = !!(sub?.nichos||[]).length || dicaFechada(); }
   $("#hojePrefsFechar").addEventListener("click", () => { try { localStorage.setItem(DICA_KEY, "1"); } catch { /* private mode */ } $("#hojePrefs").hidden = true; });
 
+  /* ── free trial (Click plan, 0017) ─────────────────────────────────── */
+  /* In trial the database serves only the latest list and no Library (RLS), and kits come from conta-membro (one a day).
+     The strip shows the days left and "Start my plan now", which ends the trial and charges the first month at once. */
+  const emTeste = () => sub?.estado === "teste";
+  const FN_CONTA = SB_URL.replace(/\/+$/, "") + "/functions/v1/conta-membro";
+  async function contaMembro(corpo){
+    const { data } = await sb.auth.getSession();
+    const token = data?.session?.access_token;
+    if(!token) return { status: 401, body: {} };
+    try {
+      const r = await fetch(FN_CONTA, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token, "apikey": SB_KEY }, body: JSON.stringify(corpo) });
+      return { status: r.status, body: await r.json().catch(() => ({})) };
+    } catch { return { status: 0, body: {} }; }
+  }
+  function avisoTeste(texto){ const m = $("#testeMsg"); m.textContent = texto; m.hidden = !texto; if(texto) $("#teste").scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  function diasRestantes(){ const f = parse(sub?.teste_fim); return f ? Math.max(0, Math.ceil((f.getTime() - Date.now()) / 864e5)) : null; }
+  function renderTeste(){
+    const box = $("#teste"); box.hidden = !emTeste(); if(!emTeste()) return;
+    const n = diasRestantes(), cancelado = !!sub.acesso_fim;
+    $("#testeTitulo").textContent = "Free trial" + (n == null ? "" : ` · ${n} ${n === 1 ? "day" : "days"} left`);
+    $("#testeTexto").textContent = cancelado
+      ? `You cancelled: your access ends on ${dia(sub.acesso_fim)} and you won’t be charged.`
+      : `Then €${PRECO_MES}/month${sub.teste_fim ? ", from " + dia(sub.teste_fim) : ""}. During the trial: the full daily list and one kit download a day. The Library opens when your plan starts.`;
+    $("#testeAcoes").hidden = cancelado; $("#testeConfirmar").hidden = true;
+  }
+  const PRECO_MES = String(C.PRICE_MONTHLY || "15").replace(/[^\d.,]/g, "") || "15";
+  document.querySelectorAll("[data-preco-mes]").forEach(e => { e.textContent = PRECO_MES; });
+  $("#testeComecar").addEventListener("click", () => { $("#testeAcoes").hidden = true; $("#testeConfirmar").hidden = false; avisoTeste(""); });
+  $("#testeNao").addEventListener("click", () => { $("#testeConfirmar").hidden = true; $("#testeAcoes").hidden = false; });
+  $("#testeSim").addEventListener("click", async () => {
+    const b = $("#testeSim"); b.disabled = true; b.textContent = "Starting…";
+    const r = await contaMembro({ acao: "comecar_plano" });
+    b.disabled = false; b.textContent = "Yes, start my plan";
+    if(r.status === 402){ $("#testeConfirmar").hidden = true; $("#testeAcoes").hidden = false; return avisoTeste("Your card was declined, so nothing changed. Update your card in Subscription → Manage subscription and try again."); }
+    if(r.status !== 200 && r.status !== 409){ return avisoTeste("Your plan could not be started right now. Please try again in a minute."); }
+    $("#testeConfirmar").hidden = true;
+    avisoTeste("Your plan has started and the first month was charged. Opening everything for you…");
+    /* The webhook turns the trial into "active" a few seconds later: wait for it, then reload. */
+    for(let i = 0; i < 15; i++){
+      await new Promise(res => setTimeout(res, 2000));
+      const { data } = await sb.from("subscritores").select("estado").eq("user_id", user.id).maybeSingle();
+      if(data && data.estado !== "teste") break;
+    }
+    location.reload();
+  });
+
   /* ── subscription ───────────────────────────────────────────────── */
   function renderConta(){
     $("#contaEmail").textContent = sub.email;
-    const estado = { ativo: sub.acesso_fim ? "Active until " + dia(sub.acesso_fim) + " (cancelled)" : "Active", em_atraso: "Payment overdue (" + Math.max(0, TOLERANCIA_DIAS - (diasAtraso(sub) ?? 0)) + " days of access left)", cancelado: "Cancelled", incompleto: "Payment not completed" }[sub.estado] || sub.estado;
+    const estado = { teste: (sub.teste_fim ? "Free trial until " + dia(sub.teste_fim) : "Free trial") + (sub.acesso_fim ? " (cancelled: access ends then)" : ""), ativo: sub.acesso_fim ? "Active until " + dia(sub.acesso_fim) + " (cancelled)" : "Active", em_atraso: "Payment overdue (" + Math.max(0, TOLERANCIA_DIAS - (diasAtraso(sub) ?? 0)) + " days of access left)", cancelado: "Cancelled", incompleto: "Payment not completed" }[sub.estado] || sub.estado;
     $("#contaEstado").textContent = estado;
     $("#contaDesde").textContent = dia(sub.criado_em) || "—";
     const g = $("#contaPortal"); g.hidden = !PORTAL; if(PORTAL) g.href = PORTAL;
