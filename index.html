@@ -37,7 +37,8 @@
 <div class="topbar">
 <div class="wrap topbar-in">
 <span class="mono tag ann-new">New</span>
-<span class="mono fs12"><span class="ann-l">ProvenDrop × Click · </span><span class="ann-s">Click plan: </span>€<span data-fill="price-monthly">15</span>/month, no joining fee</span>
+<span class="mono fs12" data-no-trial><span class="ann-l">ProvenDrop × Click · </span><span class="ann-s">Click plan: </span>€<span data-fill="price-monthly">15</span>/month, no joining fee</span>
+<span class="mono fs12 ann-trial" data-trial hidden>Launch offer: 5-day free trial if you join by Friday 20 November.</span>
 <a href="#plans" class="mono fs12 topbar-link">See plan →</a>
 </div>
 </div>
@@ -267,7 +268,7 @@
 <span class="mono fs12 c-lime">[Click Dynamics clients]</span>
 <h3 class="plan-name">ProvenDrop × Click</h3>
 <div class="price"><span class="big64">€<span data-fill="price-monthly">15</span></span><span class="mono fs12 price-sub-d">/month · no joining fee</span></div>
-<p class="plan-trial">5-day free trial, then €<span data-fill="price-monthly">15</span>/month. Cancel anytime.</p>
+<p class="plan-trial" data-trial hidden>5-day free trial, then €<span data-fill="price-monthly">15</span>/month. Cancel anytime.</p>
 <ul class="plan-list plan-list-d"><li>Daily list in the Click WhatsApp group, with the ZIP</li><li>Member area, kits and the full library</li><li>Instant access; Click confirms you’re a client</li></ul>
 <!-- "#buy-click" in the mock-up: the link comes from STRIPE_LINK_CLICK in config.js (enabled by the script at the end). -->
 <a class="btn btn-lime plan-btn js-click-link" id="btnClick" aria-disabled="true">Subscribe with Click</a>
@@ -307,7 +308,7 @@
 <details class="qa"><summary>Do you run my campaigns or produce my creatives?</summary><p>No. The Launch Kit gives you the reference photos, the creative prompt, the video prompt and the collection report; you generate the creatives and the video with your own AI tools and run your own campaigns. Results depend on your products, pricing, store and campaign management.</p></details>
 <details class="qa"><summary>Can I cancel?</summary><p>Yes, whenever you want, in your member area (“Manage subscription”). There is no minimum term.</p></details>
 <details class="qa"><summary>How much does it cost?</summary><p>€<span data-fill="price-monthly">15</span> a month<span data-if-joining>, plus a €<span data-fill="price-joining">25</span> joining fee charged with your first payment. The Click plan is €<span data-fill="price-monthly">15</span> a month with no joining fee</span>.</p></details>
-<details class="qa"><summary>Is there a free trial?</summary><p>Yes, on the Click plan: 5-day free trial, then €<span data-fill="price-monthly">15</span>/month. Cancel anytime. A card is needed to start, and you are only charged when the trial ends. During the trial you get the full daily list and one kit download a day; the Library opens when your plan starts, or straight away with “Start my plan now”. One free trial per person: if the card, phone number or store has already had a trial, or the card is prepaid, there is no trial and the first month is charged right away.</p></details>
+<details class="qa" data-trial hidden><summary>Is there a free trial?</summary><p>Yes, on the Click plan: 5-day free trial, then €<span data-fill="price-monthly">15</span>/month. Cancel anytime. A card is needed to start, and you are only charged when the trial ends. During the trial you get the full daily list and one kit download a day; the Library opens when your plan starts, or straight away with “Start my plan now”. One free trial per person: if the card, phone number or store has already had a trial, or the card is prepaid, there is no trial and the first month is charged right away.</p></details>
 </div>
 </div>
 </section>
@@ -356,6 +357,17 @@
     document.querySelectorAll("[data-if-joining]").forEach(function(e){ e.remove(); });
     document.querySelectorAll("[data-if-no-joining]").forEach(function(e){ e.hidden=false; });
   }
+
+  /* Click plan launch offer: the free-trial texts show only until TRIAL_ATE, then the page goes back
+     to the plan without a trial (also when it stays open past that moment). */
+  var ate=Date.parse(s("TRIAL_ATE"));
+  var oferta=function(){
+    var on=isFinite(ate) && Date.now()<=ate;
+    document.querySelectorAll("[data-trial]").forEach(function(e){ e.hidden=!on; });
+    document.querySelectorAll("[data-no-trial]").forEach(function(e){ e.hidden=on; });
+    return on;
+  };
+  if(oferta() && ate-Date.now()<2147483647) setTimeout(oferta, ate-Date.now()+1000);
 
   /* Optional public contact. */
   var mail=s("CONTACT_EMAIL"), fc=document.getElementById("footContact");

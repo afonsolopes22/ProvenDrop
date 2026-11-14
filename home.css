@@ -367,6 +367,7 @@ a:hover{color:#0A1C12}
  .topbar .mono{font-size:10.5px;letter-spacing:.03em;white-space:nowrap}
  .ann-l,.ann-new{display:none}
  .ann-s{display:inline}
+ .topbar .ann-trial{white-space:normal}
  .head-in{padding-top:10px;padding-bottom:10px;gap:10px}
  .site-head .logo{font-size:18px;gap:7px}
  .site-head .logo svg{width:26px;height:26px}
