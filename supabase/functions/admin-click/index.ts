@@ -43,7 +43,7 @@ import {
   ASSUNTO_RECUSA, autorizar, type FaturaLista, paraPendente, TEXTO_RECUSA, URL_SITE, validarCorpo,
 } from "./acoes.ts";
 import { enviarBoasVindasClick, garantirUtilizador } from "./boas_vindas.ts";
-import { recusarCompra } from "./recusa.ts";
+import { ESTADOS_A_CANCELAR, recusarCompra } from "./recusa.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
   apiVersion: "2025-02-24.acacia", // versão do SDK stripe@17.7.0 (as faturas vêm na forma acacia: payment_intent no topo)
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
 /** Compras Click por confirmar, mais recentes primeiro; só os seis campos públicos. */
 async function listar() {
   const q = await admin.from("subscritores")
-    .select("email,nome,telefone,loja,codigo_compra,criado_em")
+    .select("email,nome,telefone,loja,codigo_compra,criado_em,estado,cartao_ultimos4,teste_repetido,teste_motivo")
     .eq("origem", "click").eq("estado_click", "pendente")
     .order("criado_em", { ascending: false });
   if (q.error) throw q.error;
@@ -135,7 +135,7 @@ async function listar() {
 async function listarAuto() {
   const desde = new Date(Date.now() - 7 * 864e5).toISOString();
   const q = await admin.from("subscritores")
-    .select("email,nome,telefone,loja,codigo_compra,criado_em,estado_click,validado_auto_em")
+    .select("email,nome,telefone,loja,codigo_compra,criado_em,estado_click,validado_auto_em,estado,cartao_ultimos4,teste_repetido,teste_motivo")
     .eq("origem", "click").gte("validado_auto_em", desde)
     .order("validado_auto_em", { ascending: false });
   if (q.error) throw q.error;
@@ -202,7 +202,7 @@ async function recusar(req: Request, email: string): Promise<Response> {
       return (up.data?.[0] as { codigo_compra: string | null } | undefined) ?? null;
     },
     subscricoesClick: async (e) => {
-      const q = await admin.from("subscricoes").select("stripe_subscription_id").eq("email", e).eq("origem", "click").in("estado", ["ativo", "em_atraso"]);
+      const q = await admin.from("subscricoes").select("stripe_subscription_id").eq("email", e).eq("origem", "click").in("estado", [...ESTADOS_A_CANCELAR]);
       if (q.error) throw q.error;
       return (q.data ?? []).map((x) => x.stripe_subscription_id as string);
     },

@@ -80,7 +80,7 @@ Deno.test("texto ao cliente recusado: assunto e corpo exatos do plano, sem portu
 });
 Deno.test("listar: só os seis campos públicos, vazios → null", () => {
   const linha = { email: "a@b.pt", nome: "Ana", telefone: "", loja: null, codigo_compra: "PD-ABC123", criado_em: "2026-11-08T10:00:00Z", user_id: "segredo", estado_click: "pendente" };
-  assertEquals(paraPendente(linha), { email: "a@b.pt", nome: "Ana", telefone: null, loja: null, codigo_compra: "PD-ABC123", criado_em: "2026-11-08T10:00:00Z" });
+  assertEquals(paraPendente(linha), { email: "a@b.pt", nome: "Ana", telefone: null, loja: null, codigo_compra: "PD-ABC123", criado_em: "2026-11-08T10:00:00Z", estado: null, cartao_ultimos4: null, teste_repetido: false, teste_motivo: null });
 });
 Deno.test("normalizarEmail: trim e minúsculas; null → vazio", () => {
   assertEquals(normalizarEmail(" X@Y.Z "), "x@y.z");
@@ -89,4 +89,9 @@ Deno.test("normalizarEmail: trim e minúsculas; null → vazio", () => {
 
 Deno.test("validarCorpo aceita listar_auto (validados automaticamente nos últimos 7 dias)", () => {
   assertEquals(validarCorpo({ acao: "listar_auto" }), { ok: true, corpo: { acao: "listar_auto" } });
+});
+
+Deno.test("paraPendente: leva o estado, os últimos 4 do cartão e a repetição do teste; nunca outros campos", () => {
+  const p = paraPendente({ email: "a@x.pt", nome: "Ana", telefone: "+351", loja: "L", codigo_compra: "PD-AAAAAA", criado_em: "2026-11-14", estado: "teste", cartao_ultimos4: "4242", teste_repetido: true, teste_motivo: "repeat: phone", cartao_impressao: "fp_segredo", telefone_norm: "351" });
+  assertEquals(p, { email: "a@x.pt", nome: "Ana", telefone: "+351", loja: "L", codigo_compra: "PD-AAAAAA", criado_em: "2026-11-14", estado: "teste", cartao_ultimos4: "4242", teste_repetido: true, teste_motivo: "repeat: phone" });
 });

@@ -2,7 +2,7 @@
 // Reject & refund (2026-11-13): também para quem foi validado automaticamente. Stripe e base em memória;
 // a base respeita a condição WHERE da marcação (pendente, ou validado com validado_auto_em).
 import { assert, assertEquals } from "jsr:@std/assert@1";
-import { type DepsRecusa, podeRecusar, recusarCompra } from "./recusa.ts";
+import { type DepsRecusa, ESTADOS_A_CANCELAR, podeRecusar, recusarCompra } from "./recusa.ts";
 import { temAcesso } from "../_shared/acesso.ts";
 import type { FaturaLista } from "./acoes.ts";
 
@@ -25,6 +25,10 @@ function cenario(linha: { estado_click: string | null; validado_auto_em: string 
   return { row, deps, chamadas };
 }
 const PAGA = [{ status: "paid", amount_paid: 1500, payment_intent: "pi_1" }];
+
+Deno.test("Reject & refund cancela também as subscrições em teste grátis (senão seriam cobradas no fim do teste)", () => {
+  assertEquals([...ESTADOS_A_CANCELAR].sort(), ["ativo", "em_atraso", "teste"]);
+});
 
 Deno.test("podeRecusar: pendente, ou validado automaticamente; nunca a validação manual nem uma recusa", () => {
   assertEquals(podeRecusar("pendente", null), true);

@@ -10,10 +10,13 @@ export function podeRecusar(estadoClick: string | null | undefined, validadoAuto
   return estadoClick === "pendente" || (estadoClick === "validado" && !!validadoAutoEm);
 }
 
+/** Estados das subscrições Click que "Reject & refund" cancela: também 'teste' (senão seria cobrada no fim do teste). */
+export const ESTADOS_A_CANCELAR = ["ativo", "teste", "em_atraso"] as const;
+
 export interface DepsRecusa {
   /** update … set estado_click = 'recusado' where (podeRecusar); devolve a linha, ou null se não podia. */
   marcarRecusado: (email: string) => Promise<{ codigo_compra: string | null } | null>;
-  /** Subscrições Click a cobrar (ativo/em_atraso) deste e-mail. */
+  /** Subscrições Click a cobrar (ESTADOS_A_CANCELAR) deste e-mail. */
   subscricoesClick: (email: string) => Promise<string[]>;
   faturas: (subId: string) => Promise<FaturaLista[]>;
   reembolsar: (paymentIntent: string) => Promise<void>;
