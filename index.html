@@ -54,7 +54,7 @@
 </nav>
 <div class="head-cta">
 <a href="app.html" class="btn btn-l signin">Sign in</a>
-<a href="#plans" class="btn btn-d">Subscribe</a>
+<a href="#plans" class="btn btn-buy">Subscribe</a>
 </div>
 </div>
 </header>
@@ -70,9 +70,10 @@
 <h1 class="h1">Stop guessing your next collection</h1>
 <p class="hero-lead">Every morning, ProvenDrop sends you the collections that are already running ads and growing in demand, in eight markets, with a Launch Kit ready to go.</p>
 <div class="hero-cta">
-<a href="#plans" class="btn btn-d"><span>Subscribe · €<span data-fill="price-monthly">15</span>/month</span></a>
+<a href="#plans" class="btn btn-buy"><span>Subscribe · €<span data-fill="price-monthly">15</span>/month</span></a>
 <a href="#how" class="btn btn-l btn-w">See how it works</a>
 </div>
+<p class="hero-trial" data-trial hidden>Click Dynamics client? <a href="#planClick">Your first 5 days are free.</a></p>
 <ul class="checks"><li><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#12301F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Cancel anytime</li><li><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#12301F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>New list every day at <span data-fill="hour">09:00</span></span></li></ul>
 </div>
 <div class="heroshot">
@@ -264,14 +265,14 @@
 <div class="wrap plans-in">
 <h2 class="h2 mw760">Two plans, the same collections</h2>
 <div class="cols2">
-<div class="panel plan">
+<div class="panel plan" id="planClick">
 <span class="mono fs12 c-lime">[Click Dynamics clients]</span>
 <h3 class="plan-name">ProvenDrop × Click</h3>
-<div class="price"><span class="big64">€<span data-fill="price-monthly">15</span></span><span class="mono fs12 price-sub-d">/month · no joining fee</span></div>
+<div class="price"><span class="big64">€<span data-fill="price-monthly">15</span></span><span class="mono fs12 price-sub-d">/month · no joining fee</span><span class="trial-tag" data-trial hidden>5 days free</span></div>
 <p class="plan-trial" data-trial hidden>5-day free trial, then €<span data-fill="price-monthly">15</span>/month. Cancel anytime.</p>
 <ul class="plan-list plan-list-d"><li>Daily list in the Click WhatsApp group, with the ZIP</li><li>Member area, kits and the full library</li><li>Instant access; Click confirms you’re a client</li></ul>
 <!-- "#buy-click" in the mock-up: the link comes from STRIPE_LINK_CLICK in config.js (enabled by the script at the end). -->
-<a class="btn btn-lime plan-btn js-click-link" id="btnClick" aria-disabled="true">Subscribe with Click</a>
+<a class="btn btn-buy plan-btn js-click-link" id="btnClick" aria-disabled="true">Subscribe with Click</a>
 </div>
 <div class="win plan">
 <span class="mono fs12 c-green">[Everyone]</span>
@@ -279,7 +280,7 @@
 <div class="price"><span class="big64">€<span data-fill="price-first">40</span></span><span class="mono fs12 c-muted" data-if-joining>first month · then €<span data-fill="price-monthly">15</span>/month</span><span class="mono fs12 c-muted" data-if-no-joining hidden>/month</span></div>
 <ul class="plan-list"><li>Daily e-mail at <span data-fill="hour">09:00</span> and your member area</li><li>Kit download on every collection, library with filters</li><li data-if-joining>First month includes the €<span data-fill="price-joining">25</span> joining fee</li></ul>
 <!-- "#buy-direct" in the mock-up: the link comes from STRIPE_LINK_DIRECT in config.js. -->
-<a class="btn btn-d plan-btn" id="btnSubscribe" aria-disabled="true">Subscribe</a>
+<a class="btn btn-buy plan-btn" id="btnSubscribe" aria-disabled="true">Subscribe</a>
 </div>
 </div>
 <div class="plans-notes">
@@ -358,11 +359,11 @@
     document.querySelectorAll("[data-if-no-joining]").forEach(function(e){ e.hidden=false; });
   }
 
-  /* Click plan launch offer: the free-trial texts show only until TRIAL_ATE, then the page goes back
-     to the plan without a trial (also when it stays open past that moment). */
-  var ate=Date.parse(s("TRIAL_ATE"));
+  /* Click plan launch offer: the free-trial texts show only before OFFER_TRIAL_END, then the page goes back
+     to the plan without a trial (also when it stays open past that moment). OFFER_TRIAL_END is the first moment WITHOUT the offer. */
+  var ate=Date.parse(s("OFFER_TRIAL_END"));
   var oferta=function(){
-    var on=isFinite(ate) && Date.now()<=ate;
+    var on=isFinite(ate) && Date.now()<ate;
     document.querySelectorAll("[data-trial]").forEach(function(e){ e.hidden=!on; });
     document.querySelectorAll("[data-no-trial]").forEach(function(e){ e.hidden=on; });
     return on;

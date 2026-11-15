@@ -41,15 +41,23 @@ a:hover{color:#0A1C12}
 .btn-d{background:#12301F;color:#D4F57A}
 .btn-d:hover{background:#0A1C12;color:#E4FB9F}
 .btn-l{background:#F1F7EE;color:#12301F;border:1px solid #CFE0CC}
+.site-head .signin{background:transparent}
 .btn-w{background:#FFFFFF}
 .btn-lime{background:#D4F57A;color:#12301F}
 .btn-lime:hover{background:#E4FB9F;color:#0A1C12}
+/* Purchase buttons (everything that leads to checkout): the only lime fills on the page, so they win the squint test.
+   On light backgrounds a dark edge and a soft shadow keep the lime from washing out. */
+.btn-buy{background:#D4F57A;color:#12301F;border:1.5px solid #12301F;font-weight:600;box-shadow:0 6px 18px rgba(18,48,31,.22)}
+.btn-buy:hover{background:#E4FB9F;color:#0A1C12}
+.panel .btn-buy{border-color:#D4F57A;box-shadow:0 6px 22px rgba(212,245,122,.18)}
+.btn:focus-visible{outline:2px solid #12301F;outline-offset:3px}
+.panel .btn:focus-visible{outline-color:#D4F57A}
 .btn[aria-disabled="true"]{opacity:.55;pointer-events:none;cursor:not-allowed}
 
 /* Announcement bar and header */
 .topbar{background:#12301F;color:#DCEBD8}
 .topbar-in{padding-top:9px;padding-bottom:9px;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;text-align:center}
-.tag{background:#D4F57A;color:#12301F;font-size:11px;padding:2px 7px;border-radius:4px}
+.tag{background:transparent;color:#D4F57A;border:1px solid #D4F57A;font-size:11px;padding:2px 7px;border-radius:4px}
 .topbar-link,.topbar-link:hover{color:#D4F57A;text-decoration:none}
 .topbar-link:hover{text-decoration:underline}
 .ann-s{display:none}
@@ -67,11 +75,11 @@ a:hover{color:#0A1C12}
 
 /* Hero: text on the left, an example of the member area on the right */
 .hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#F6FAF3 0%,#FFFFFF 100%);border-bottom:1px solid #DCE9D8}
-.glow{position:absolute;right:-8%;top:8%;width:62%;height:84%;background:radial-gradient(closest-side,rgba(212,245,122,.55),rgba(63,176,106,.18) 55%,rgba(255,255,255,0));filter:blur(10px);pointer-events:none}
+.glow{position:absolute;right:-8%;top:8%;width:62%;height:84%;background:radial-gradient(closest-side,rgba(63,176,106,.16),rgba(63,176,106,.07) 55%,rgba(255,255,255,0));filter:blur(10px);pointer-events:none}
 .herogrid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:56px;align-items:center;padding-top:96px;padding-bottom:110px}
 .herotext{display:flex;flex-direction:column;gap:24px}
 .hero .h1{font-size:68px}
-.eyebrow{align-self:flex-start;background:#EAF5D2;color:#12301F;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500}
+.eyebrow{align-self:flex-start;background:#EEF4EC;color:#12301F;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500}
 .hero-lead{margin:0;max-width:520px;font-size:18px;line-height:1.55;color:#2C4A36}
 .hero-cta{display:flex;gap:10px;flex-wrap:wrap}
 .checks{list-style:none;margin:0;padding:0;display:flex;gap:18px;flex-wrap:wrap;color:#3A5444;font-size:14px}
@@ -81,9 +89,9 @@ a:hover{color:#0A1C12}
 .dot-8{margin-right:8px}
 
 /* Example mock-ups (hero and "How it works"). Everything in them is example data, labelled as such. */
-.exbadge{background:#EAF5D2;color:#1F6B42;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:600;white-space:nowrap}
+.exbadge{background:#EEF4EC;color:#1F6B42;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:600;white-space:nowrap}
 .exbadge-d{background:#2C5A3E;color:#D4F57A}
-.b-ok{background:#EAF5D2;color:#1F6B42;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600;white-space:nowrap}
+.b-ok{background:#EEF4EC;color:#1F6B42;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600;white-space:nowrap}
 .b-obs{background:#FBEFD6;color:#8A5A0B;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600;white-space:nowrap}
 .logo-drop-s{color:#1F6B42}
 .mock{display:grid;grid-template-columns:150px minmax(0,1fr);background:#FFFFFF;border:1px solid #CFE0CC;border-radius:16px;box-shadow:0 40px 80px rgba(18,48,31,.18),0 8px 20px rgba(18,48,31,.08);overflow:hidden;font-size:12px}
@@ -91,7 +99,7 @@ a:hover{color:#0A1C12}
 .mlogo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;margin-bottom:12px}
 .mlogo svg{flex-shrink:0}
 .mnav{padding:7px 9px;border-radius:7px;color:#3A5444}
-.mnav.on{background:#EAF5D2;color:#12301F;font-weight:600}
+.mnav.on{background:#EEF4EC;color:#12301F;font-weight:600}
 .mmain{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .mtop>div{display:flex;flex-direction:column;gap:2px}
@@ -112,7 +120,7 @@ a:hover{color:#0A1C12}
 
 /* Floating pills next to the mock-ups (absolute on wide screens, in the flow below the mock-up on phones) */
 .pill{position:absolute;display:inline-flex;align-items:center;gap:10px;background:#FFFFFF;border:1px solid #DCE9D8;border-radius:14px;padding:10px 14px 10px 10px;font-weight:600;font-size:14px;box-shadow:0 14px 30px rgba(18,48,31,.12);white-space:nowrap;z-index:2}
-.pico{width:26px;height:26px;border-radius:8px;background:#EAF5D2;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.pico{width:26px;height:26px;border-radius:8px;background:#EEF4EC;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .p-dot .pico::before{content:"";width:9px;height:9px;border-radius:50%;background:#3FB06A;box-shadow:0 0 0 4px rgba(63,176,106,.2)}
 .hp1{left:-18px;bottom:34px}
 .hp2{right:-6px;top:-34px}
@@ -161,7 +169,7 @@ a:hover{color:#0A1C12}
 .tlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .trow{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 0}
 .tchk{box-sizing:content-box;width:18px;height:18px;border-radius:5px;border:1.5px solid #9DB8A3;position:relative}
-.tchk::after{content:"";box-sizing:content-box;position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #12301F;border-width:0 2px 2px 0;transform:rotate(45deg);opacity:0}
+.tchk::after{content:"";box-sizing:content-box;position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #F1F7EE;border-width:0 2px 2px 0;transform:rotate(45deg);opacity:0}
 .tlabel{color:#2C4A36}
 .ttime{font-size:12px;color:#48604F}
 .ttotal{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #DCE9D8;margin-top:10px;padding-top:16px;font-weight:600}
@@ -179,7 +187,7 @@ a:hover{color:#0A1C12}
 .fkicker{display:flex;gap:10px;align-items:center}
 .ficon{width:30px;height:30px;border-radius:7px;background:#12301F;display:flex;align-items:center;justify-content:center}
 .fp{margin:0;font-size:17px;color:#3A5444;max-width:30em}
-.badge{display:inline-flex;gap:10px;align-items:center;background:#EAF5D2;border-radius:6px;padding:7px 10px;font-family:"Geist Mono",monospace;font-size:12px;letter-spacing:.06em;color:#12301F;align-self:flex-start}
+.badge{display:inline-flex;gap:10px;align-items:center;background:#EEF4EC;border-radius:6px;padding:7px 10px;font-family:"Geist Mono",monospace;font-size:12px;letter-spacing:.06em;color:#12301F;align-self:flex-start}
 .badge b{font-family:Geist,sans-serif;font-size:15px;letter-spacing:-.01em}
 .fvis{position:relative}
 .c-soft{color:#BFD7C4}
@@ -281,6 +289,9 @@ a:hover{color:#0A1C12}
 .plan-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;color:#3A5444}
 .plan-list-d{color:#DCEBD8}
 .plan-btn{justify-content:center;margin-top:6px}
+.trial-tag{align-self:center;border:1px solid #BFD7C4;color:#F1F7EE;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;font-family:"Geist Mono",monospace;letter-spacing:.04em;white-space:nowrap}
+.hero-trial{margin:12px 0 0;font-size:14px;color:#3D5A45}
+.hero-trial a{color:#12301F;font-weight:600;text-underline-offset:3px}
 .plans-notes{display:flex;flex-direction:column;gap:10px}
 .plans-note{margin:0;font-size:12px;color:#48604F;line-height:1.6}
 
@@ -309,7 +320,7 @@ a:hover{color:#0A1C12}
 @keyframes marq{to{transform:translateX(-50%)}}
 @keyframes lit{from{color:#5E7A66}to{color:#F1F7EE}}
 @keyframes litg{from{color:#5E7A66}to{color:#D4F57A}}
-@keyframes chkbg{to{background:#D4F57A;border-color:#12301F}}
+@keyframes chkbg{to{background:#2C5A3E;border-color:#2C5A3E}}
 @keyframes chk{to{opacity:1}}
 @keyframes strike{to{color:#5F7A66;text-decoration:line-through;text-decoration-color:#5F7A66}}
 @media (prefers-reduced-motion:no-preference){

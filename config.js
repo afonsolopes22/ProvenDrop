@@ -51,13 +51,14 @@ window.PROVENDROP_CONFIG = {
   POSTHOG_KEY: "phc_tPR88szrRKLyytWEjc9gpXwnsRq8BeKfArL8sEWd7avj",
   POSTHOG_HOST: "https://eu.i.posthog.com",
 
-  /* End of the Click plan launch offer (5-day free trial), ISO date with offset.
-     Until then index.html shows the free-trial texts (top strip, Click plan card, FAQ);
-     after it they disappear on their own and the page shows the plan without a trial.
-     Lisbon is UTC+0 in November, so 23:59 in Lisbon = 23:59+00:00. Empty = no trial texts.
-     The stripe-webhook has the same date (secret CLICK_TRIAL_ATE, default this value): a
-     NEW purchase still in trial after it has its trial ended and is charged at once. */
-  TRIAL_ATE: "2026-11-20T23:59:00+00:00",
+  /* End of the Click plan launch offer (5-day free trial): the first moment WITHOUT the offer,
+     ISO date with offset. Before it index.html shows everything about the trial (top strip,
+     "5 days free" tag on the Click plan card, the line under the hero button, the trial line
+     and the FAQ); from then on they disappear on their own and the page shows the plan without
+     a trial. Lisbon is UTC+0 in November, so 21/11 00:00 in Lisbon = 00:00+00:00. Empty = no
+     trial texts. The stripe-webhook has its own cut-off (secret CLICK_TRIAL_ATE, default
+     2026-11-20T23:59:00+00:00): a NEW purchase still in trial after it is charged at once. */
+  OFFER_TRIAL_END: "2026-11-21T00:00:00+00:00",
 
   /* Time the daily collections are delivered, Europe/Lisbon, "HH:MM".
      Must match the HORA_ENVIO secret of the email-diario function
