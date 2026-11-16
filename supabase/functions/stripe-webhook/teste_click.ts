@@ -57,11 +57,37 @@ export interface DepsTesteClick {
   cancelar: (sub: string) => Promise<void>;
   guardar: (email: string, d: Record<string, unknown>) => Promise<void>;
   alertar: (assunto: string, linhas: string[]) => Promise<boolean>;
+  /** E-mail ao CLIENTE de um teste sem cartão recusado (já usado): o teste não se repete, o plano começa na área de membros. */
+  avisarTesteUsado: (email: string) => Promise<boolean>;
 }
 
 export interface CompraTeste { email: string; sub: string; codigo: string; emTeste: boolean; telefone: string | null; loja: string | null; cartao: DadosCartao | null; ofertaTerminou?: boolean }
 
-export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): Promise<{ teste: boolean; motivo: string | null; cobrado: boolean | null }> {
+export type Decisao = { teste: boolean; motivo: string | null; cobrado: boolean | null };
+
+/** Sem teste e com cartão: acaba o teste já e cobra; se a cobrança falhar, cancela (nunca fica acesso grátis). */
+async function cobrarJa(deps: DepsTesteClick, email: string, sub: string, codigo: string, motivo: string, titulo: string): Promise<Decisao> {
+  try {
+    await deps.acabarTeste(sub);
+    return { teste: false, motivo, cobrado: true };
+  } catch (e) {
+    await deps.cancelar(sub);
+    await deps.alertar(`${titulo}: payment failed, subscription cancelled · ${codigo}`, [
+      `Reason for no trial: ${motivo}.`, `E-mail: ${email}`,
+      `The first month could not be charged (${String((e as Error)?.message ?? e).slice(0, 120)}), so the subscription was cancelled and there is no access.`,
+    ]);
+    return { teste: false, motivo, cobrado: false };
+  }
+}
+
+/**
+ * Na compra (checkout.session.completed). Desde 2026-11-16 o link Click não pede cartão (if_required): sem cartão o
+ * anti-abuso fica no telefone e na loja (um teste cada), e um teste recusado não pode ser cobrado, por isso a
+ * subscrição é cancelada logo e o cliente recebe um e-mail para começar o plano na área de membros. Com cartão,
+ * tudo como antes (cartão repetido ou pré-pago → cobra logo).
+ */
+export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): Promise<Decisao & { semCartao: boolean }> {
+  const semCartao = !c.cartao;
   const telefone = normalizarTelefone(c.telefone), loja = normalizarLoja(c.loja);
   const impressao = c.cartao?.fingerprint && c.cartao.fingerprint.length >= 3 ? c.cartao.fingerprint : null;
   await deps.guardar(c.email, {
@@ -69,7 +95,7 @@ export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): P
     telefone_norm: telefone, loja_norm: loja,
   });
   // Link sem teste (ou a subscrição já não está em teste): nada a decidir.
-  if (!c.emTeste) return { teste: false, motivo: null, cobrado: null };
+  if (!c.emTeste) return { teste: false, motivo: null, cobrado: null, semCartao };
 
   const valores: Array<{ tipo: TipoDado; valor: string }> = [];
   if (impressao) valores.push({ tipo: "cartao", valor: impressao });
@@ -79,17 +105,42 @@ export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): P
   const repetidos = !c.ofertaTerminou && valores.length ? await deps.reclamar(valores, c.email, c.sub) : [];
   const d = c.ofertaTerminou ? { teste: false, motivo: "trial offer ended" } : decidirTeste({ funding: c.cartao?.funding, repetidos });
   await deps.guardar(c.email, { teste_repetido: repetidos.length > 0, teste_motivo: d.motivo });
-  if (d.teste) return { teste: true, motivo: null, cobrado: null };
+  if (d.teste) return { teste: true, motivo: null, cobrado: null, semCartao };
 
-  try {
-    await deps.acabarTeste(c.sub);
-    return { teste: false, motivo: d.motivo, cobrado: true };
-  } catch (e) {
+  if (semCartao) {
+    // Não há com que cobrar: cancela já, avisa o Afonso e o cliente.
     await deps.cancelar(c.sub);
-    await deps.alertar(`Click purchase without free trial: payment failed, subscription cancelled · ${c.codigo}`, [
+    await deps.alertar(`Click free trial already used, no card: subscription cancelled · ${c.codigo}`, [
       `Reason for no trial: ${d.motivo}.`, `E-mail: ${c.email}`,
-      `The first month could not be charged (${String((e as Error)?.message ?? e).slice(0, 120)}), so the subscription was cancelled and there is no access.`,
+      "No card was given at checkout, so nothing was charged and there is no access. The customer was e-mailed how to start the paid plan.",
     ]);
-    return { teste: false, motivo: d.motivo, cobrado: false };
+    await deps.avisarTesteUsado(c.email);
+    return { teste: false, motivo: d.motivo, cobrado: false, semCartao };
   }
+  return { ...await cobrarJa(deps, c.email, c.sub, c.codigo, d.motivo!, "Click purchase without free trial"), semCartao };
+}
+
+/**
+ * Cartão adicionado a meio de um teste sem cartão (Checkout em modo setup): guarda-o e aplica-lhe as regras do
+ * cartão (já teve teste noutra subscrição, ou é pré-pago → o teste acaba e o primeiro mês é cobrado já).
+ */
+export async function avaliarCartaoAdicionado(deps: DepsTesteClick, c: { email: string; sub: string; codigo: string; cartao: DadosCartao }): Promise<Decisao> {
+  const impressao = c.cartao.fingerprint && c.cartao.fingerprint.length >= 3 ? c.cartao.fingerprint : null;
+  await deps.guardar(c.email, { cartao_ultimos4: c.cartao.last4 ?? null, cartao_impressao: impressao, cartao_tipo: c.cartao.funding ?? null });
+  const repetidos = impressao ? await deps.reclamar([{ tipo: "cartao", valor: impressao }], c.email, c.sub) : [];
+  const d = decidirTeste({ funding: c.cartao.funding, repetidos });
+  if (d.teste) return { teste: true, motivo: null, cobrado: null };
+  await deps.guardar(c.email, { teste_repetido: repetidos.length > 0, teste_motivo: d.motivo });
+  return await cobrarJa(deps, c.email, c.sub, c.codigo, d.motivo!, "Card added during the Click free trial");
+}
+
+/**
+ * A subscrição cancelada (customer.subscription.deleted) foi o fim de um teste sem cartão? Estava em teste, acabou no
+ * fim do teste (com 2 min de folga) e ninguém pediu o cancelamento (cancel_at_period_end / cancel_at). Exclui o
+ * cliente que cancelou no teste, o Reject & refund e a repetição cancelada na compra (acabam antes do fim do teste).
+ */
+export function fimDoTesteSemCartao(x: { anterior: string | null | undefined; trialEnd: number | null; endedAt: number | null; cancelAtPeriodEnd: boolean; cancelAt: number | null }): boolean {
+  if (x.anterior !== "teste" || !x.trialEnd || !x.endedAt) return false;
+  if (x.cancelAtPeriodEnd || x.cancelAt) return false;
+  return x.endedAt >= x.trialEnd - 120;
 }

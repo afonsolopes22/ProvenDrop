@@ -115,3 +115,43 @@ export function moldeRecusaClick(assunto: string, texto: string, url: string): O
   const html = molde(assunto, `<p>${esc(texto)}</p>`, { texto: "See the ProvenDrop Platform plan", url });
   return { subject: assunto, html, text: `${texto}\n\n${url}` };
 }
+
+// ── Teste grátis Click sem cartão (2026-11-16) ──────────────────────────────
+// O botão leva à área de membros (`url` = APP_URL?plano=click): depois de entrar, "Start my plan" abre um Checkout do
+// Stripe SEM teste (conta-membro, acao assinar_click). Nunca o link público da Click, que tem o teste e não pede cartão:
+// a pessoa voltaria a cair num teste repetido e cancelado.
+
+/** O teste de 5 dias acabou sem cartão e o Stripe cancelou a subscrição. */
+export function moldeFimTesteClick(url: string, preco: string): Omit<Mensagem, "to"> {
+  const assunto = "Your trial has ended - start your plan";
+  const text =
+    `Hi! Your 5-day ProvenDrop × Click free trial has ended, and no card was added, so your access is paused.\n\n` +
+    `Start your plan (€${preco}/month, cancel anytime) to get the daily collections and launch kits back:\n${url}\n\n` +
+    `Sign in with this e-mail address and choose "Start my plan". Any question, reply to this e-mail.`;
+  const html = molde(
+    "Your free trial has ended",
+    `<p>Hi! Your 5-day ProvenDrop × Click free trial has ended, and no card was added, so your access is paused.</p>
+     <p>Start your plan (€${esc(preco)}/month, cancel anytime) to get the daily collections and launch kits back.</p>`,
+    { texto: "Start my plan", url },
+    `Sign in with this e-mail address and choose “Start my plan”. Any question, reply to this e-mail.`,
+  );
+  return { subject: assunto, html, text };
+}
+
+/** Compra Click sem cartão de quem já teve o teste (mesmo telefone ou loja): nada cobrado, subscrição cancelada. */
+export function moldeTesteUsadoClick(url: string, preco: string): Omit<Mensagem, "to"> {
+  const assunto = "You have already had your free trial";
+  const text =
+    `Hi! The ProvenDrop × Click free trial is one per person, and the phone number or store you used has already had one. ` +
+    `Nothing was charged and no subscription was started.\n\n` +
+    `To join, start your plan (€${preco}/month, cancel anytime):\n${url}\n\n` +
+    `Sign in with this e-mail address and choose "Start my plan". Any question, reply to this e-mail.`;
+  const html = molde(
+    "You have already had your free trial",
+    `<p>Hi! The ProvenDrop × Click free trial is one per person, and the phone number or store you used has already had one. Nothing was charged and no subscription was started.</p>
+     <p>To join, start your plan (€${esc(preco)}/month, cancel anytime).</p>`,
+    { texto: "Start my plan", url },
+    `Sign in with this e-mail address and choose “Start my plan”. Any question, reply to this e-mail.`,
+  );
+  return { subject: assunto, html, text };
+}

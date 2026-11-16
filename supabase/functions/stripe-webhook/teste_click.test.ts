@@ -2,7 +2,7 @@
 // Teste grátis do plano Click (2026-11-14): normalização, decisão e "um teste por pessoa", com uma base em memória
 // que respeita a chave única (tipo, valor) de testes_click_usados.
 import { assert, assertEquals } from "jsr:@std/assert@1";
-import { avaliarTesteClick, decidirTeste, fimDaOferta, ofertaTerminou, TRIAL_ATE_PADRAO, type DepsTesteClick, normalizarLoja, normalizarTelefone } from "./teste_click.ts";
+import { avaliarCartaoAdicionado, avaliarTesteClick, decidirTeste, fimDoTesteSemCartao, fimDaOferta, ofertaTerminou, TRIAL_ATE_PADRAO, type DepsTesteClick, normalizarLoja, normalizarTelefone } from "./teste_click.ts";
 import { temAcesso } from "../_shared/acesso.ts";
 
 Deno.test("telefone: só dígitos, com indicativo; curto demais não conta", () => {
@@ -37,7 +37,7 @@ Deno.test("decisão: pré-pago ou repetido → sem teste; senão mantém o teste
 /** testes_click_usados em memória: insert … on conflict (tipo, valor) do nothing, depois lê quem é o dono. */
 function base() {
   const usados = new Map<string, { email: string; sub: string }>();
-  const fim: string[] = [], cancelados: string[] = [], alertas: string[] = [];
+  const fim: string[] = [], cancelados: string[] = [], alertas: string[] = [], clientes: string[] = [];
   const guardado: Record<string, unknown> = {};
   let falharCobranca = false;
   const deps: DepsTesteClick = {
@@ -49,8 +49,9 @@ function base() {
     cancelar: async (sub) => { cancelados.push(sub); },
     guardar: async (_e, d) => { Object.assign(guardado, d); },
     alertar: async (assunto) => { alertas.push(assunto); return true; },
+    avisarTesteUsado: async (email) => { clientes.push(email); return true; },
   };
-  return { deps, usados, fim, cancelados, alertas, guardado, falhar: () => { falharCobranca = true; } };
+  return { deps, usados, fim, cancelados, alertas, clientes, guardado, falhar: () => { falharCobranca = true; } };
 }
 const CARTAO = { fingerprint: "fpA", funding: "credit", last4: "4242" };
 const compra = (sub: string, o: Partial<{ email: string; telefone: string; loja: string; cartao: typeof CARTAO | null }> = {}) => ({
@@ -155,7 +156,7 @@ Deno.test("ofertaTerminou: até às 23:59:00 ainda conta; depois não", () => {
 Deno.test("compra nova em trialing depois da oferta → acaba o teste e cobra logo, sem gastar o teste da pessoa", async () => {
   const b = base();
   const r = await avaliarTesteClick(b.deps, { ...compra("sub_9"), ofertaTerminou: true });
-  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: true });
+  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: true, semCartao: false });
   assertEquals(b.fim, ["sub_9"]);
   assertEquals(b.usados.size, 0);
   assertEquals(b.guardado.teste_repetido, false);
@@ -166,7 +167,7 @@ Deno.test("compra nova em trialing depois da oferta → acaba o teste e cobra lo
 Deno.test("depois da oferta, se a cobrança falhar → cancela e alerta", async () => {
   const b = base(); b.falhar();
   const r = await avaliarTesteClick(b.deps, { ...compra("sub_9"), ofertaTerminou: true });
-  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: false });
+  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: false, semCartao: false });
   assertEquals(b.cancelados, ["sub_9"]);
   assertEquals(b.alertas.length, 1);
 });
@@ -176,4 +177,105 @@ Deno.test("dentro do prazo (ofertaTerminou false) continua como antes", async ()
   const r = await avaliarTesteClick(b.deps, { ...compra("sub_1"), ofertaTerminou: false });
   assertEquals(r.teste, true);
   assertEquals(b.fim, []);
+});
+
+// ── Teste SEM cartão (2026-11-16): o checkout já não pede cartão (payment_method_collection = if_required).
+const SEM = { cartao: null };
+
+Deno.test("sem cartão, primeira compra: mantém o teste e reclama telefone e loja", async () => {
+  const b = base();
+  const r = await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  assertEquals(r, { teste: true, motivo: null, cobrado: null, semCartao: true });
+  assertEquals([...b.usados.keys()].sort(), ["loja|lojadaana", "telefone|351912345678"]);
+  assertEquals(b.guardado.cartao_ultimos4, null);
+});
+
+Deno.test("sem cartão, mesmo telefone: não tenta cobrar, cancela, alerta e avisa o cliente", async () => {
+  const b = base();
+  await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  const r = await avaliarTesteClick(b.deps, compra("sub_2", { ...SEM, email: "b@x.pt", loja: "Outra Loja" }));
+  assertEquals(r, { teste: false, motivo: "repeat: phone", cobrado: false, semCartao: true });
+  assertEquals(b.fim, []);
+  assertEquals(b.cancelados, ["sub_2"]);
+  assertEquals(b.alertas.length, 1);
+  assertEquals(b.alertas[0].startsWith("Click free trial already used, no card"), true);
+  assertEquals(b.clientes, ["b@x.pt"]);
+  assertEquals(b.guardado.teste_repetido, true);
+});
+
+Deno.test("sem cartão, mesma loja escrita de outra maneira: também cancela", async () => {
+  const b = base();
+  await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  const r = await avaliarTesteClick(b.deps, compra("sub_2", { ...SEM, email: "b@x.pt", telefone: "+351 933 333 333", loja: "LOJA da ana!" }));
+  assertEquals(r.motivo, "repeat: store");
+  assertEquals(b.cancelados, ["sub_2"]);
+});
+
+Deno.test("sem cartão depois do fim da oferta: cancela sem tentar cobrar", async () => {
+  const b = base();
+  const r = await avaliarTesteClick(b.deps, { ...compra("sub_9", SEM), ofertaTerminou: true });
+  assertEquals(r, { teste: false, motivo: "trial offer ended", cobrado: false, semCartao: true });
+  assertEquals(b.fim, []);
+  assertEquals(b.cancelados, ["sub_9"]);
+});
+
+Deno.test("com cartão continua como antes (semCartao false)", async () => {
+  const b = base();
+  const r = await avaliarTesteClick(b.deps, compra("sub_1"));
+  assertEquals(r, { teste: true, motivo: null, cobrado: null, semCartao: false });
+});
+
+// ── Cartão adicionado a meio do teste (Checkout em modo setup)
+const NOVO = { fingerprint: "fpNovo", funding: "credit", last4: "4444" };
+
+Deno.test("cartão adicionado: guarda os dados, reclama o cartão e mantém o teste", async () => {
+  const b = base();
+  await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  const r = await avaliarCartaoAdicionado(b.deps, { email: "a@x.pt", sub: "sub_1", codigo: "PD-AAAAAA", cartao: NOVO });
+  assertEquals(r, { teste: true, motivo: null, cobrado: null });
+  assertEquals(b.guardado.cartao_ultimos4, "4444");
+  assertEquals(b.guardado.cartao_impressao, "fpNovo");
+  assertEquals(b.usados.has("cartao|fpNovo"), true);
+  assertEquals(b.fim, []);
+});
+
+Deno.test("cartão adicionado que já teve teste noutra subscrição → acaba o teste e cobra", async () => {
+  const b = base();
+  await avaliarTesteClick(b.deps, compra("sub_1", { cartao: NOVO }));
+  await avaliarTesteClick(b.deps, compra("sub_2", { ...SEM, email: "b@x.pt", telefone: "+351 933 333 333", loja: "Outra" }));
+  const r = await avaliarCartaoAdicionado(b.deps, { email: "b@x.pt", sub: "sub_2", codigo: "PD-BBBBBB", cartao: NOVO });
+  assertEquals(r, { teste: false, motivo: "repeat: card", cobrado: true });
+  assertEquals(b.fim, ["sub_2"]);
+  assertEquals(b.guardado.teste_repetido, true);
+});
+
+Deno.test("cartão pré-pago adicionado → acaba o teste e cobra", async () => {
+  const b = base();
+  await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  const r = await avaliarCartaoAdicionado(b.deps, { email: "a@x.pt", sub: "sub_1", codigo: "PD-AAAAAA", cartao: { fingerprint: "fpP", funding: "prepaid", last4: "5100" } });
+  assertEquals(r, { teste: false, motivo: "prepaid card", cobrado: true });
+  assertEquals(b.fim, ["sub_1"]);
+});
+
+Deno.test("cartão adicionado sem teste a cobrar e a cobrança falha → cancela e alerta", async () => {
+  const b = base(); b.falhar();
+  await avaliarTesteClick(b.deps, compra("sub_1", SEM));
+  const r = await avaliarCartaoAdicionado(b.deps, { email: "a@x.pt", sub: "sub_1", codigo: "PD-AAAAAA", cartao: { fingerprint: "fpP", funding: "prepaid", last4: "5100" } });
+  assertEquals(r.cobrado, false);
+  assertEquals(b.cancelados, ["sub_1"]);
+  assertEquals(b.alertas.length, 1);
+});
+
+// ── Fim do teste sem cartão: o Stripe cancela a subscrição (missing_payment_method = cancel)
+const T = 1_800_000_000;
+Deno.test("fim do teste sem cartão: só quando estava em teste e acabou no fim do teste, sem pedido de cancelamento", () => {
+  const ok = { anterior: "teste", trialEnd: T, endedAt: T + 5, cancelAtPeriodEnd: false, cancelAt: null };
+  assertEquals(fimDoTesteSemCartao(ok), true);
+  assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: T - 30 }), true);          // poucos segundos antes (relógio)
+  assertEquals(fimDoTesteSemCartao({ ...ok, anterior: "ativo" }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: T - 3 * 86400 }), false);  // cancelado a meio (Reject & refund, repetição)
+  assertEquals(fimDoTesteSemCartao({ ...ok, cancelAtPeriodEnd: true }), false); // o cliente cancelou no teste
+  assertEquals(fimDoTesteSemCartao({ ...ok, cancelAt: T }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, trialEnd: null }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: null }), false);
 });
