@@ -168,7 +168,7 @@
   sb.auth.onAuthStateChange((_ev, session) => { if(session?.user?.id !== user?.id) entrar(session); });
   entrarPorTokenHash().then(ok => { if(!ok) sb.auth.getSession().then(({ data }) => { if(!mesmoUser(data.session)) entrar(data.session); }); });
 
-  const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em,teste_fim";
+  const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em,teste_fim,cartao_ultimos4";
   async function entrar(session){
     user = session?.user || null;
     if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
@@ -178,7 +178,7 @@
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
     window.pdIdentify(user.id, { origem: sub?.origem || "" }); window.pdTrack("area_membros_entrada", { via_link_c: !!cPedido });
-    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); renderTeste(); iniciarContagem();
+    renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); renderTeste(); iniciarContagem(); voltaDoStripe();
     /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
     if(!sub.guia_visto && !cPedido) abrirGuia(); else mostrarDica();
     /* The Library loads right after the list, so "From your library" can say how many collections it has. */
@@ -187,7 +187,7 @@
 
   function semAcesso(){
     const t = $("#semTitulo"), p = $("#semTexto"), g = $("#semPortal"), r = $("#semRegresso"), s = $("#semSubscrever"), pl = $("#semPlataforma");
-    r.hidden = true; s.hidden = false; pl.hidden = true;
+    r.hidden = true; s.hidden = false; pl.hidden = true; $("#semPlanoClick").hidden = true; $("#semMsg").hidden = true;
     let portal = !!PORTAL && !!sub;
     if(!sub){ t.textContent = "No active subscription"; p.textContent = "This e-mail has an account but is not linked to an active ProvenDrop subscription. If you have just paid, wait a minute and reload the page."; }
     else if(sub.bloqueado_em){ t.textContent = "Access suspended"; p.textContent = "Your access was suspended because of a payment dispute. Reply to any ProvenDrop e-mail and we sort it out with you."; s.hidden = true; }
@@ -196,11 +196,35 @@
     else if(ehClick(sub) && sub.estado_click === "pendente" && (sub.estado === "ativo" || sub.estado === "em_atraso")){ t.textContent = "Your Click access is being confirmed"; p.textContent = "Usually the same day. You'll get an e-mail as soon as Click confirms you're a client."; s.hidden = true; }
     else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
     else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
+    /* Click client (validated) with no plan running: the free trial ended without a card, or the trial was already used.
+       "Start my plan" opens a Stripe Checkout WITHOUT a trial (the public Click link has the trial and asks for no card). */
+    else if(ehClick(sub) && sub.estado_click === "validado" && sub.estado === "cancelado"){ t.textContent = "Start your plan"; p.textContent = `Your free trial or subscription has ended. Start your ProvenDrop × Click plan (€${PRECO_MES}/month, cancel anytime) to get the daily collections and launch kits back.`; s.hidden = true; $("#semPlanoClick").hidden = false; portal = false; }
     else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
     else { t.textContent = "No access to the member area"; p.textContent = "This account is not linked to an active ProvenDrop subscription right now. If you have just paid, wait a minute and reload the page."; }
     g.hidden = !portal; if(PORTAL) g.href = PORTAL;
     show("vSemAcesso");
   }
+
+  $("#semPlanoClick").addEventListener("click", async () => {
+    const b = $("#semPlanoClick"), m = $("#semMsg"); b.disabled = true; b.textContent = "Opening Stripe…"; m.hidden = true;
+    const r = await contaMembro({ acao: "assinar_click" });
+    if(r.status === 200 && r.body.url){ location.href = r.body.url; return; }
+    b.disabled = false; b.textContent = "Start my plan";
+    m.textContent = r.status === 409 ? "Your plan is already running. Reload the page." : "Stripe could not be opened right now. Please try again in a minute.";
+    m.hidden = false;
+  });
+  /* Back from that Checkout (?plano=ok): access arrives through the webhook a few seconds later. */
+  (async () => {
+    if(new URLSearchParams(location.search).get("plano") !== "ok") return;
+    history.replaceState(null, "", location.pathname + location.hash);
+    for(let i = 0; i < 20; i++){
+      await new Promise(res => setTimeout(res, 2000));
+      if(!user) continue;
+      if(!$("#vSemAcesso").hidden){ const m = $("#semMsg"); m.textContent = "Payment received. Opening your member area…"; m.hidden = false; }
+      const { data } = await sb.from("subscritores").select(CAMPOS).eq("user_id", user.id).maybeSingle();
+      if(temAcesso(data)){ if(!$("#vSemAcesso").hidden) location.reload(); return; }
+    }
+  })();
 
   /* Which plan this member is on (design §5): in the top of Today and in Subscription. */
   const PLANO = { click: "Plan: ProvenDrop × Click — member area + daily list in the Click WhatsApp group", direto: "Plan: ProvenDrop Platform — member area + daily e-mail" };
@@ -592,14 +616,68 @@
   }
   function avisoTeste(texto){ const m = $("#testeMsg"); m.textContent = texto; m.hidden = !texto; if(texto) $("#teste").scrollIntoView({ block: "nearest", behavior: "smooth" }); }
   function diasRestantes(){ const f = parse(sub?.teste_fim); return f ? Math.max(0, Math.ceil((f.getTime() - Date.now()) / 864e5)) : null; }
+  /* Free trial without a card (2026-11-16): the Click link asks for no card. From day 3 (3 days or fewer left) the strip
+     and a once-a-day popup ask for the card; "Add your card" opens a Stripe Checkout in setup mode (conta-membro). */
+  const temCartao = () => !!sub?.cartao_ultimos4;
+  const pedirCartao = () => emTeste() && !sub.acesso_fim && !temCartao() && (diasRestantes() ?? 99) <= 3;
   function renderTeste(){
     const box = $("#teste"); box.hidden = !emTeste(); if(!emTeste()) return;
-    const n = diasRestantes(), cancelado = !!sub.acesso_fim;
-    $("#testeTitulo").textContent = "Free trial" + (n == null ? "" : ` · ${n} ${n === 1 ? "day" : "days"} left`);
-    $("#testeTexto").textContent = cancelado
-      ? `You cancelled: your access ends on ${dia(sub.acesso_fim)} and you won’t be charged.`
-      : `Then €${PRECO_MES}/month${sub.teste_fim ? ", from " + dia(sub.teste_fim) : ""}. During the trial: the full daily list and one kit download a day. The Library opens when your plan starts.`;
+    const n = diasRestantes(), cancelado = !!sub.acesso_fim, fim = dia(sub.teste_fim);
+    if(cancelado){
+      $("#testeTitulo").textContent = "Free trial" + (n == null ? "" : ` · ${n} ${n === 1 ? "day" : "days"} left`);
+      $("#testeTexto").textContent = `You cancelled: your access ends on ${dia(sub.acesso_fim)} and you won’t be charged.`;
+    } else if(temCartao()){
+      $("#testeTitulo").textContent = fim ? `Card added · your plan starts on ${fim}` : "Card added";
+      $("#testeTexto").textContent = `Then €${PRECO_MES}/month on the card ending ${sub.cartao_ultimos4}. Until then: the full daily list and one kit download a day. The Library opens when your plan starts.`;
+    } else if(pedirCartao()){
+      $("#testeTitulo").textContent = fim ? `Your free trial ends on ${fim}` : "Your free trial ends soon";
+      $("#testeTexto").textContent = "Add your card to keep your access. You are only charged when the trial ends, €" + PRECO_MES + "/month, cancel anytime.";
+    } else {
+      $("#testeTitulo").textContent = "Free trial" + (n == null ? "" : ` · ${n} ${n === 1 ? "day" : "days"} left`);
+      $("#testeTexto").textContent = `No card needed during the trial. To keep your access after ${fim || "it ends"}, add your card: €${PRECO_MES}/month, cancel anytime. During the trial: the full daily list and one kit download a day.`;
+    }
     $("#testeAcoes").hidden = cancelado; $("#testeConfirmar").hidden = true;
+    $("#testeCartao").hidden = temCartao(); $("#testeComecar").hidden = !temCartao();
+    $("#teste").classList.toggle("trial-alerta", pedirCartao());
+    abrirPopCartao();
+  }
+  /* Popup: once per Lisbon day, closable; never on top of the welcome guide. */
+  const POP_KEY = "pd_cartao_pop";
+  function abrirPopCartao(){
+    if(!pedirCartao() || !$("#guia").hidden) return;
+    let visto = ""; try { visto = localStorage.getItem(POP_KEY) || ""; } catch { /* private mode */ }
+    if(visto === hojeLisboa()) return;
+    $("#cartaoPopTitulo").textContent = sub.teste_fim ? `Your free trial ends on ${dia(sub.teste_fim)}` : "Your free trial ends soon";
+    $("#cartaoPopTexto").textContent = `Your free trial ends on ${dia(sub.teste_fim) || "soon"}. Add your card to keep your access.`;
+    $("#cartaoPop").hidden = false; $("#cartaoPopSim").focus();
+  }
+  function fecharPopCartao(){ try { localStorage.setItem(POP_KEY, hojeLisboa()); } catch { /* private mode */ } $("#cartaoPop").hidden = true; }
+  $("#cartaoPopFechar").addEventListener("click", fecharPopCartao);
+  $("#cartaoPopNao").addEventListener("click", fecharPopCartao);
+  $("#cartaoPop").addEventListener("keydown", e => { if(e.key === "Escape") fecharPopCartao(); });
+  async function adicionarCartao(botao){
+    const txt = botao.textContent; botao.disabled = true; botao.textContent = "Opening Stripe…";
+    const r = await contaMembro({ acao: "adicionar_cartao" });
+    if(r.status === 200 && r.body.url){ location.href = r.body.url; return; }
+    botao.disabled = false; botao.textContent = txt;
+    $("#cartaoPop").hidden = true;
+    avisoTeste("The card page could not be opened right now. Please try again in a minute.");
+  }
+  $("#testeCartao").addEventListener("click", () => adicionarCartao($("#testeCartao")));
+  $("#cartaoPopSim").addEventListener("click", () => { try { localStorage.setItem(POP_KEY, hojeLisboa()); } catch { /* private mode */ } adicionarCartao($("#cartaoPopSim")); });
+  /* Back from Stripe: the card reaches the database through the webhook a few seconds later. */
+  async function voltaDoStripe(){
+    const q = new URLSearchParams(location.search);
+    if(q.get("cartao") !== "ok") return;
+    history.replaceState(null, "", location.pathname + location.hash);
+    if(!emTeste() || temCartao()) return;
+    avisoTeste("Card added. Updating your plan…");
+    for(let i = 0; i < 15 && !temCartao(); i++){
+      await new Promise(res => setTimeout(res, 2000));
+      const { data } = await sb.from("subscritores").select("cartao_ultimos4,estado").eq("user_id", user.id).maybeSingle();
+      if(data?.cartao_ultimos4 || data?.estado !== "teste"){ location.reload(); return; }
+    }
+    avisoTeste("Card added. It can take a minute to show here.");
   }
   const PRECO_MES = String(C.PRICE_MONTHLY || "15").replace(/[^\d.,]/g, "") || "15";
   document.querySelectorAll("[data-preco-mes]").forEach(e => { e.textContent = PRECO_MES; });
@@ -609,6 +687,7 @@
     const b = $("#testeSim"); b.disabled = true; b.textContent = "Starting…";
     const r = await contaMembro({ acao: "comecar_plano" });
     b.disabled = false; b.textContent = "Yes, start my plan";
+    if(r.status === 409 && r.body.erro === "sem_cartao"){ $("#testeConfirmar").hidden = true; $("#testeAcoes").hidden = false; return adicionarCartao($("#testeCartao")); }
     if(r.status === 402){ $("#testeConfirmar").hidden = true; $("#testeAcoes").hidden = false; return avisoTeste("Your card was declined, so nothing changed. Update your card in Subscription → Manage subscription and try again."); }
     if(r.status !== 200 && r.status !== 409){ return avisoTeste("Your plan could not be started right now. Please try again in a minute."); }
     $("#testeConfirmar").hidden = true;
