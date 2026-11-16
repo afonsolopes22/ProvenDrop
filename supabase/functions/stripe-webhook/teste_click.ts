@@ -135,12 +135,15 @@ export async function avaliarCartaoAdicionado(deps: DepsTesteClick, c: { email: 
 }
 
 /**
- * A subscrição cancelada (customer.subscription.deleted) foi o fim de um teste sem cartão? Estava em teste, acabou no
- * fim do teste (com 2 min de folga) e ninguém pediu o cancelamento (cancel_at_period_end / cancel_at). Exclui o
- * cliente que cancelou no teste, o Reject & refund e a repetição cancelada na compra (acabam antes do fim do teste).
+ * A subscrição cancelada (customer.subscription.deleted) foi o fim de um teste sem cartão? Acabou no fim do teste (2 min
+ * antes a 2 h depois) e ninguém pediu o cancelamento (cancel_at_period_end / cancel_at). O Stripe dá sempre o motivo
+ * "cancellation_requested", mesmo no fim natural (visto no Stripe de teste), por isso não serve para distinguir.
+ * O estado anterior na base pode ser 'teste' ou o 'incompleto' passageiro (o Stripe põe a subscrição "active" por
+ * instantes antes de a cancelar). Exclui o cliente que cancelou no teste, o Reject & refund e a repetição cancelada
+ * na compra (acabam antes do fim do teste).
  */
-export function fimDoTesteSemCartao(x: { anterior: string | null | undefined; trialEnd: number | null; endedAt: number | null; cancelAtPeriodEnd: boolean; cancelAt: number | null }): boolean {
-  if (x.anterior !== "teste" || !x.trialEnd || !x.endedAt) return false;
+export function fimDoTesteSemCartao(x: { anterior: string | null; trialEnd: number | null; endedAt: number | null; cancelAtPeriodEnd: boolean; cancelAt: number | null }): boolean {
+  if (!x.anterior || x.anterior === "cancelado" || !x.trialEnd || !x.endedAt) return false;
   if (x.cancelAtPeriodEnd || x.cancelAt) return false;
-  return x.endedAt >= x.trialEnd - 120;
+  return x.endedAt >= x.trialEnd - 120 && x.endedAt <= x.trialEnd + 7200;
 }

@@ -272,7 +272,10 @@ Deno.test("fim do teste sem cartão: só quando estava em teste e acabou no fim 
   const ok = { anterior: "teste", trialEnd: T, endedAt: T + 5, cancelAtPeriodEnd: false, cancelAt: null };
   assertEquals(fimDoTesteSemCartao(ok), true);
   assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: T - 30 }), true);          // poucos segundos antes (relógio)
-  assertEquals(fimDoTesteSemCartao({ ...ok, anterior: "ativo" }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, anterior: "incompleto" }), true);   // "active" passageiro já gravado
+  assertEquals(fimDoTesteSemCartao({ ...ok, anterior: "cancelado" }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, anterior: null }), false);
+  assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: T + 3 * 3600 }), false);    // muito depois do fim do teste
   assertEquals(fimDoTesteSemCartao({ ...ok, endedAt: T - 3 * 86400 }), false);  // cancelado a meio (Reject & refund, repetição)
   assertEquals(fimDoTesteSemCartao({ ...ok, cancelAtPeriodEnd: true }), false); // o cliente cancelou no teste
   assertEquals(fimDoTesteSemCartao({ ...ok, cancelAt: T }), false);

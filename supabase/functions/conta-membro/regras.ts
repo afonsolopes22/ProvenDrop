@@ -37,5 +37,6 @@ export function decidirAdicionarCartao(i: { emTeste: boolean; statusStripe: stri
 export function decidirAssinar(s: { origem: string; estado: string; estado_click: string | null; bloqueado_em: string | null }):
   { ok: true } | { ok: false; erro: "nao_permitido" | "ja_tem_plano" } {
   if (s.origem !== "click" || s.estado_click !== "validado" || s.bloqueado_em) return { ok: false, erro: "nao_permitido" };
-  return s.estado === "cancelado" || s.estado === "incompleto" ? { ok: true } : { ok: false, erro: "ja_tem_plano" };
+  // 'incompleto' ainda tem uma subscrição no Stripe (ex.: a 1.ª cobrança depois do teste falhou): uma nova duplicava-a.
+  return s.estado === "cancelado" ? { ok: true } : { ok: false, erro: "ja_tem_plano" };
 }

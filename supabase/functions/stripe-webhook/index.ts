@@ -70,6 +70,7 @@ import { codigoDeCompra } from "../_shared/codigo.ts";
 import { lojaDaSessao } from "../_shared/loja.ts";
 import { autoValidarClick, type LinhaClick, registarCompraClick as decidirCompraClick } from "./compra_click.ts";
 import { temAcesso as regraAcesso } from "../_shared/acesso.ts";
+import { type Estado, estadoDaSubscricao, faturaPorCobrar, precisaDeFaturas } from "../_shared/estado.ts";
 import { avaliarCartaoAdicionado, avaliarTesteClick, fimDaOferta, fimDoTesteSemCartao, ofertaTerminou, type DepsTesteClick, type TipoDado } from "./teste_click.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
@@ -112,7 +113,6 @@ function horaTexto(): string {
 }
 const HORA = horaTexto();
 
-type Estado = "ativo" | "teste" | "em_atraso" | "incompleto" | "cancelado";
 type EstadoClick = "pendente" | "validado" | "recusado";
 
 interface Subscritor {
@@ -245,20 +245,33 @@ function origemDaSubscricao(sub: Stripe.Subscription): Origem | null {
 // ───────────────────────────────────────────────────────────────────────
 // Estado
 
-function estadoDe(status: Stripe.Subscription.Status): Estado {
-  switch (status) {
-    case "active":
-      return "ativo";
-    case "trialing": // teste grátis do plano Click (0017)
-      return "teste";
-    case "past_due":
-    case "unpaid":
-      return "em_atraso";
-    case "incomplete":
-      return "incompleto";
-    default: // canceled, incomplete_expired, paused
-      return "cancelado";
+/**
+ * Estado da base (_shared/estado.ts). Depois de um teste grátis, "active" só conta com a fatura a seguir ao teste paga
+ * (no Stripe a subscrição fica "active" antes de pagar: sem cartão por instantes, antes de ser cancelada; com cartão
+ * durante a hora em que a fatura fica em rascunho). Com cartão, essa fatura é finalizada e cobrada já, em vez de esperar
+ * pela hora do Stripe: o membro não perde o acesso nesse intervalo. Se a cobrança falhar, fica sem acesso.
+ */
+async function estadoComFaturas(sub: Stripe.Subscription, cliente: Stripe.Customer | null): Promise<Estado> {
+  const agora = Math.floor(Date.now() / 1000);
+  const base = { status: sub.status, trialEnd: sub.trial_end ?? null, agora };
+  if (!precisaDeFaturas(base)) return estadoDaSubscricao({ ...base, faturas: [] });
+  const ler = async () => (await stripe.invoices.list({ subscription: sub.id, limit: 10 })).data
+    .map((f: Stripe.Invoice) => ({ id: f.id ?? "", status: f.status ?? null, total: f.total ?? 0, created: f.created, billing_reason: f.billing_reason ?? null }));
+  let faturas = await ler();
+  const estado = estadoDaSubscricao({ ...base, faturas });
+  const porCobrar = estado === "incompleto" ? faturaPorCobrar({ trialEnd: sub.trial_end ?? null, faturas }) : null;
+  const temCartao = !!sub.default_payment_method || !!cliente?.invoice_settings?.default_payment_method;
+  if (!porCobrar || !temCartao) return estado;
+  try {
+    await stripe.invoices.finalizeInvoice(porCobrar, { auto_advance: true });
+    await stripe.invoices.pay(porCobrar);
+    console.log(`fatura depois do teste cobrada já (${sub.id})`);
+  } catch (e) {
+    // Cartão recusado ou fatura já em processamento: fica sem acesso; o invoice.paid / payment_failed volta a sincronizar.
+    console.warn(`fatura depois do teste ${sub.id}: ${semSegredos((e as Error).message)}`);
   }
+  faturas = await ler();
+  return estadoDaSubscricao({ ...base, faturas });
 }
 
 /**
@@ -283,7 +296,7 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
   let origem: Origem | null = origemHint ?? origemDaSubscricao(sub) ?? (existente.data?.origem as Origem | undefined) ?? null;
   if (!origem) { console.warn(`origem desconhecida na subscrição ${sub.id} (${uid}): registada como "click", sem acesso`); origem = "click"; }
 
-  const estado = estadoDe(sub.status);
+  const estado = await estadoComFaturas(sub, cliente && !cliente.deleted ? cliente as Stripe.Customer : null);
   const emAtrasoDesde = estado === "em_atraso" ? (existente.data?.em_atraso_desde ?? new Date().toISOString()) : null;
   // current_period_end no topo (acacia) ou em items.data[0] (endive): compat.ts
   const fim = fimDoPeriodo(sub);
@@ -330,7 +343,7 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
     resultado.alerta_cancelamento_click = await alertarCancelamentoClick(email);
     // Fim de um teste sem cartão (o Stripe cancela: missing_payment_method = cancel): e-mail ao cliente para começar o plano.
     const fimTeste = fimDoTesteSemCartao({
-      anterior: existente.data?.estado, trialEnd: sub.trial_end ?? null, endedAt: sub.ended_at ?? null,
+      anterior: existente.data?.estado ?? null, trialEnd: sub.trial_end ?? null, endedAt: sub.ended_at ?? null,
       cancelAtPeriodEnd: !!sub.cancel_at_period_end, cancelAt: sub.cancel_at ?? null,
     });
     console.log(`cancelada ${sub.id}: motivo Stripe ${sub.cancellation_details?.reason ?? "—"}, fim do teste sem cartão: ${fimTeste}`);

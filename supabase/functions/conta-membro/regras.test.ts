@@ -45,6 +45,7 @@ Deno.test("começar o plano depois do teste: só cliente Click validado, cancela
   assertEquals(decidirAssinar({ ...base, estado: "ativo" }), { ok: false, erro: "ja_tem_plano" });
   assertEquals(decidirAssinar({ ...base, estado: "teste" }), { ok: false, erro: "ja_tem_plano" });
   assertEquals(decidirAssinar({ ...base, estado: "em_atraso" }), { ok: false, erro: "ja_tem_plano" });
+  assertEquals(decidirAssinar({ ...base, estado: "incompleto" }), { ok: false, erro: "ja_tem_plano" });
   assertEquals(decidirAssinar({ ...base, origem: "direto" }), { ok: false, erro: "nao_permitido" });
   assertEquals(decidirAssinar({ ...base, estado_click: "recusado" }), { ok: false, erro: "nao_permitido" });
   assertEquals(decidirAssinar({ ...base, estado_click: "pendente" }), { ok: false, erro: "nao_permitido" });
