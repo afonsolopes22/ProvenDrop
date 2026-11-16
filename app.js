@@ -647,7 +647,6 @@
     if(!pedirCartao() || !$("#guia").hidden) return;
     let visto = ""; try { visto = localStorage.getItem(POP_KEY) || ""; } catch { /* private mode */ }
     if(visto === hojeLisboa()) return;
-    $("#cartaoPopTitulo").textContent = sub.teste_fim ? `Your free trial ends on ${dia(sub.teste_fim)}` : "Your free trial ends soon";
     $("#cartaoPopTexto").textContent = `Your free trial ends on ${dia(sub.teste_fim) || "soon"}. Add your card to keep your access.`;
     $("#cartaoPop").hidden = false; $("#cartaoPopSim").focus();
   }
