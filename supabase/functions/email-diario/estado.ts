@@ -2,13 +2,23 @@
 
 /**
  * Coleção aprovada: a MESMA regra da área de membros (app.js, `aprovada`): o estado diz "aprovada"
- * OU o veredito é 🟢. A rotina usa quatro estados ("nova", "a observar", "aprovada", "continua a bater");
+ * OU o veredito é 🟢, e nunca uma "nova" (ver situacao). A rotina usa quatro estados ("nova", "a observar", "aprovada", "continua a bater");
  * "nova" e "continua a bater" podem vir com veredito 🟢 ANUNCIAR, e essas coleções aparecem como
  * "Approved" na área. Até 2026-11-10 o e-mail só olhava para o estado e mostrava-as como
  * "under observation" (🟡).
  */
 export function aprovada(estado: string | null | undefined, veredito: string | null | undefined): boolean {
-  return /aprov/i.test(estado ?? "") || /🟢/.test(veredito ?? "");
+  return situacao(estado, veredito) === "aprovada";
+}
+
+/**
+ * 2026-11-17: "nova" (confirmação amanhã) vem antes de tudo, mesmo com veredito 🟢: nunca é "Approved";
+ * na área e no e-mail é "New · confirmation tomorrow", a âmbar, como no WhatsApp. A mesma regra está em app.js.
+ */
+export type Situacao = "aprovada" | "nova" | "observar";
+export function situacao(estado: string | null | undefined, veredito: string | null | undefined): Situacao {
+  if (/^\s*nova\s*$/i.test(estado ?? "")) return "nova";
+  return /aprov/i.test(estado ?? "") || /🟢/.test(veredito ?? "") ? "aprovada" : "observar";
 }
 
 /** Data por extenso em Europe/Lisbon, em inglês: "Tuesday, 11 November". */

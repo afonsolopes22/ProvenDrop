@@ -32,7 +32,13 @@
   const parse = v => { if(!v) return null; const d = new Date(String(v).length === 10 ? v+"T12:00:00" : v); return isNaN(d) ? null : d; };
   const dia = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : ""; };
   const diaCurto = v => { const d = parse(v); return d ? d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}) : ""; };
-  const aprovada = r => /aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"");
+  /* Status of a collection (the same rule as the daily e-mail, email-diario/estado.ts). Since 2026-11-17 "nova"
+     (confirmation tomorrow) comes first, even with a 🟢 verdict: it is never "Approved"; it shows
+     "New · confirmation tomorrow" in amber, like the WhatsApp message. */
+  const situacao = r => /^\s*nova\s*$/i.test(r.estado||"") ? "nova" : (/aprov/i.test(r.estado||"") || /🟢/.test(r.veredito||"")) ? "aprovada" : "observar";
+  const aprovada = r => situacao(r) === "aprovada";
+  const NOVA = "New · confirmation tomorrow";
+  const rotulo = (r, observar) => situacao(r) === "aprovada" ? "Approved" : situacao(r) === "nova" ? NOVA : observar;
   /* Ads per platform (0005). Meta ads = anuncios_meta, or anuncios_ativos − anuncios_google when only the total is known
      (rows published before 2026-11-02 only have anuncios_ativos, which were Meta). Google ads = anuncios_google. */
   const googleAds = r => r.anuncios_google != null ? r.anuncios_google : 0;
@@ -239,7 +245,7 @@
     feed.innerHTML = '<div class="empty">Loading…</div>';
     /* One query serves the latest list, "Earlier this week" and the Library: every sending, newest first
        (PostgREST returns at most 1000 rows, i.e. the most recent ones; enough for many months of lists). */
-    const { data, error } = await sb.from("feed_dia").select("*").order("dia", { ascending: false }).order("ordem");
+    const [{ data, error }] = await Promise.all([sb.from("feed_dia").select("*").order("dia", { ascending: false }).order("ordem"), lerUltimoEnvio()]);
     if(error){ feed.innerHTML = '<div class="empty">The collections could not be loaded right now.</div>'; return false; }
     feedTodos = data || [];
     retiradas = new Set(); { const vistas = new Set(); for(const r of feedTodos){ const k = chave(r); if(vistas.has(k)) continue; vistas.add(k); if(r.retirada === true) retiradas.add(k); } }
@@ -308,15 +314,23 @@
 
   /* Greeting and summary of the list shown (diaLista: its day, "" while there is none). */
   let diaLista = "", filtroHoje = "todas";
+  /* "Today's list" (2026-11-17): the list sent this morning is the PREVIOUS day's list, so "today's" is the list of
+     today's sending (envios_diarios, read through ultimo_envio(), migration 0018), not the one dated today. Before
+     today's sending (or without 0018) it falls back to the old rule: the list dated today. */
+  let ultimoEnvio = null;
+  async function lerUltimoEnvio(){
+    try { const { data, error } = await sb.rpc("ultimo_envio"); ultimoEnvio = !error && data && data.dia ? data : null; } catch { ultimoEnvio = null; }
+  }
+  const listaDeHoje = () => !!diaLista && (ultimoEnvio ? ultimoEnvio.dia === hojeLisboa() && ultimoEnvio.feed_dia === diaLista : diaLista === hojeLisboa());
   function renderTopo(rows){
-    const n = rows.length, ok = rows.filter(aprovada).length, obs = n - ok, kits = rows.filter(temKit).length, deHoje = diaLista === hojeLisboa();
+    const n = rows.length, ok = rows.filter(aprovada).length, nov = rows.filter(r => situacao(r) === "nova").length, obs = n - ok - nov, kits = rows.filter(temKit).length, deHoje = listaDeHoje();
     const col = k => k + (k === 1 ? " collection" : " collections"), e = k => (k === 1 ? "is" : "are");
     $("#hojeData").textContent = diaExtenso(new Date());
     $("#hojeLista").textContent = !diaLista || deHoje ? "Today’s collections" : "Collections for " + dia(diaLista);
     if(!diaLista){ $("#hojeTitulo").textContent = saudacao() + ". No collections yet."; $("#hojeSub").textContent = HORA ? "They arrive every day at " + HORA + "." : ""; return; }
     $("#hojeTitulo").textContent = !deHoje ? saudacao() + ". Today’s list is not in yet." : n ? `${saudacao()}. ${col(n)} ${e(n)} ready.` : saudacao() + ". No collections in today’s list.";
-    const partes = []; if(ok) partes.push(`${ok} ${e(ok)} approved`); if(obs) partes.push(`${obs} ${e(obs)} under observation`);
-    const frases = []; if(partes.length) frases.push(partes.join(" and ") + ".");
+    const partes = []; if(ok) partes.push(`${ok} ${e(ok)} approved`); if(nov) partes.push(`${nov} ${e(nov)} new (confirmation tomorrow)`); if(obs) partes.push(`${obs} ${e(obs)} under observation`);
+    const frases = []; if(partes.length) frases.push((partes.length > 1 ? partes.slice(0, -1).join(", ") + " and " + partes.at(-1) : partes[0]) + ".");
     if(n) frases.push(kits === n ? (n === 1 ? "Its kit is ready to download." : "Every kit is ready to download.") : `${kits} of ${n} kits ${e(kits)} ready to download.`);
     $("#hojeSub").textContent = (deHoje ? "" : `This is the most recent one, from ${dia(diaLista)}: ${col(n)}. `) + frases.join(" ");
   }
@@ -390,7 +404,7 @@
   /* "See all N": N is known once the Library has loaded (it also counts approved collections from before the platform). */
   function renderVerTodos(){ const a = $("#semanaTodos"); if(a) a.textContent = verdes ? `See all ${biblioteca().length} →` : "See all →"; }
   function linhaBib(r){
-    const ok = aprovada(r), mk = String(r.mercado_destaque||"").toUpperCase(), st = ok ? "Approved" : "Observing";
+    const ok = aprovada(r), mk = String(r.mercado_destaque||"").toUpperCase(), st = rotulo(r, "Observing");
     const kit = r.zip_path ? `<button class="lkit" type="button" data-zip="${esc(r.zip_path)}" aria-label="Download the kit of ${esc(titulo(r))}">Kit</button>`
       : kitExterno(r) ? `<a class="lkit" href="${esc(kitExterno(r))}" target="_blank" rel="noopener noreferrer" aria-label="Download the kit of ${esc(titulo(r))}">Kit</a>` : `<span></span>`;
     return `<div class="lrow"${attrC(r)}><span class="lthumb">${iconeNicho(r)}${imagem(r)}</span><span class="min-w-0"><b class="block truncate font-semibold">${esc(titulo(r))}</b><span class="lsub">${st}${mk ? " · " + esc(mk) : ""} · ${score(r.score)}</span></span><span class="mut hide-m">${esc(nicho(r.nicho))}</span><span class="hide-m font-mono text-[12px]"${mk ? ` title="${esc(pais(mk))}"` : ""}>${esc(mk || "—")}</span><b class="hide-m tabular-nums">${score(r.score)}</b><span class="lst hide-m ${ok ? "ok" : "obs"}">${st}</span>${kit}</div>`;
@@ -417,7 +431,7 @@
       : kitExterno(r) ? `<a class="cc-btn bd" href="${esc(kitExterno(r))}" target="_blank" rel="noopener noreferrer" title="Opens the kit link in a new tab">Download kit</a>`
       : `<span class="cc-btn off">Kit being prepared</span>`;
     return `<article class="cc"${attrC(r)}>
-      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${imagem(r)}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${ok ? "Approved" : "Observing"}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
+      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${imagem(r)}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${rotulo(r, "Observing")}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
       <div class="cc-body">
         <div class="cc-title"><h3>${esc(titulo(r))}</h3><span>${esc(nicho(r.nicho))}${mk ? ` · best in ${esc(emPais(mk))}` : ""}</span></div>
         ${blocoPorque(r)}
@@ -516,7 +530,7 @@
       const ainda = r.ainda_a_anunciar === true ? `<span class="sub mt-2 font-semibold !text-ok">Still advertising</span>` : r.ainda_a_anunciar === false ? `<span class="sub mt-2">No longer advertising</span>` : "";
       return `<tr${attrC(r)}>
         <td class="n whitespace-nowrap" data-l="Sent"><span>${esc(diaCurto(r.enviado_em) || "—")}${r.data_aprovacao && r.data_aprovacao !== r.enviado_em ? `<span class="sub">approved ${esc(diaMes(r.data_aprovacao))}</span>` : ""}</span></td>
-        <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${ok ? "Approved" : "Under observation"}</span>${ainda}${chips(r, "mt-2")}</span></td>
+        <td data-l="Status"><span class="block min-w-[140px]"><span class="status ${ok ? "go" : "watch"}">${rotulo(r, "Under observation")}</span>${ainda}${chips(r, "mt-2")}</span></td>
         <td data-l="Collection"><span class="block min-w-[160px] max-w-[240px]">${lk ? `<a class="text-[15px] font-bold leading-snug no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(titulo(r))}</a>` : `<span class="text-[15px] font-bold leading-snug text-ink">${esc(titulo(r))}</span>`}${lk ? `<a class="sub break-all font-medium no-underline hover:underline" href="${esc(lk.href)}" target="_blank" rel="noopener">${esc(lk.texto)}</a>` : `<span class="sub">${esc(r.loja||"")}</span>`}${an ? `<span class="sub">Analysed ${esc(an)}</span>` : ""}${blocoPorque(r, "why-dt")}<span class="mt-2.5 block">${kit}</span></span></td>
         <td data-l="Niche"><span class="block min-w-[112px]"><b class="font-semibold">${esc(nicho(r.nicho))}</b>${mk ? `<span class="sub">strongest in ${esc(pais(mk))}</span>` : ""}</span></td>
         <td class="n md:text-right" data-l="Score"><span class="whitespace-nowrap"><b class="font-extrabold">${score(r.score)}</b>${sc.mk ? `<span class="sub" title="${sc.proprio ? "Score for" : "Approved for"} ${esc(pais(sc.mk))}, the strongest market">${sc.proprio ? `${sc.valor} in ${esc(sc.mk)}` : `for ${esc(sc.mk)}`}</span>` : ""}</span></td>
