@@ -100,7 +100,10 @@
             <a class="btn btn-line" id="semSubscrever" href="./#join">Subscribe</a>
             <!-- Click plan refused (0009): points to the plan anyone can take. -->
             <a class="btn btn-go" id="semPlataforma" href="./#join" hidden>See the ProvenDrop Platform plan</a>
+            <!-- Click client whose free trial ended without a card (or who already had the trial): Checkout WITHOUT a trial (conta-membro). -->
+            <button class="btn btn-go" type="button" id="semPlanoClick" hidden>Start my plan</button>
           </div>
+          <p class="mt-3 text-[13.5px] font-semibold text-brand" id="semMsg" hidden></p>
         </div>
       </section>
 
@@ -125,6 +128,7 @@
           <div class="trial" id="teste" hidden>
             <div class="min-w-0"><p class="trial-t" id="testeTitulo">Free trial</p><p class="trial-s" id="testeTexto"></p></div>
             <div class="trial-acts" id="testeAcoes">
+              <button class="btn btn-go btn-sm" type="button" id="testeCartao" hidden>Add your card</button>
               <button class="btn btn-go btn-sm" type="button" id="testeComecar">Start my plan now</button>
             </div>
             <div class="trial-acts" id="testeConfirmar" hidden>
@@ -233,6 +237,20 @@
 </div>
 
 <!-- first-visit guide -->
+<!-- Free trial without a card, from day 3: once a day, closable (app.js). -->
+<div class="fixed inset-0 z-40 grid place-items-center bg-ink/55 p-4 backdrop-blur-sm" id="cartaoPop" role="dialog" aria-modal="true" aria-labelledby="cartaoPopTitulo" hidden>
+  <div class="card relative w-full max-w-[460px] p-7 pr-14">
+    <button class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-line bg-white text-[14px] font-bold text-ink hover:border-ink-2" type="button" id="cartaoPopFechar" aria-label="Close">✕</button>
+    <p class="font-mono text-[12px] font-medium uppercase tracking-[0.06em] text-brand-dark">Free trial</p>
+    <h2 class="mt-2 text-[clamp(22px,2.6vw,28px)] font-semibold leading-[1.1] tracking-[-0.03em] text-ink" id="cartaoPopTitulo">Keep your access</h2>
+    <p class="mt-3 text-ink-2" id="cartaoPopTexto"></p>
+    <div class="mt-6 flex flex-wrap gap-2.5">
+      <button class="btn btn-go" type="button" id="cartaoPopSim">Add your card</button>
+      <button class="btn btn-line" type="button" id="cartaoPopNao">Not now</button>
+    </div>
+  </div>
+</div>
+
 <div class="fixed inset-0 z-30 grid place-items-center bg-ink/55 p-4 backdrop-blur-sm" id="guia" role="dialog" aria-modal="true" aria-labelledby="guiaTitulo" hidden>
   <div class="card relative max-h-[calc(100dvh-32px)] w-full max-w-[640px] overflow-y-auto p-7 pr-14 md:p-8 md:pr-14">
     <button class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-line bg-white text-[14px] font-bold text-ink hover:border-ink-2" type="button" id="guiaFechar" aria-label="Close the guide">✕</button>

@@ -164,7 +164,7 @@
       `<td data-l="Name"><b>${esc(txt(p.nome))}</b></td>` +
       `<td data-l="Store">${esc(txt(p.loja))}</td>` +
       `<td data-l="Phone" class="n whitespace-nowrap">${esc(txt(p.telefone))}</td>` +
-      `<td data-l="Card" class="n whitespace-nowrap">${p.cartao_ultimos4 ? "•••• " + esc(p.cartao_ultimos4) : "—"}</td>` +
+      `<td data-l="Card" class="n whitespace-nowrap">${p.cartao_ultimos4 ? "•••• " + esc(p.cartao_ultimos4) : "No card"}</td>` +
       `<td data-l="Plan">${plano(p)}</td>` +
       `<td data-l="E-mail"><a href="mailto:${e}">${e}</a></td>` +
       `<td data-l="Code" class="n font-semibold whitespace-nowrap">${esc(txt(p.codigo_compra))}</td>` +

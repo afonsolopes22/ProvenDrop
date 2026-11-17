@@ -24,3 +24,19 @@ export function decidirComecar(i: { emTeste: boolean; statusStripe: string }): {
   if (!i.emTeste) return { ok: false, erro: "nao_em_teste" };
   return i.statusStripe === "trialing" ? { ok: true } : { ok: false, erro: "ja_comecou" };
 }
+
+/** Adicionar cartão (teste sem cartão): as mesmas condições do Start my plan now. */
+export function decidirAdicionarCartao(i: { emTeste: boolean; statusStripe: string }): { ok: true } | { ok: false; erro: "nao_em_teste" | "ja_comecou" } {
+  return decidirComecar(i);
+}
+
+/**
+ * "Start my plan" depois do teste (o teste acabou sem cartão, ou o teste já tinha sido usado): Checkout SEM teste.
+ * Só para quem a Click já validou, sem plano a correr e sem bloqueio (reembolso, disputa).
+ */
+export function decidirAssinar(s: { origem: string; estado: string; estado_click: string | null; bloqueado_em: string | null }):
+  { ok: true } | { ok: false; erro: "nao_permitido" | "ja_tem_plano" } {
+  if (s.origem !== "click" || s.estado_click !== "validado" || s.bloqueado_em) return { ok: false, erro: "nao_permitido" };
+  // 'incompleto' ainda tem uma subscrição no Stripe (ex.: a 1.ª cobrança depois do teste falhou): uma nova duplicava-a.
+  return s.estado === "cancelado" ? { ok: true } : { ok: false, erro: "ja_tem_plano" };
+}

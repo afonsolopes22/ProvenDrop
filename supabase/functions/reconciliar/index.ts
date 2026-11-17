@@ -14,6 +14,7 @@ import Stripe from "npm:stripe@17.7.0";
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
+import { type Estado, estadoDaSubscricao, precisaDeFaturas } from "../_shared/estado.ts";
 import { alertar } from "../_shared/alerta.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
@@ -28,17 +29,6 @@ const TOLERANCIA_DIAS = 7;
 const json = (b: unknown, status = 200) =>
   new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 
-type Estado = "ativo" | "teste" | "em_atraso" | "incompleto" | "cancelado";
-function estadoDe(status: Stripe.Subscription.Status): Estado {
-  switch (status) {
-    case "active": return "ativo";
-    case "trialing": return "teste"; // teste grátis do plano Click (0017)
-    case "past_due": case "unpaid": return "em_atraso";
-    case "incomplete": return "incompleto";
-    default: return "cancelado";
-  }
-}
-
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
   if (!(await cronSecretOk(req))) return json({ erro: "não autorizado" }, 401);
@@ -48,7 +38,12 @@ Deno.serve(async (req) => {
     const noStripe = new Map<string, { estado: Estado; customer: string; status: string }>();
     for await (const sub of stripe.subscriptions.list({ status: "all", limit: 100, expand: ["data.customer"] })) {
       if (sub.status === "incomplete_expired") continue;
-      noStripe.set(sub.id, { estado: estadoDe(sub.status), customer: typeof sub.customer === "string" ? sub.customer : sub.customer.id, status: sub.status });
+      // A mesma regra do stripe-webhook (_shared/estado.ts): depois de um teste, "active" sem fatura paga = incompleto.
+      const agora = Math.floor(Date.now() / 1000), base = { status: sub.status, trialEnd: sub.trial_end ?? null, agora };
+      const faturas = precisaDeFaturas(base)
+        ? (await stripe.invoices.list({ subscription: sub.id, limit: 10 })).data.map((f: Stripe.Invoice) => ({ status: f.status ?? null, total: f.total ?? 0, created: f.created, billing_reason: f.billing_reason ?? null }))
+        : [];
+      noStripe.set(sub.id, { estado: estadoDaSubscricao({ ...base, faturas }), customer: typeof sub.customer === "string" ? sub.customer : sub.customer.id, status: sub.status });
     }
 
     // 2. Base: subscricoes e subscritores.

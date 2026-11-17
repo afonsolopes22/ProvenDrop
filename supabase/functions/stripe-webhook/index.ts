@@ -62,7 +62,7 @@
 
 import Stripe from "npm:stripe@17.7.0";
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
-import { enviarEmail, esc, molde, moldeBoasVindasClick } from "../_shared/email.ts";
+import { enviarEmail, esc, molde, moldeBoasVindasClick, moldeFimTesteClick, moldeTesteUsadoClick } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { idEmail, semSegredos } from "../_shared/log.ts";
 import { alertar } from "../_shared/alerta.ts";
@@ -70,7 +70,8 @@ import { codigoDeCompra } from "../_shared/codigo.ts";
 import { lojaDaSessao } from "../_shared/loja.ts";
 import { autoValidarClick, type LinhaClick, registarCompraClick as decidirCompraClick } from "./compra_click.ts";
 import { temAcesso as regraAcesso } from "../_shared/acesso.ts";
-import { avaliarTesteClick, fimDaOferta, ofertaTerminou, type TipoDado } from "./teste_click.ts";
+import { type Estado, estadoDaSubscricao, faturaPorCobrar, precisaDeFaturas } from "../_shared/estado.ts";
+import { avaliarCartaoAdicionado, avaliarTesteClick, fimDaOferta, fimDoTesteSemCartao, ofertaTerminou, type DepsTesteClick, type TipoDado } from "./teste_click.ts";
 import {
   chargeDe, clienteDe, fimDoPeriodo, motivoBloqueio, origemDaSessao as origemCompat, origemDaSubscricao as origemSubCompat,
   prazoDaDisputa, precosDasLinhas, reembolsoTotal, subscricaoDaInvoice, valorTexto, type Origem,
@@ -90,6 +91,10 @@ const LINK_DIRETO = Deno.env.get("STRIPE_PAYMENT_LINK_DIRETO") ?? "";
 const PRICE_DIRETO = Deno.env.get("STRIPE_PRICE_DIRETO") ?? "";
 const PRICE_CLICK = Deno.env.get("STRIPE_PRICE_CLICK") ?? "";
 const MINUTOS = Deno.env.get("MAGIC_LINK_MINUTOS") ?? "60";
+/** Mensalidade Click nos e-mails (igual a PRICE_MONTHLY em config.js). */
+const PRECO_CLICK = "15";
+/** Área de membros com "Start my plan" (Checkout sem teste, conta-membro). */
+const URL_COMECAR_PLANO = `${APP_URL}${APP_URL.includes("?") ? "&" : "?"}plano=click`;
 const ACEITA_TESTE = (Deno.env.get("STRIPE_ACCEPT_TEST") ?? "") === "1";
 const EM_CURSO_MIN = 5;          // A2: janela em que um evento repetido recebe 503
 const RESERVA_MIN = 10;          // A3: nova tentativa de boas-vindas só passados 10 min
@@ -108,7 +113,6 @@ function horaTexto(): string {
 }
 const HORA = horaTexto();
 
-type Estado = "ativo" | "teste" | "em_atraso" | "incompleto" | "cancelado";
 type EstadoClick = "pendente" | "validado" | "recusado";
 
 interface Subscritor {
@@ -241,20 +245,33 @@ function origemDaSubscricao(sub: Stripe.Subscription): Origem | null {
 // ───────────────────────────────────────────────────────────────────────
 // Estado
 
-function estadoDe(status: Stripe.Subscription.Status): Estado {
-  switch (status) {
-    case "active":
-      return "ativo";
-    case "trialing": // teste grátis do plano Click (0017)
-      return "teste";
-    case "past_due":
-    case "unpaid":
-      return "em_atraso";
-    case "incomplete":
-      return "incompleto";
-    default: // canceled, incomplete_expired, paused
-      return "cancelado";
+/**
+ * Estado da base (_shared/estado.ts). Depois de um teste grátis, "active" só conta com a fatura a seguir ao teste paga
+ * (no Stripe a subscrição fica "active" antes de pagar: sem cartão por instantes, antes de ser cancelada; com cartão
+ * durante a hora em que a fatura fica em rascunho). Com cartão, essa fatura é finalizada e cobrada já, em vez de esperar
+ * pela hora do Stripe: o membro não perde o acesso nesse intervalo. Se a cobrança falhar, fica sem acesso.
+ */
+async function estadoComFaturas(sub: Stripe.Subscription, cliente: Stripe.Customer | null): Promise<Estado> {
+  const agora = Math.floor(Date.now() / 1000);
+  const base = { status: sub.status, trialEnd: sub.trial_end ?? null, agora };
+  if (!precisaDeFaturas(base)) return estadoDaSubscricao({ ...base, faturas: [] });
+  const ler = async () => (await stripe.invoices.list({ subscription: sub.id, limit: 10 })).data
+    .map((f: Stripe.Invoice) => ({ id: f.id ?? "", status: f.status ?? null, total: f.total ?? 0, created: f.created, billing_reason: f.billing_reason ?? null }));
+  let faturas = await ler();
+  const estado = estadoDaSubscricao({ ...base, faturas });
+  const porCobrar = estado === "incompleto" ? faturaPorCobrar({ trialEnd: sub.trial_end ?? null, faturas }) : null;
+  const temCartao = !!sub.default_payment_method || !!cliente?.invoice_settings?.default_payment_method;
+  if (!porCobrar || !temCartao) return estado;
+  try {
+    await stripe.invoices.finalizeInvoice(porCobrar, { auto_advance: true });
+    await stripe.invoices.pay(porCobrar);
+    console.log(`fatura depois do teste cobrada já (${sub.id})`);
+  } catch (e) {
+    // Cartão recusado ou fatura já em processamento: fica sem acesso; o invoice.paid / payment_failed volta a sincronizar.
+    console.warn(`fatura depois do teste ${sub.id}: ${semSegredos((e as Error).message)}`);
   }
+  faturas = await ler();
+  return estadoDaSubscricao({ ...base, faturas });
 }
 
 /**
@@ -279,7 +296,7 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
   let origem: Origem | null = origemHint ?? origemDaSubscricao(sub) ?? (existente.data?.origem as Origem | undefined) ?? null;
   if (!origem) { console.warn(`origem desconhecida na subscrição ${sub.id} (${uid}): registada como "click", sem acesso`); origem = "click"; }
 
-  const estado = estadoDe(sub.status);
+  const estado = await estadoComFaturas(sub, cliente && !cliente.deleted ? cliente as Stripe.Customer : null);
   const emAtrasoDesde = estado === "em_atraso" ? (existente.data?.em_atraso_desde ?? new Date().toISOString()) : null;
   // current_period_end no topo (acacia) ou em items.data[0] (endive): compat.ts
   const fim = fimDoPeriodo(sub);
@@ -324,6 +341,13 @@ async function sincronizarSubscricao(subId: string, origemHint: Origem | null, n
   // que a encontre cancelada): o Afonso avisa a Click para tirar a pessoa do grupo. Direto: nada.
   if (origem === "click" && estado === "cancelado" && existente.data?.estado !== "cancelado") {
     resultado.alerta_cancelamento_click = await alertarCancelamentoClick(email);
+    // Fim de um teste sem cartão (o Stripe cancela: missing_payment_method = cancel): e-mail ao cliente para começar o plano.
+    const fimTeste = fimDoTesteSemCartao({
+      anterior: existente.data?.estado ?? null, trialEnd: sub.trial_end ?? null, endedAt: sub.ended_at ?? null,
+      cancelAtPeriodEnd: !!sub.cancel_at_period_end, cancelAt: sub.cancel_at ?? null,
+    });
+    console.log(`cancelada ${sub.id}: motivo Stripe ${sub.cancellation_details?.reason ?? "—"}, fim do teste sem cartão: ${fimTeste}`);
+    if (fimTeste) resultado.fim_teste_email = await emailCliente(email, moldeFimTesteClick(URL_COMECAR_PLANO, PRECO_CLICK));
   }
 
   // Sem acesso (Click pendente/recusado, incompleto, cancelado, bloqueado): nem login nem e-mail.
@@ -358,6 +382,8 @@ async function alertarCancelamentoClick(email: string): Promise<boolean> {
 }
 
 async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
+  // Cartão adicionado a meio de um teste sem cartão (conta-membro, acao adicionar_cartao): Checkout em modo setup.
+  if (s.mode === "setup") return await aoAdicionarCartao(s);
   if (s.payment_status !== "paid" && s.payment_status !== "no_payment_required") return { ignorado: `payment_status=${s.payment_status}` };
   const subId = typeof s.subscription === "string" ? s.subscription : s.subscription?.id ?? null;
   if (!subId) { console.warn(`sessão ${s.id} sem subscrição: ignorada`); return { ignorado: "sem subscrição" }; }
@@ -367,6 +393,18 @@ async function aoCompletarCheckout(s: Stripe.Checkout.Session): Promise<Record<s
   // A origem da sessão (metadata do Payment Link) é o sinal mais fiável.
   const resultado = await sincronizarSubscricao(subId, await origemDaSessao(s), true);
   if (desbloqueado) resultado.desbloqueado = true;
+  if (resultado.origem === "click" && s.metadata?.pd_acao === "assinar_click") {
+    // Plano começado na área de membros depois do teste (conta-membro, acao assinar_click): sem teste, com cartão.
+    // A pessoa já é cliente Click validado: não há novo código de compra nem nova validação.
+    const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
+    const q = await admin.from("subscritores").select("nome,telefone,loja,codigo_compra").eq("email", email).maybeSingle();
+    const d = (q.data ?? {}) as { nome?: string | null; telefone?: string | null; loja?: string | null; codigo_compra?: string | null };
+    resultado.click = { plano_depois_do_teste: true, email_enviado: await alertar(`Click plan started after the free trial · ${d.codigo_compra ?? "—"}`, [
+      `Name: ${d.nome ?? "—"}`, `Phone: ${d.telefone ?? "—"}`, `Store: ${d.loja ?? "—"}`, `E-mail: ${email}`,
+      "The first month was paid. Tell Click to add them back to the WhatsApp group.",
+    ]) };
+    return resultado;
+  }
   if (resultado.origem === "click") {
     // Teste grátis (0017): um teste por pessoa, nenhum com cartão pré-pago. Corre antes da validação, para o
     // alerta e o e-mail de acesso já saberem se houve teste e se a cobrança falhou.
@@ -408,12 +446,13 @@ async function registarCompraClick(s: Stripe.Checkout.Session, nota: string[] = 
   }, { email, codigo: await codigoDeCompra(s.id), telefone: (s.customer_details?.phone ?? "").trim() || null, nome: (s.customer_details?.name ?? "").trim() || null, loja: lojaDaSessao(s), sessao: s.id, nota });
 }
 
-type ResultadoTeste = { teste: boolean; motivo: string | null; cobrado: boolean | null; ultimos4: string | null };
+type ResultadoTeste = { teste: boolean; motivo: string | null; cobrado: boolean | null; semCartao: boolean; ultimos4: string | null };
 
 /** Linhas do alerta sobre o teste grátis. */
 function notaTeste(t: ResultadoTeste): string[] {
-  if (t.teste) return [`Free trial: yes (5 days). Card ending ${t.ultimos4 ?? "—"}.`];
+  if (t.teste) return [t.semCartao ? "Free trial: yes (5 days), no card yet." : `Free trial: yes (5 days). Card ending ${t.ultimos4 ?? "—"}.`];
   if (t.cobrado === null) return [];
+  if (t.semCartao) return [`Free trial: NO (${t.motivo}). No card: subscription cancelled, nothing charged, no access; the customer was e-mailed.`];
   return [`Free trial: NO (${t.motivo}). ${t.cobrado ? "The first month was charged right away." : "The charge failed: subscription cancelled, no access."} Card ending ${t.ultimos4 ?? "—"}.`];
 }
 
@@ -433,11 +472,9 @@ async function cartaoDaSubscricao(sub: Stripe.Subscription): Promise<{ fingerpri
  * se a cobrança falha, a subscrição é cancelada). O mesmo se a subscrição foi criada depois do fim da oferta
  * (CLICK_TRIAL_ATE): quem já está em teste não é tocado, porque isto só corre na compra (checkout.session.completed).
  */
-async function avaliarTesteDaCompra(s: Stripe.Checkout.Session, subId: string): Promise<ResultadoTeste> {
-  const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
-  const sub = await stripe.subscriptions.retrieve(subId, { expand: ["default_payment_method"] });
-  const cartao = await cartaoDaSubscricao(sub);
-  const r = await avaliarTesteClick({
+/** Ligações de teste_click.ts à base, ao Stripe e ao e-mail. */
+function depsTeste(): DepsTesteClick {
+  return {
     reclamar: async (valores, e, subscricao) => {
       const ins = await admin.from("testes_click_usados")
         .upsert(valores.map((v) => ({ ...v, email: e, stripe_subscription_id: subscricao })), { onConflict: "tipo,valor", ignoreDuplicates: true });
@@ -452,7 +489,59 @@ async function avaliarTesteDaCompra(s: Stripe.Checkout.Session, subId: string): 
     cancelar: async (id) => { await stripe.subscriptions.cancel(id); },
     guardar: async (e, d) => { const u = await admin.from("subscritores").update(d).eq("email", e); if (u.error) throw u.error; },
     alertar,
-  }, { email, sub: subId, codigo: await codigoDeCompra(s.id), emTeste: sub.status === "trialing", ofertaTerminou: ofertaTerminou(sub.created * 1000, CLICK_TRIAL_ATE), telefone: s.customer_details?.phone ?? null, loja: lojaDaSessao(s), cartao });
+    avisarTesteUsado: (e) => emailCliente(e, moldeTesteUsadoClick(URL_COMECAR_PLANO, PRECO_CLICK)),
+  };
+}
+
+/** E-mail a um cliente; um erro do Resend não falha o evento (fica no log). */
+async function emailCliente(email: string, m: { subject: string; html: string; text: string }): Promise<boolean> {
+  try { await enviarEmail({ to: email, ...m }); return true; } catch (e) {
+    console.error(`e-mail "${m.subject}" para ${await idEmail(email)} falhou: ${semSegredos((e as Error).message)}`);
+    return false;
+  }
+}
+
+/**
+ * Cartão adicionado num Checkout em modo setup (conta-membro, acao adicionar_cartao; metadata pd_acao = cartao e
+ * subscricao). Passa a ser o cartão por omissão do cliente e da subscrição, para o Stripe cobrar no fim do teste
+ * (sem isto, missing_payment_method = cancel cancelava na mesma), e aplica-lhe as regras do cartão (teste_click.ts).
+ */
+async function aoAdicionarCartao(s: Stripe.Checkout.Session): Promise<Record<string, unknown>> {
+  if (s.metadata?.pd_acao !== "cartao" || !s.metadata?.subscricao) return { ignorado: "setup sem pd_acao=cartao" };
+  if (s.status !== "complete") return { ignorado: `setup ${s.status}` };
+  const siId = typeof s.setup_intent === "string" ? s.setup_intent : s.setup_intent?.id;
+  if (!siId) return { ignorado: "setup sem setup_intent" };
+  const si = await stripe.setupIntents.retrieve(siId, { expand: ["payment_method"] });
+  const pm = si.payment_method && typeof si.payment_method !== "string" ? si.payment_method : null;
+  if (!pm?.card) return { ignorado: "setup sem cartão" };
+  const sub = await stripe.subscriptions.retrieve(s.metadata.subscricao);
+  const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+  const cliente = typeof s.customer === "string" ? s.customer : s.customer?.id;
+  if (customer !== cliente) throw new Error(`setup ${s.id}: cliente diferente do da subscrição`);
+  await stripe.customers.update(customer, { invoice_settings: { default_payment_method: pm.id } });
+  await stripe.subscriptions.update(sub.id, { default_payment_method: pm.id });
+  const linha = await admin.from("subscricoes").select("email").eq("stripe_subscription_id", sub.id).maybeSingle();
+  if (linha.error) throw linha.error;
+  const email = linha.data?.email ?? "";
+  if (!email) return { ignorado: "subscrição desconhecida" };
+  const cod = await admin.from("subscritores").select("codigo_compra").eq("email", email).maybeSingle();
+  const cartao = { fingerprint: pm.card.fingerprint ?? null, funding: pm.card.funding ?? null, last4: pm.card.last4 ?? null };
+  let r: Record<string, unknown>;
+  if (sub.status === "trialing") {
+    r = await avaliarCartaoAdicionado(depsTeste(), { email, sub: sub.id, codigo: cod.data?.codigo_compra ?? "—", cartao });
+  } else {
+    await depsTeste().guardar(email, { cartao_ultimos4: cartao.last4, cartao_impressao: cartao.fingerprint, cartao_tipo: cartao.funding });
+    r = { teste: false, motivo: null, cobrado: null };
+  }
+  const resultado = await sincronizarSubscricao(sub.id, "click", false);
+  return { ...resultado, cartao: { ...r, ultimos4: cartao.last4 } };
+}
+
+async function avaliarTesteDaCompra(s: Stripe.Checkout.Session, subId: string): Promise<ResultadoTeste> {
+  const email = (s.customer_details?.email ?? s.customer_email ?? "").trim().toLowerCase();
+  const sub = await stripe.subscriptions.retrieve(subId, { expand: ["default_payment_method"] });
+  const cartao = await cartaoDaSubscricao(sub);
+  const r = await avaliarTesteClick(depsTeste(), { email, sub: subId, codigo: await codigoDeCompra(s.id), emTeste: sub.status === "trialing", ofertaTerminou: ofertaTerminou(sub.created * 1000, CLICK_TRIAL_ATE), telefone: s.customer_details?.phone ?? null, loja: lojaDaSessao(s), cartao });
   return { ...r, ultimos4: cartao?.last4 ?? null };
 }
 

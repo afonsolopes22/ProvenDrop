@@ -275,6 +275,9 @@
   /* free trial strip (Click plan): days left and "Start my plan now" */
   .trial { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-top: 16px; border-radius: 16px; border: 1px solid #CFE0CC; background: var(--color-brand-soft); padding: 14px 18px; }
   .trial[hidden] { display: none; }
+  /* Free trial without a card, 3 days or fewer left: the strip asks for the card. */
+  .trial.trial-alerta { border-color: #E3B341; background: #FFF7E0; }
+  .trial.trial-alerta .trial-t { color: #7A5300; }
   .trial-t { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-brand); }
   .trial-s { margin-top: 2px; max-width: 70ch; font-size: 13.5px; line-height: 1.45; color: var(--color-ink-2); }
   .trial-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
