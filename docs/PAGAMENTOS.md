@@ -86,7 +86,8 @@ Ficheiro por omissão: `supabase/functions/stripe-webhook/index.ts`.
 
 | Status Stripe | Estado | Avaliação |
 |---|---|---|
-| active, trialing | ativo | ✅ |
+| active | ativo | ✅ |
+| trialing | teste (0017) | só subscrições Click com teste grátis, criadas até 20/11/2026; o link Click deixou de ter teste a 2026-11-26 (docs/STRIPE.md), por isso as compras novas entram `ativo` |
 | past_due | em_atraso | tolerância de 7 dias (decisão) |
 | unpaid | em_atraso | ✅ |
 | incomplete | incompleto | sem boas-vindas, texto próprio (M3) |

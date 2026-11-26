@@ -33,6 +33,19 @@ Categoria fiscal dos três produtos: General – Services (`txcd_20030000`). Str
 - **Webhook** `provendrop-supabase` a entregar e a processar eventos (confirmado em `stripe_eventos`); segredos `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_DIRETO`, `STRIPE_PRICE_CLICK`, `APP_URL`, `ADMIN_EMAIL` definidos. **`ALERT_EMAIL` ainda por definir** (sem ele, e sem `EMAIL_REPLY_TO`, os alertas de compra Click, cancelamento, disputa e reembolso não têm destinatário).
 - Portal de cliente: `https://billing.stripe.com/p/login/7sYaEYd3Rcmid5w6nA4gg00` (`config.js` → `STRIPE_PORTAL_LINK`).
 
+## Alteração de 2026-11-26: o link Click deixou de ter teste grátis
+
+- **O quê:** o Afonso retirou o teste grátis de 5 dias do Payment Link via Click (`plink_1UYanHJPREpzETp6ixc4JBF0`, `https://buy.stripe.com/9B6eVe5BpgCyfdEaDQ4gg01`). O link mantém-se e `STRIPE_LINK_CLICK` não muda.
+- **Agora:** `subscription_data.trial_period_days` vazio. O cliente paga 15 €/mês logo no checkout e o cartão é sempre pedido. `payment_method_collection` ficou `if_required`, mas sem teste há sempre um valor a pagar, por isso o Stripe pede o cartão.
+- **Verificado pela API (modo real) a 2026-11-26:** nenhuma subscrição em `trialing`. Na base não há linhas em `teste`.
+- **Histórico:** o teste esteve ligado de 2026-11-14 até à promoção acabar (compras até 20/11 às 23:59, Lisboa). Era um teste com cartão, com anti-abuso: um teste por cartão, telefone e loja; cartão pré-pago sem teste.
+- **Código:**
+  - o site (`index.html`, `config.js`), os termos e a privacidade deixaram de falar do teste;
+  - na área de membros, a faixa do teste só aparece a uma subscrição ainda em teste (hoje nenhuma);
+  - o `stripe-webhook` mantém a lógica do teste para uma eventual subscrição em `trialing`. Numa compra sem teste guarda só os últimos 4 dígitos e o tipo do cartão (deixou de guardar a impressão do cartão, o telefone e a loja normalizados).
+  - O segredo `CLICK_TRIAL_ATE` só é usado com subscrições em `trialing`.
+- **PR 34 (teste sem cartão):** nunca foi integrado nem publicado, e ficou sem efeito.
+
 ## a) Payment Link Direct: confirmar
 
 **Links de pagamento** (Payment Links) → abre o link `7sYaEY…`:
@@ -95,7 +108,7 @@ O estado **nunca** é copiado do evento: em todos os casos a função relê a su
 | Evento | Efeito |
 |---|---|
 | `checkout.session.completed` (pago) | Sincroniza a subscrição da sessão. Origem: metadata do link → price_id → payment link. Alerta se o e-mail ficar com duas subscrições a cobrar. |
-| `customer.subscription.created` / `updated` / `deleted` | Sincroniza: `ativo` (active/trialing), `em_atraso` (past_due/unpaid; guarda `em_atraso_desde`), `incompleto` (incomplete: sem login nem e-mail), `cancelado` (canceled/paused/incomplete_expired). `cancel_at_period_end` → `acesso_fim` (B4). |
+| `customer.subscription.created` / `updated` / `deleted` | Sincroniza: `ativo` (active), `teste` (trialing: teste grátis Click, só subscrições até 20/11/2026), `em_atraso` (past_due/unpaid; guarda `em_atraso_desde`), `incompleto` (incomplete: sem login nem e-mail), `cancelado` (canceled/paused/incomplete_expired). `cancel_at_period_end` → `acesso_fim` (B4). |
 | `invoice.paid` / `invoice.payment_failed` | Sincroniza a subscrição da fatura (relida no Stripe). |
 | `charge.dispute.created` | Marca todos os subscritores desse cliente (`bloqueado_em`, `bloqueado_motivo = "disputa dp_…"`), o que revoga o acesso (`tem_acesso` → false), e envia alerta com o prazo de resposta (A4). |
 | `charge.refunded` | **Total** (`amount_refunded ≥ amount`): marca o subscritor (`bloqueado_motivo = "reembolso ch_…"`) e revoga o acesso, alerta a pedir o cancelamento da subscrição no Stripe. **Parcial**: só alerta (A4, 2026-11-06). |
