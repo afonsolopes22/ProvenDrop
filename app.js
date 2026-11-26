@@ -196,7 +196,7 @@
     else if(ehClick(sub) && sub.estado_click === "pendente" && (sub.estado === "ativo" || sub.estado === "em_atraso")){ t.textContent = "Your Click access is being confirmed"; p.textContent = "Usually the same day. You'll get an e-mail as soon as Click confirms you're a client."; s.hidden = true; }
     else if(sub.estado === "incompleto"){ t.textContent = "Payment not completed"; p.textContent = "Your payment was started but not completed (for example, the bank confirmation was not finished). Nothing was charged yet. Subscribe again to complete it."; }
     else if(sub.estado === "em_atraso"){ t.textContent = "Payment overdue"; p.textContent = "The last payment failed and the " + TOLERANCIA_DIAS + "-day grace period is over. Update your card in “Manage subscription” and your access comes back as soon as the payment goes through."; }
-    else if(sub.estado === "cancelado"){ t.textContent = "Subscription cancelled"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription was cancelled. You can come back whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription was cancelled. You can subscribe again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
+    else if(sub.estado === "cancelado"){ t.textContent = "Subscription ended"; const volta = !!(LINK_RETURN && sub.boas_vindas_em); p.textContent = volta ? "Your subscription has ended. Start your ProvenDrop plan again whenever you want: as a former member you only pay the monthly fee, not the joining fee again." : "Your subscription has ended. Start your ProvenDrop plan again whenever you want."; if(volta){ r.href = LINK_RETURN; r.hidden = false; s.hidden = true; } }
     else { t.textContent = "No access to the member area"; p.textContent = "This account is not linked to an active ProvenDrop subscription right now. If you have just paid, wait a minute and reload the page."; }
     g.hidden = !portal; if(PORTAL) g.href = PORTAL;
     show("vSemAcesso");
@@ -577,6 +577,8 @@
   $("#hojePrefsFechar").addEventListener("click", () => { try { localStorage.setItem(DICA_KEY, "1"); } catch { /* private mode */ } $("#hojePrefs").hidden = true; });
 
   /* ── free trial (Click plan, 0017) ─────────────────────────────────── */
+  /* Since 2026-11-26 the Click payment link has no free trial: new members arrive "ativo". This part only runs for a
+     subscription still in trial (estado "teste"), so it stays for those; nobody else ever sees the strip or the notice. */
   /* In trial the database serves only the latest list and no Library (RLS), and kits come from conta-membro (one a day).
      The strip shows the days left and "Start my plan now", which ends the trial and charges the first month at once. */
   const emTeste = () => sub?.estado === "teste";
