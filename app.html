@@ -195,6 +195,8 @@
               <label class="check min-h-11"><input type="checkbox" id="fAtivas"> Only still advertising</label>
               <label class="check min-h-11" id="fTodosWrap" title="Also show the collections outside your niches"><input type="checkbox" id="fTodos"> Show all</label>
             </div>
+            <!-- Phones: the table header is hidden (cards), so the sort order is chosen here (app.js, ordem da Library). -->
+            <div class="mt-4 md:hidden"><label class="mb-1.5 block font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2" for="fOrdem">Sort by</label><select class="field" id="fOrdem"><option value="">Default (your niches first)</option><option value="sent:desc">Sent · newest first</option><option value="sent:asc">Sent · oldest first</option><option value="status:desc">Status · approved first</option><option value="status:asc">Status · approved last</option><option value="collection:asc">Collection · A to Z</option><option value="collection:desc">Collection · Z to A</option><option value="niche:asc">Niche · A to Z</option><option value="niche:desc">Niche · Z to A</option><option value="score:desc">Score · highest first</option><option value="score:asc">Score · lowest first</option><option value="ads:desc">Ads · most first</option><option value="ads:asc">Ads · fewest first</option><option value="reach:desc">Reach · highest first</option><option value="reach:asc">Reach · lowest first</option><option value="days:desc">Days · most first</option><option value="days:asc">Days · fewest first</option></select></div>
             <div class="mt-5 md:overflow-x-auto" id="arqBox"></div>
           </div>
         </div>
