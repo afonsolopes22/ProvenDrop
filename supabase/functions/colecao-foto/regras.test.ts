@@ -15,6 +15,8 @@ Deno.test("id_curto: seis caracteres sem 0/O/1/I", () => {
 
 Deno.test("só fotos do bucket público fotos deste projeto", () => {
   assertEquals(caminhoDaFoto(`${SB}/storage/v1/object/public/fotos/2026-11-27/H6RCRL.jpg`, SB), "2026-11-27/H6RCRL.jpg");
+  // 2026-11-28: nome com token aleatório (publicar_plataforma.py e scripts/migrar_fotos_token.py)
+  assertEquals(caminhoDaFoto(`${SB}/storage/v1/object/public/fotos/2026-11-27/H6RCRL-0123456789abcdef0123456789abcdef.jpg`, SB), "2026-11-27/H6RCRL-0123456789abcdef0123456789abcdef.jpg");
   assertEquals(caminhoDaFoto(`${SB}/storage/v1/object/public/kits/2026-11-27/H6RCRL.zip`, SB), null);
   assertEquals(caminhoDaFoto("https://evil.example.com/storage/v1/object/public/fotos/x.jpg", SB), null);
   assertEquals(caminhoDaFoto(`${SB}/storage/v1/object/public/fotos/../kits/x.zip`, SB), null);
