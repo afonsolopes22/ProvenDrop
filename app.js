@@ -303,18 +303,22 @@
       $("#prevTexto").textContent = disponivel
         ? "Members see the store, the collection link and a ready-to-launch kit for every collection in the daily list."
         : "Collections leave the list when they stop working. Members get new ones every morning, each with the store and a ready-to-launch kit.";
-      $("#prevCartao").innerHTML = disponivel ? cartaoPublico(Object.assign({}, r, { colecao: r.titulo || "" })) : "";
+      $("#prevCartao").innerHTML = disponivel ? cartaoPublico(r) : "";
       show("vPreview");
       window.pdTrack("colecao_preview_vista", { id_curto: c, disponivel });
     })();
     return previewEmCurso;
   }
-  /* The member card without the kit and the store button; the heading is the cleaned title, or the niche. */
+  /* The member card without the kit and the store button. The heading is the product type (from the "Why it's working"
+     sentence) or the niche: the exact collection title is for members only. The photo is a 32×24 thumbnail from the
+     colecao-foto Edge Function, blown up with a strong blur; the original's address never reaches the page. */
+  const FN_FOTO = SB_URL.replace(/\/+$/, "") + "/functions/v1/colecao-foto?c=";
   function cartaoPublico(r){
     const ok = aprovada(r), mk = String(r.mercado_destaque||"").toUpperCase(), [adsL, adsV, adsT] = kpiAds(r);
-    const t = String(r.colecao || "").trim() ? titulo(r) : nicho(r.nicho);
+    const t = String(r.tipo || "").trim() || nicho(r.nicho);
+    const foto = r.tem_foto && C_RE.test(String(r.id_curto || "")) ? `<span class="prev-recorte"><img class="prev-blur" src="${FN_FOTO + esc(r.id_curto)}" alt="" decoding="async" data-foto></span><span class="prev-selo">Members see the full photo</span>` : "";
     return `<article class="cc">
-      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${imagem(r)}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${rotulo(r, "Under observation")}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
+      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${foto}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${rotulo(r, "Under observation")}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
       <div class="cc-body">
         <div class="cc-title"><h3>${esc(t)}</h3><span>${esc(nicho(r.nicho))}${mk ? ` · best in ${esc(emPais(mk))}` : ""}</span></div>
         ${blocoPorque(r)}

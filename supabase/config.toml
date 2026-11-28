@@ -29,3 +29,6 @@ verify_jwt = false
 # (para a mensagem de WhatsApp), a partir do ?session_id=, validado no Stripe; nunca e-mail, nome ou telefone.
 [functions.loja-click]
 verify_jwt = false
+
+[functions.colecao-foto]
+verify_jwt = false
