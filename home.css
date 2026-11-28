@@ -285,13 +285,9 @@ a:hover{color:#0A1C12}
 .plan-name{margin:0;font-weight:600;font-size:28px;letter-spacing:-.03em}
 .price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .price-sub-d{color:#BFD7C4}
-.plan-trial{margin:-6px 0 0;font-size:15px;font-weight:600;color:#D4F57A}
 .plan-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;color:#3A5444}
 .plan-list-d{color:#DCEBD8}
 .plan-btn{justify-content:center;margin-top:6px}
-.trial-tag{align-self:center;border:1px solid #BFD7C4;color:#F1F7EE;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;font-family:"Geist Mono",monospace;letter-spacing:.04em;white-space:nowrap}
-.hero-trial{margin:12px 0 0;font-size:14px;color:#3D5A45}
-.hero-trial a{color:#12301F;font-weight:600;text-underline-offset:3px}
 .plans-notes{display:flex;flex-direction:column;gap:10px}
 .plans-note{margin:0;font-size:12px;color:#48604F;line-height:1.6}
 
@@ -378,7 +374,6 @@ a:hover{color:#0A1C12}
  .topbar .mono{font-size:10.5px;letter-spacing:.03em;white-space:nowrap}
  .ann-l,.ann-new{display:none}
  .ann-s{display:inline}
- .topbar .ann-trial{white-space:normal}
  .head-in{padding-top:10px;padding-bottom:10px;gap:10px}
  .site-head .logo{font-size:18px;gap:7px}
  .site-head .logo svg{width:26px;height:26px}

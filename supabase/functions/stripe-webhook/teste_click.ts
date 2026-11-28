@@ -62,14 +62,19 @@ export interface DepsTesteClick {
 export interface CompraTeste { email: string; sub: string; codigo: string; emTeste: boolean; telefone: string | null; loja: string | null; cartao: DadosCartao | null; ofertaTerminou?: boolean }
 
 export async function avaliarTesteClick(deps: DepsTesteClick, c: CompraTeste): Promise<{ teste: boolean; motivo: string | null; cobrado: boolean | null }> {
+  // Link sem teste (desde 2026-11-26 o link Click já não tem teste grátis): nada a decidir. Guarda só os últimos 4
+  // dígitos e o tipo do cartão (o admin mostra-os); a impressão digital do cartão, o telefone e a loja normalizados
+  // só serviam para "um teste por pessoa" e deixam de ser recolhidos.
+  if (!c.emTeste) {
+    await deps.guardar(c.email, { cartao_ultimos4: c.cartao?.last4 ?? null, cartao_tipo: c.cartao?.funding ?? null });
+    return { teste: false, motivo: null, cobrado: null };
+  }
   const telefone = normalizarTelefone(c.telefone), loja = normalizarLoja(c.loja);
   const impressao = c.cartao?.fingerprint && c.cartao.fingerprint.length >= 3 ? c.cartao.fingerprint : null;
   await deps.guardar(c.email, {
     cartao_ultimos4: c.cartao?.last4 ?? null, cartao_impressao: impressao, cartao_tipo: c.cartao?.funding ?? null,
     telefone_norm: telefone, loja_norm: loja,
   });
-  // Link sem teste (ou a subscrição já não está em teste): nada a decidir.
-  if (!c.emTeste) return { teste: false, motivo: null, cobrado: null };
 
   const valores: Array<{ tipo: TipoDado; valor: string }> = [];
   if (impressao) valores.push({ tipo: "cartao", valor: impressao });

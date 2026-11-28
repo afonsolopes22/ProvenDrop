@@ -117,6 +117,8 @@ Deno.test("compra sem teste (link antigo) → não reclama nada nem mexe na subs
   assertEquals(r.teste, false);
   assertEquals(b.usados.size, 0);
   assertEquals(b.fim, []);
+  // 2026-11-26 (link Click sem teste): só os últimos 4 e o tipo do cartão, para o admin; nada do anti-abuso do teste.
+  assertEquals(b.guardado, { cartao_ultimos4: "4242", cartao_tipo: "credit" });
 });
 
 Deno.test("dados curtos ou vazios nunca coincidem (não reclamam)", async () => {
