@@ -10,19 +10,30 @@
      1. short collection links from the Click WhatsApp message, provendrop.com/c/<id> (six characters, no 0/O/1/I),
         go to the member area as app.html?c=<id>, which opens that collection after sign-in; a /c/ link with a bad
         id just opens the member area;
-     2. any other path shows this "Page not found" page.
+     2. the member-area tab addresses (/today, /library, /preferences, /subscription) go to app.html?tab=<name>,
+        which opens that tab and puts the clean address back (2026-11-28);
+     3. any other path shows this "Page not found" page.
      Paths are absolute (/tailwind.css, /app.html) because this page is served at any depth. No CSP here (like the
      legal pages), so the small decision script lives inline and runs before the page paints. -->
 <script>
-  /* pdDestino(pathname) → "/app.html?c=<ID>" for /c/<valid id>, "/app.html" for any other /c/… path, null otherwise. */
+  /* pdDestino(pathname) → "/app.html?c=<ID>" for /c/<valid id>, "/app.html" for any other /c/… path,
+     "/app.html?tab=<name>" for the member-area tabs (/today, /library, /preferences, /subscription), null otherwise. */
   window.pdDestino = function(pathname){
+    var t = /^\/(today|library|preferences|subscription)\/?$/i.exec(String(pathname || ""));
+    if(t) return "/app.html?tab=" + t[1].toLowerCase();
     var m = /^\/c\/([^\/?#]*)\/?$/i.exec(String(pathname || ""));
     if(!m) return null;
     var id = "";
     try { id = decodeURIComponent(m[1]).trim().toUpperCase(); } catch(e) { id = ""; }
     return /^[A-HJ-NP-Z2-9]{6}$/.test(id) ? "/app.html?c=" + id : "/app.html";
   };
-  (function(){ var d = window.pdDestino(location.pathname); if(d) location.replace(d); })();
+  (function(){
+    var d = window.pdDestino(location.pathname);
+    if(!d) return;
+    /* A tab address keeps its own query (e.g. ?plano=ok back from Stripe) and fragment. */
+    if(/\?tab=/.test(d) && location.search) d += "&" + location.search.slice(1);
+    location.replace(d + location.hash);
+  })();
 </script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">

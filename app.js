@@ -130,6 +130,21 @@
     if(q.has("c")){ q.delete("c"); const qs = q.toString(); history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash); } }
   const esquecerC = () => { cPedido = null; try { sessionStorage.removeItem(C_KEY); } catch { /* private mode */ } };
 
+  /* ── addresses per tab (2026-11-28) ─────────────────────────────── */
+  /* Each tab has its own address, named like the menu: provendrop.com/today, /library, /preferences, /subscription.
+     GitHub Pages has no rewrites, so opening one of these directly lands on 404.html, which sends it here as
+     app.html?tab=<name>; the tab is read once, kept for after sign-in, and the address is set back with
+     history.pushState/replaceState in go(). The page itself is still app.html (sign-in links keep using it). */
+  const ROTAS = { hoje: "/today", arquivo: "/library", prefs: "/preferences", conta: "/subscription" };
+  const TAB_DA_ROTA = Object.fromEntries(Object.entries(ROTAS).map(([t, r]) => [r.slice(1), t]));
+  const tabDoCaminho = p => TAB_DA_ROTA[String(p || "").replace(/^\/+|\/+$/g, "").toLowerCase()] || null;
+  let tabPedida = tabDoCaminho(location.pathname), tabAtual = null;
+  { const q = new URLSearchParams(location.search), t = tabDoCaminho(q.get("tab"));
+    if(t) tabPedida = t;
+    if(q.has("tab")){ q.delete("tab"); const qs = q.toString(); history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash); } }
+  /* Reload without going through 404.html: back to app.html on the same tab. */
+  const recarregar = () => location.replace("/app.html" + (tabAtual && tabAtual !== "hoje" ? "?tab=" + ROTAS[tabAtual].slice(1) : ""));
+
   /* ── session ────────────────────────────────────────────────────── */
   /* Sign-in links from our e-mails carry ?token_hash=…&type=magiclink: they are only
      consumed here, by verifyOtp, so an e-mail scanner that opens the URL does not burn them. */
@@ -154,13 +169,13 @@
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return msg(m, "Enter a valid e-mail address.", "erro");
     b.disabled = true; msg(m, "Sending…");
     /* A pending /c/<id> rides along in the redirect so the magic link comes back to that collection. */
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname + (cPedido ? "?c=" + cPedido : ""), shouldCreateUser: false } });
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + "/app.html" + (cPedido ? "?c=" + cPedido : (tabPedida && tabPedida !== "hoje" ? "?tab=" + ROTAS[tabPedida].slice(1) : "")), shouldCreateUser: false } });
     b.disabled = false;
     /* S11: neutral answer, whether or not the e-mail has an account. */
     if(error && !/signup|not allowed|not found|user/i.test(error.message)) return msg(m, "The link could not be sent right now. Please try again in a minute.", "erro");
     msg(m, "If this e-mail has a ProvenDrop subscription, a sign-in link is on its way. Open it on this device. Check the spam folder too.");
   });
-  $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.hash = ""; location.reload(); });
+  $("#btnSair").addEventListener("click", async () => { await sb.auth.signOut(); location.replace("/app.html"); });
 
   /* Both paths may fire for the same session (INITIAL_SESSION and getSession); the area is entered once per user
      (2026-11-09: a second entrar() re-rendered the tables and lost the /c/<id> highlight). */
@@ -177,6 +192,7 @@
     sub = error ? null : data;
     if(!temAcesso(sub)) return semAcesso();
     show("vApp");
+    go(tabPedida || "hoje", "replace"); tabPedida = null;
     window.pdIdentify(user.id, { origem: sub?.origem || "" }); window.pdTrack("area_membros_entrada", { via_link_c: !!cPedido });
     renderPlano(); renderConta(); renderPrefsForm(); renderBarras(); renderAvisos(); renderCaixaClick(); renderTeste(); iniciarContagem();
     /* Someone arriving from a /c/<id> link came for that collection: the guide waits for a normal visit. */
@@ -223,13 +239,19 @@
 
   /* ── tabs ───────────────────────────────────────────────────────── */
   const paineis = { hoje:"#tHoje", arquivo:"#tArquivo", prefs:"#tPrefs", conta:"#tConta" };
-  function go(tab){
+  function go(tab, historico = "push"){
+    if(!paineis[tab]) tab = "hoje";
+    const rota = ROTAS[tab];
+    if(historico && location.pathname !== rota) history[historico === "replace" || !tabAtual ? "replaceState" : "pushState"](null, "", rota + location.search + location.hash);
+    tabAtual = tab;
     Object.entries(paineis).forEach(([k, s]) => { $(s).hidden = k !== tab; });
     document.querySelectorAll("#tabs [data-tab]").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
     if(tab === "arquivo"){ const t = emTeste(); $("#libTeste").hidden = !t; $("#arqBox").closest(".card").hidden = t; $("#barLib").hidden = t; if(!t && !verdes) carregarArquivo(); }
     scrollTo({ top: 0 });
   }
   $("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b) go(b.dataset.tab); });
+  /* Back/forward between tabs: the address already changed, only the panel follows. */
+  addEventListener("popstate", () => { const t = tabDoCaminho(location.pathname); if(t && !$("#vApp").hidden) go(t, false); });
   document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
 
   /* ── today ──────────────────────────────────────────────────────── */
@@ -263,11 +285,11 @@
     window.pdTrack("link_colecao_aberto", { id_curto: c });
     const linha = feedTodos.find(r => String(r.id_curto || "").toUpperCase() === c && visivel(r));
     const sel = `[data-c="${c}"]`;
-    if(!linha){ go("arquivo"); msg($("#msgArquivo"), "This collection is no longer available."); return; }
+    if(!linha){ go("arquivo", "replace"); msg($("#msgArquivo"), "This collection is no longer available."); return; }
     let tr = $("#tHoje " + sel);
-    if(tr) go("hoje");
+    if(tr) go("hoje", "replace");
     else {
-      go("arquivo");
+      go("arquivo", "replace");
       if(!verdes) await carregarArquivo();
       tr = $("#arqBox " + sel);
       if(!tr && !$("#fTodosWrap").hidden && !$("#fTodos").checked){ $("#fTodos").checked = true; renderArquivo(); tr = $("#arqBox " + sel); }
@@ -619,7 +641,7 @@
       const { data } = await sb.from("subscritores").select("estado").eq("user_id", user.id).maybeSingle();
       if(data && data.estado !== "teste") break;
     }
-    location.reload();
+    recarregar();
   });
 
   /* ── subscription ───────────────────────────────────────────────── */
