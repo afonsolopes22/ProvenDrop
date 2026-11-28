@@ -27,7 +27,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { botaoHtml, enviarEmails, esc, molde, type Mensagem } from "../_shared/email.ts";
 import { cronSecretOk } from "../_shared/auth.ts";
 import { semSegredos } from "../_shared/log.ts";
-import { aprovada as regraAprovada, cabecalho, dataPorExtenso, porqueFunciona } from "./estado.ts";
+import { aprovada as regraAprovada, cabecalho, dataPorExtenso, porqueFunciona, situacao } from "./estado.ts";
 // Títulos sem o nome da loja: o MESMO ficheiro que a área de membros carrega (/titulo.js, script clássico que
 // regista globalThis.pdLimparTitulo). Testes: ../_shared/titulo.test.ts.
 import "../../../titulo.js";
@@ -93,11 +93,11 @@ function anuncios(i: Item): string {
 const temKit = (i: Item) => i.kit_pronto === true || !!(i.zip_path || i.zip_url);
 
 function linhaTexto(i: Item): string {
-  const ok = aprovada(i);
+  const sit = situacao(i.estado, i.veredito), ok = sit === "aprovada";
   // título sem o nome da loja (titulo.js); igual ao nicho → uma só vez (estado.ts, cabecalho)
   const cab = cabecalho(limparTitulo(i.colecao, i.loja, i.link_colecao) || "Collection", nicho(i), mercado(i));
   const partes = [
-    ok ? "" : "under observation",
+    ok ? "" : sit === "nova" ? "new · confirmation tomorrow" : "under observation",
     anuncios(i),
     dias(i),
     k(i.alcance_eu),

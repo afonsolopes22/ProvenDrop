@@ -1,6 +1,6 @@
 // deno test supabase/functions/email-diario/estado.test.ts
 import { assertEquals } from "jsr:@std/assert@1";
-import { aprovada, cabecalho, dataPorExtenso, porqueFunciona } from "./estado.ts";
+import { aprovada, cabecalho, dataPorExtenso, porqueFunciona, situacao } from "./estado.ts";
 
 Deno.test("estado: as combinações reais do feed dão o mesmo que a área de membros", () => {
   // lista de 2026-11-10: a 1.ª a observar, as outras duas aprovadas (o e-mail mostrava as três com 🟡)
@@ -8,7 +8,7 @@ Deno.test("estado: as combinações reais do feed dão o mesmo que a área de me
   assertEquals(aprovada("continua a bater", "🟢 ANUNCIAR (GB)"), true);
   assertEquals(aprovada("continua a bater", "🟢 ANUNCIAR (IT)"), true);
   // restantes combinações que existem na tabela
-  assertEquals(aprovada("nova", "🟢 ANUNCIAR (DE)"), true);
+  assertEquals(aprovada("nova", "🟢 ANUNCIAR (DE)"), false); // 2026-11-17: "nova" nunca é Approved (confirmação amanhã)
   assertEquals(aprovada("aprovada", "🟢 ANUNCIAR (ES)"), true);
   assertEquals(aprovada("a observar", "🟡 OBSERVAR"), false);
 });
@@ -54,4 +54,17 @@ Deno.test("why it's working: frase limpa; nula, vazia ou só espaços não apare
   assertEquals(porqueFunciona(undefined), "");
   assertEquals(porqueFunciona(""), "");
   assertEquals(porqueFunciona(" \n\t "), "");
+});
+
+// 2026-11-17: uma coleção "nova" (confirmação amanhã) nunca aparece como Approved, mesmo com veredito 🟢:
+// mostra "New · confirmation tomorrow", a âmbar, como no WhatsApp.
+Deno.test("situação: nova > aprovada > a observar", () => {
+  assertEquals(situacao("nova", "🟢 ANUNCIAR (IT)"), "nova");
+  assertEquals(situacao("nova", "🟡 OBSERVAR"), "nova");
+  assertEquals(situacao("Nova", null), "nova");
+  assertEquals(situacao("aprovada", "🟢 ANUNCIAR (FR)"), "aprovada");
+  assertEquals(situacao("continua a bater", "🟢 ANUNCIAR (ES)"), "aprovada");
+  assertEquals(situacao(null, "🟢 ANUNCIAR (FR)"), "aprovada");
+  assertEquals(situacao("a observar", "🟡 OBSERVAR"), "observar");
+  assertEquals(situacao(null, null), "observar");
 });
