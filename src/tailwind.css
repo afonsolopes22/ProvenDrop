@@ -132,6 +132,13 @@
   .dt { @apply w-full border-collapse text-[14px]; }
   .dt th { @apply whitespace-nowrap border-b border-line px-3 py-3 text-left font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-3; }
   .dt td { @apply border-b border-line px-3 py-3.5 align-top text-ink; }
+  /* Library: sortable headers (buttons with aria-sort on the th). */
+  .th-ord { display: inline-flex; align-items: center; gap: 3px; border: 0; background: none; padding: 0; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+  .th-ord:hover { color: var(--color-ink); }
+  .th-ord:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; border-radius: 2px; }
+  .th-ord .seta { font-size: 9px; opacity: 0.35; }
+  .th-ord.on { color: var(--color-ink); }
+  .th-ord.on .seta { opacity: 1; }
   .dt tbody tr:last-child td { @apply border-b-0; }
   .dt tbody tr { @apply transition-colors duration-150 hover:bg-page; }
   .dt tr > :first-child { @apply pl-0; }
@@ -153,6 +160,8 @@
   .dt-dark tr.hit > td { @apply bg-lime/10; }
   @media (max-width: 767px) {
     .dt thead { @apply sr-only; }
+    /* the hidden header (screen readers only) is absolute: kept inside the table, so it no longer widens the page by ~9 px */
+    .dt { position: relative; overflow: hidden; }
     .dt, .dt tbody, .dt tr, .dt td { @apply block w-full; }
     /* one card per row */
     .dt tbody { @apply grid gap-3; }

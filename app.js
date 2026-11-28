@@ -530,6 +530,49 @@
     return [...porChave.values()].sort((a, b) => ((b.ainda_a_anunciar === true) - (a.ainda_a_anunciar === true)) || ((Number(b.score) || 0) - (Number(a.score) || 0)) || String(b.enviado_em||"").localeCompare(String(a.enviado_em||"")));
   }
   ["#fNicho","#fPais","#fPlat","#fAtivas","#fTodos"].forEach(s => $(s).addEventListener("change", renderArquivo));
+
+  /* ── Library order by column (2026-11-28) ───────────────────────── */
+  /* Every header is a button with aria-sort. 1st click: biggest / newest first (A→Z for the two text columns);
+     2nd click: the other way. Applied after the filters; until a column is chosen the old order stays (your niches
+     first, then still advertising and score). The choice is kept in localStorage. Rows without a value go last in
+     both directions (Reach: "Not public", "Google ads · reach not public" and no Meta data). Phones use #fOrdem. */
+  const ORD_KEY = "pd_lib_ordem";
+  const ORD_COLS = {
+    sent:       { txt: false, v: r => { const d = parse(r.enviado_em); return d ? d.getTime() : null; } },
+    status:     { txt: false, v: r => ({ aprovada: 2, observar: 1 })[situacao(r)] ?? 0 },
+    collection: { txt: true,  v: r => titulo(r).toLowerCase() },
+    niche:      { txt: true,  v: r => (nicho(r.nicho) + " " + pais(r.mercado_destaque)).trim().toLowerCase() || null },
+    score:      { txt: false, v: r => r.score == null || r.score === "" || !Number.isFinite(Number(r.score)) ? null : Number(r.score) },
+    ads:        { txt: false, v: r => { const a = r.anuncios_ultima_verificacao != null ? r.anuncios_ultima_verificacao : r.anuncios_ativos; return a == null || a === "" ? null : Number(a); } },
+    reach:      { txt: false, v: r => { const a = r.alcance_eu == null || r.alcance_eu === "" ? 0 : Number(r.alcance_eu); return a > 0 ? a : null; } },
+    days:       { txt: false, v: r => { const n = diasAgora(r); return n != null ? n : (r.dias_ativo == null || r.dias_ativo === "" ? null : Number(r.dias_ativo)); } },
+  };
+  let ordemLib = null;   // { col, dir: "asc" | "desc" } or null (default order)
+  try { const o = JSON.parse(localStorage.getItem(ORD_KEY) || "null"); if(o && ORD_COLS[o.col] && (o.dir === "asc" || o.dir === "desc")) ordemLib = o; } catch { /* private mode */ }
+  function guardarOrdem(){ try { ordemLib ? localStorage.setItem(ORD_KEY, JSON.stringify(ordemLib)) : localStorage.removeItem(ORD_KEY); } catch { /* private mode */ } }
+  function ordenarLib(rows){
+    if(!ordemLib) return rows;
+    const c = ORD_COLS[ordemLib.col], s = ordemLib.dir === "asc" ? 1 : -1;
+    const k = rows.map((r, i) => ({ r, i, v: c.v(r) }));
+    k.sort((a, b) => {
+      if(a.v == null || b.v == null) return (a.v == null) - (b.v == null) || a.i - b.i;   // no value: always last
+      const d = c.txt ? String(a.v).localeCompare(String(b.v), "en", { sensitivity: "base" }) : a.v - b.v;
+      return d ? s * d : a.i - b.i;
+    });
+    return k.map(x => x.r);
+  }
+  /* First click on a column: newest / biggest first (A→Z for text); the same column again: the other way. */
+  function escolherOrdem(col){
+    const prim = ORD_COLS[col].txt ? "asc" : "desc";
+    ordemLib = ordemLib && ordemLib.col === col ? { col, dir: ordemLib.dir === "asc" ? "desc" : "asc" } : { col, dir: prim };
+    guardarOrdem(); renderArquivo();
+    requestAnimationFrame(() => $(`#arqBox [data-ord="${col}"]`)?.focus({ preventScroll: true }));
+  }
+  const SETAS = { asc: "▲", desc: "▼", none: "↕" };
+  const cab = (col, rotulo, cls, titulo) => { const at = ordemLib && ordemLib.col === col ? ordemLib.dir : "none";
+    return `<th${cls ? ` class="${cls}"` : ""} aria-sort="${at === "asc" ? "ascending" : at === "desc" ? "descending" : "none"}"${titulo ? ` title="${titulo}"` : ""}><button class="th-ord${at !== "none" ? " on" : ""}" type="button" data-ord="${col}">${rotulo}<span class="seta" aria-hidden="true">${SETAS[at]}</span></button></th>`; };
+  document.addEventListener("click", e => { const b = e.target.closest("#arqBox [data-ord]"); if(b) escolherOrdem(b.dataset.ord); });
+  $("#fOrdem").addEventListener("change", e => { const [col, dir] = String(e.target.value).split(":"); ordemLib = ORD_COLS[col] ? { col, dir } : null; guardarOrdem(); renderArquivo(); });
   /* Library and your niches (2026-11-08): with niches chosen, only those are listed until "Show all" is ticked; with
      "Show all" (or no niches) every collection is listed, yours first. */
   const prefNichos = () => new Set((sub?.nichos||[]).map(s => s.toLowerCase()));
@@ -541,12 +584,14 @@
     const n = $("#fNicho").value, p = $("#fPais").value, pl = $("#fPlat").value, so = $("#fAtivas").checked;
     const temPref = prefNichos().size > 0, todos = !temPref || $("#fTodos").checked;
     $("#fTodosWrap").hidden = !temPref;
-    const rows = biblioteca().filter(r => (todos || ehPref(r)) && (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true))
-      .sort((a, b) => ehPref(b) - ehPref(a));   /* stable: keeps "still advertising, then score" inside each group */
+    const filtradas = biblioteca().filter(r => (todos || ehPref(r)) && (!n || r.nicho === n) && (!p || String(r.mercado_destaque||"").toUpperCase() === p) && plataformaOk(r, pl) && (!so || r.ainda_a_anunciar === true));
+    /* A chosen column replaces the default order; otherwise your niches first (stable: keeps "still advertising, then score"). */
+    const rows = ordemLib ? ordenarLib(filtradas) : filtradas.sort((a, b) => ehPref(b) - ehPref(a));
+    $("#fOrdem").value = ordemLib ? `${ordemLib.col}:${ordemLib.dir}` : "";
     if(!rows.length){ $("#arqBox").innerHTML = `<div class="empty" style="border:0">${temPref && !todos ? "No collections in your niches match these filters. Tick “Show all” to see the other niches." : "No collections match these filters."}</div>`; return; }
     /* Same shape as the daily table so the whole row fits at 1280 without horizontal scroll (2026-11-08): the kit
        under the collection name, platform chips and "still advertising" under the status, market under the niche. */
-    $("#arqBox").innerHTML = `<table class="dt"><thead><tr><th>Sent</th><th>Status</th><th>Collection · kit</th><th>Niche · market</th><th class="text-right">Score</th><th class="text-right" title="Active ads when sent, on Google, at the last check">Ads</th><th class="text-right" title="Meta reach">Reach</th><th class="text-right" title="Days advertising">Days</th></tr></thead><tbody>${rows.map(r => {
+    $("#arqBox").innerHTML = `<table class="dt"><thead><tr>${cab("sent", "Sent")}${cab("status", "Status")}${cab("collection", "Collection · kit")}${cab("niche", "Niche · market")}${cab("score", "Score", "text-right")}${cab("ads", "Ads", "text-right", "Active ads when sent, on Google, at the last check")}${cab("reach", "Reach", "text-right", "Meta reach")}${cab("days", "Days", "text-right", "Days advertising")}</tr></thead><tbody>${rows.map(r => {
       const ok = aprovada(r), lk = ligacao(r), an = analisado(r), mk = String(r.mercado_destaque||"").toUpperCase(), sc = scoreMercado(r);
       const kit = temKit(r) ? botaoKit(r, "Download Launch Kit") : `<span class="sub">No kit for this one</span>`;
       const ainda = r.ainda_a_anunciar === true ? `<span class="sub mt-2 font-semibold !text-ok">Still advertising</span>` : r.ainda_a_anunciar === false ? `<span class="sub mt-2">No longer advertising</span>` : "";
