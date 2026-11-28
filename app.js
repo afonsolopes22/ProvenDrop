@@ -109,7 +109,7 @@
   const ehClick = s => s?.origem === "click";
   const temAcesso = s => !!s && !s.bloqueado_em && (s.origem === "direto" || (ehClick(s) && s.estado_click === "validado")) && (s.estado === "ativo" || s.estado === "teste" || (s.estado === "em_atraso" && diasAtraso(s) != null && diasAtraso(s) < TOLERANCIA_DIAS));
 
-  const views = ["vConfig","vLogin","vSemAcesso","vApp"];
+  const views = ["vConfig","vLogin","vPreview","vSemAcesso","vApp"];
   function show(id){ views.forEach(v => { $("#"+v).hidden = v !== id; }); const app = id === "vApp"; $("#tabs").hidden = !app; }
   function msg(el, texto, tipo){ el.textContent = texto; el.className = "msg" + (tipo ? " "+tipo : ""); el.hidden = !texto; }
 
@@ -192,7 +192,7 @@
   const CAMPOS = "email,origem,estado,estado_click,nichos,paises,guia_visto,criado_em,em_atraso_desde,acesso_fim,bloqueado_em,boas_vindas_em,teste_fim";
   async function entrar(session){
     user = session?.user || null;
-    if(!user){ sub = null; $("#who").hidden = true; show("vLogin"); return; }
+    if(!user){ sub = null; $("#who").hidden = true; if(cPedido && !previewFechada) return mostrarPreview(cPedido); show("vLogin"); return; }
     $("#whoEmail").textContent = user.email || ""; $("#who").hidden = false;
     const { data, error } = await sb.from("subscritores").select(CAMPOS).eq("user_id", user.id).maybeSingle();
     sub = error ? null : data;
@@ -279,6 +279,56 @@
     if(verdes) renderArquivo();
     return true;
   }
+
+  /* ── public preview of a /c/<id> collection (2026-11-28) ───────────── */
+  /* Someone who opens a /c/<id> link from the Click group without a session sees a preview of that collection
+     instead of the sign-in (PostHog: they landed on the sign-in, had no account and left). The data comes from
+     colecao_publica() (migration 0019): only safe fields, never the store, its domain, the collection link or the kit;
+     the title and the "Why it's working" sentence come back null when they name the store. feed_dia itself stays
+     closed to anonymous visitors (RLS). Without 0019 (or on any error) the page falls back to the sign-in, as before.
+     "Already a member? Sign in" keeps the id (sessionStorage + magic-link redirect), so the collection opens after it. */
+  let previewFechada = false, previewEmCurso = null;
+  function mostrarPreview(c){
+    if(previewEmCurso) return previewEmCurso;
+    previewEmCurso = (async () => {
+      let r = null;
+      try {
+        const { data, error } = await sb.rpc("colecao_publica", { p_id: c });
+        if(error) throw error;
+        r = data;
+      } catch { previewEmCurso = null; show("vLogin"); return; }
+      if(user) return;                                   // signed in meanwhile: the area takes over
+      const disponivel = !!(r && r.id_curto);
+      $("#prevTitulo").textContent = disponivel ? "A collection that is selling right now" : "This collection is no longer available";
+      $("#prevTexto").textContent = disponivel
+        ? "Members see the store, the collection link and a ready-to-launch kit for every collection in the daily list."
+        : "Collections leave the list when they stop working. Members get new ones every morning, each with the store and a ready-to-launch kit.";
+      $("#prevCartao").innerHTML = disponivel ? cartaoPublico(r) : "";
+      show("vPreview");
+      window.pdTrack("colecao_preview_vista", { id_curto: c, disponivel });
+    })();
+    return previewEmCurso;
+  }
+  /* The member card without the kit and the store button. The heading is the product type (from the "Why it's working"
+     sentence) or the niche: the exact collection title is for members only. The photo is a 32×24 thumbnail from the
+     colecao-foto Edge Function, blown up with a strong blur; the original's address never reaches the page. */
+  const FN_FOTO = SB_URL.replace(/\/+$/, "") + "/functions/v1/colecao-foto?c=";
+  function cartaoPublico(r){
+    const ok = aprovada(r), mk = String(r.mercado_destaque||"").toUpperCase(), [adsL, adsV, adsT] = kpiAds(r);
+    const t = String(r.tipo || "").trim() || nicho(r.nicho);
+    const foto = r.tem_foto && C_RE.test(String(r.id_curto || "")) ? `<span class="prev-recorte"><img class="prev-blur" src="${FN_FOTO + esc(r.id_curto)}" alt="" decoding="async" data-foto></span><span class="prev-selo">Members see the full photo</span>` : "";
+    return `<article class="cc">
+      <div class="cc-photo"><span class="cc-ph">${iconeNicho(r)}</span>${foto}<span class="cc-status ${ok ? "ok" : "obs"}"><i></i>${rotulo(r, "Under observation")}</span>${chips(r, "cc-plats")}${anel(r, ok)}</div>
+      <div class="cc-body">
+        <div class="cc-title"><h3>${esc(t)}</h3><span>${esc(nicho(r.nicho))}${mk ? ` · best in ${esc(emPais(mk))}` : ""}</span></div>
+        ${blocoPorque(r)}
+        <dl class="cc-kpis"><div${adsT ? ` title="${esc(adsT)}"` : ""}><dt>${adsL}</dt><dd>${adsV}</dd></div><div><dt>Days live</dt><dd>${kpiDias(r)}</dd></div><div><dt>Reach</dt>${kpiAlcance(r)}</div></dl>
+        <p class="cc-sub">Score <b>${score(r.score)}</b> out of 10${mk ? ` · strongest market: ${esc(pais(mk))}` : ""}</p>
+      </div>
+    </article>`;
+  }
+  $("#prevEntrar").addEventListener("click", () => { previewFechada = true; window.pdTrack("preview_sign_in_click", { id_curto: cPedido || "" }); show("vLogin"); $("#email").focus(); });
+  $("#prevAcesso").addEventListener("click", () => { window.pdTrack("preview_get_access_click", { id_curto: cPedido || "" }); });
 
   /* Attribute for /c/<id>: lets abrirColecao() find a collection in Today (card or "From your library" row) or in the Library table. */
   const attrC = r => C_RE.test(String(r.id_curto || "")) ? ` data-c="${esc(r.id_curto)}"` : "";
